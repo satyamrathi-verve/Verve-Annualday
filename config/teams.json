@@ -1,0 +1,36 @@
+[
+  {
+    "id": "aurora",
+    "name": "Team Aurora",
+    "color": "#2f6bff",
+    "memberIds": [
+      "aria.menon",
+      "dev.iyer",
+      "sana.kapoor",
+      "rohan.pillai",
+      "meera.joshi",
+      "kabir.shah",
+      "tara.nair",
+      "arjun.reddy",
+      "nisha.verma",
+      "faiz.khan",
+      "priya.desai",
+      "sameer.gupta"
+    ]
+  },
+  {
+    "id": "nimbus",
+    "name": "Team Nimbus",
+    "color": "#e0a436",
+    "memberIds": [
+      "lina.fernandes",
+      "vikram.rao",
+      "anika.bose",
+      "karthik.nambiar",
+      "ria.malhotra",
+      "omar.sheikh",
+      "divya.krishnan",
+      "aditya.saxena"
+    ]
+  }
+]

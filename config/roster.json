@@ -1,0 +1,242 @@
+[
+  {
+    "id": "aria.menon",
+    "displayName": "Aria Menon",
+    "dailyGroup": "Finance",
+    "teamId": "aurora",
+    "isManager": true,
+    "clues": {
+      "hobbies": ["Competitive Scrabble", "Bakes sourdough every weekend"],
+      "quirks": ["Colour-codes absolutely everything"],
+      "funFacts": ["Once recited pi to 100 digits at a friend's wedding"]
+    }
+  },
+  {
+    "id": "dev.iyer",
+    "displayName": "Dev Iyer",
+    "dailyGroup": "IT",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Builds custom mechanical keyboards", "Trail running"],
+      "quirks": ["Names his houseplants after famous auditors"],
+      "funFacts": ["Trekked to Everest Base Camp last winter"]
+    }
+  },
+  {
+    "id": "sana.kapoor",
+    "displayName": "Sana Kapoor",
+    "dailyGroup": "HR",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Salsa dancing", "Wheel-throwing pottery"],
+      "quirks": ["Always carries exactly three pens"],
+      "funFacts": ["Was a national-level swimmer in school"]
+    }
+  },
+  {
+    "id": "rohan.pillai",
+    "displayName": "Rohan Pillai",
+    "dailyGroup": "Operations",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Cooks a legendary Kerala fish curry", "Long-distance cycling"],
+      "quirks": ["Point-blank refuses to take the elevator"],
+      "funFacts": ["Can solve a Rubik's cube one-handed"]
+    }
+  },
+  {
+    "id": "meera.joshi",
+    "displayName": "Meera Joshi",
+    "dailyGroup": "Finance",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Birdwatching", "Watercolour painting"],
+      "quirks": ["Hums softly while reconciling ledgers"],
+      "funFacts": ["Has visited 19 national parks"]
+    }
+  },
+  {
+    "id": "kabir.shah",
+    "displayName": "Kabir Shah",
+    "dailyGroup": "IT",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Collects retro video games", "Brews his own kombucha"],
+      "quirks": ["Keeps a rubber duck on his desk for debugging"],
+      "funFacts": ["Once spent an afternoon with a llama farmer on a road trip"]
+    }
+  },
+  {
+    "id": "tara.nair",
+    "displayName": "Tara Nair",
+    "dailyGroup": "HR",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Does stand-up comedy open mics", "Knitting"],
+      "quirks": ["Always laughs at her own jokes first"],
+      "funFacts": ["Once interviewed a Bollywood actor for a college magazine"]
+    }
+  },
+  {
+    "id": "arjun.reddy",
+    "displayName": "Arjun Reddy",
+    "dailyGroup": "Operations",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Marathon running", "Plays chess online at 2am"],
+      "quirks": ["Drinks exactly four cups of chai a day, never five"],
+      "funFacts": ["Has run the Mumbai marathon twice"]
+    }
+  },
+  {
+    "id": "nisha.verma",
+    "displayName": "Nisha Verma",
+    "dailyGroup": "Finance",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Makes her own hot sauce", "Balcony gardening"],
+      "quirks": ["Labels her tupperware with the date AND the time"],
+      "funFacts": ["Grew a chilli so hot a colleague teared up tasting it"]
+    }
+  },
+  {
+    "id": "faiz.khan",
+    "displayName": "Faiz Khan",
+    "dailyGroup": "IT",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Astrophotography", "Flying camera drones"],
+      "quirks": ["Works a Star Wars quote into every standup"],
+      "funFacts": ["Photographed a total solar eclipse from a rooftop"]
+    }
+  },
+  {
+    "id": "priya.desai",
+    "displayName": "Priya Desai",
+    "dailyGroup": "HR",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Trained Bharatanatyam dancer", "Daily journaling"],
+      "quirks": ["Carries a tiny notebook everywhere she goes"],
+      "funFacts": ["Performed classical dance on stage for 12 years"]
+    }
+  },
+  {
+    "id": "sameer.gupta",
+    "displayName": "Sameer Gupta",
+    "dailyGroup": "Operations",
+    "teamId": "aurora",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Woodworking", "Collects jazz vinyl"],
+      "quirks": ["Is always early by exactly ten minutes"],
+      "funFacts": ["Built his own dining table from scratch"]
+    }
+  },
+  {
+    "id": "lina.fernandes",
+    "displayName": "Lina Fernandes",
+    "dailyGroup": "HR",
+    "teamId": "nimbus",
+    "isManager": true,
+    "clues": {
+      "hobbies": ["Scuba diving", "Bakes finicky French macarons"],
+      "quirks": ["Colour-codes her calendar by mood"],
+      "funFacts": ["Dived with reef sharks in the Andamans"]
+    }
+  },
+  {
+    "id": "vikram.rao",
+    "displayName": "Vikram Rao",
+    "dailyGroup": "Finance",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Runs a fantasy cricket league", "Weekend hiking"],
+      "quirks": ["Narrates spreadsheet formulas out loud"],
+      "funFacts": ["Has a cricket statistic ready for any occasion"]
+    }
+  },
+  {
+    "id": "anika.bose",
+    "displayName": "Anika Bose",
+    "dailyGroup": "IT",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Generative art", "Indoor rock climbing"],
+      "quirks": ["Her laptop stickers tell a whole story"],
+      "funFacts": ["Coded a bot that orders her lunch automatically"]
+    }
+  },
+  {
+    "id": "karthik.nambiar",
+    "displayName": "Karthik Nambiar",
+    "dailyGroup": "Operations",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Motorcycle touring", "Street photography"],
+      "quirks": ["Guards a thermos of South Indian filter coffee"],
+      "funFacts": ["Rode solo from Bangalore to Leh"]
+    }
+  },
+  {
+    "id": "ria.malhotra",
+    "displayName": "Ria Malhotra",
+    "dailyGroup": "Finance",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Ballet", "True-crime podcasts"],
+      "quirks": ["Always finishes the office crossword first"],
+      "funFacts": ["Once won a pub quiz almost single-handed"]
+    }
+  },
+  {
+    "id": "omar.sheikh",
+    "displayName": "Omar Sheikh",
+    "dailyGroup": "HR",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Calligraphy", "Five-a-side football"],
+      "quirks": ["Doodles in the margins of every meeting"],
+      "funFacts": ["Loyally supports a club that hasn't won in 30 years"]
+    }
+  },
+  {
+    "id": "divya.krishnan",
+    "displayName": "Divya Krishnan",
+    "dailyGroup": "IT",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Aquascaping", "Baking artisan bread"],
+      "quirks": ["Has full conversations with her fish"],
+      "funFacts": ["Keeps a planted aquarium full of tiny shrimp"]
+    }
+  },
+  {
+    "id": "aditya.saxena",
+    "displayName": "Aditya Saxena",
+    "dailyGroup": "Operations",
+    "teamId": "nimbus",
+    "isManager": false,
+    "clues": {
+      "hobbies": ["Himalayan trekking", "Sketching hand-drawn maps"],
+      "quirks": ["Carries a tiny compass keychain"],
+      "funFacts": ["Has trekked across five Himalayan states"]
+    }
+  }
+]

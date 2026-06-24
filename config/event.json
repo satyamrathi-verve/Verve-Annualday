@@ -1,0 +1,51 @@
+{
+  "eventName": "Operation Getaway",
+  "edition": "Verve Advisory · Anniversary 2026",
+  "landing": {
+    "eyebrow": "A transmission reached you",
+    "title": "Operation Getaway",
+    "subtitle": "The courier found you. The portal is open. Somewhere in this firm your crew is waiting — scattered, scrambled, hiding in plain sight. Time to assemble.",
+    "cta": "Begin the mission"
+  },
+  "vibe": {
+    "eyebrow": "Before anything serious",
+    "title": "Quick vibe check. No wrong answers, promise.",
+    "subtitle": "The door is right there. First, tell us what kind of adventurer showed up today.",
+    "questions": [
+      {
+        "id": "movie",
+        "prompt": "If this were a movie, it's a…",
+        "options": ["Heist caper", "Slow-burn mystery", "Comedy that escalates", "Epic road trip"]
+      },
+      {
+        "id": "fuel",
+        "prompt": "Your expedition fuel is…",
+        "options": ["Strong black coffee", "Chai, obviously", "Pure adrenaline", "Snacks. So many snacks."]
+      }
+    ],
+    "cta": "Open the door"
+  },
+  "signIn": {
+    "eyebrow": "Step one · who goes there",
+    "title": "Sign in to begin.",
+    "subtitle": "It just tells the mission who you are — so we can point you to your crew. No passwords today.",
+    "googleLabel": "Continue with Verve Google",
+    "pickLabel": "Demo mode · pick your name to step in"
+  },
+  "brief": {
+    "eyebrow": "Eyes only · plays once",
+    "captain": "Captain Wanderlust",
+    "title": "If you choose to accept it.",
+    "videoLabel": "Captain Wanderlust · the briefing",
+    "quote": "Listen closely, recruit. Your crew isn't who you sit with every day — I've scrambled finance, HR, ops and IT into something new. You'll find them not by their desk, but by what makes them them. The quirks. The hobbies. The little legends. Light up every canister on your wheel, and the real adventure begins.",
+    "cta": "Find my crew"
+  },
+  "guess": {
+    "eyebrow": "Stage one · assemble",
+    "title": "Guess your crew.",
+    "subtitle": "Each clue describes one of your teammates. Match it to the right colleague — every correct call lights a canister on your team's wheel, live, for everyone.",
+    "distractorCount": 6,
+    "completeTitle": "Crew assembled.",
+    "completeSubtitle": "Your wheel is whole and the centre is lit. Stand by, recruit — the next transmission is already on its way."
+  }
+}
