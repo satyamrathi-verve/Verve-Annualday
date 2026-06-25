@@ -28,8 +28,29 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/*
+  Testing switch: when NEXT_PUBLIC_ALLOW_DEMO=1, visiting the app with `?demo`
+  forces the mock name picker (impersonate any teammate — no Google needed) and
+  remembers it; `?demo=off` clears it. Lets one deployment serve both real
+  Google sign-in and no-login testing. Set NEXT_PUBLIC_ALLOW_DEMO=0 for the event.
+*/
+function demoModeOverride(): AuthMode | undefined {
+  if (typeof window === "undefined") return undefined;
+  if (process.env.NEXT_PUBLIC_ALLOW_DEMO !== "1") return undefined;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("demo") === "off") {
+    window.localStorage.removeItem("getaway.demo");
+    return undefined;
+  }
+  if (params.has("demo")) {
+    window.localStorage.setItem("getaway.demo", "1");
+    return "mock";
+  }
+  return window.localStorage.getItem("getaway.demo") === "1" ? "mock" : undefined;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [backend] = useState(() => getAuthBackend());
+  const [backend] = useState(() => getAuthBackend(demoModeOverride()));
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
 

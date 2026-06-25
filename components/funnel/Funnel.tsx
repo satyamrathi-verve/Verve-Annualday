@@ -25,7 +25,7 @@ export function Funnel() {
   // Wait for the persisted/auth session check before rendering the funnel. This
   // also means the resume-from-storage below runs only on the client (after the
   // OAuth redirect returns), so there's no hydration mismatch.
-  const { ready, session } = useAuth();
+  const { ready, session, mode } = useAuth();
   if (!ready) {
     return (
       <div className="grid min-h-dvh place-items-center">
@@ -35,9 +35,21 @@ export function Funnel() {
       </div>
     );
   }
-  // Super admins skip the funnel entirely and get the live all-teams dashboard.
-  if (session?.isSuperAdmin) return <AdminDashboard />;
-  return <FunnelInner />;
+  return (
+    <>
+      {mode === "mock" && <DemoBadge />}
+      {/* Super admins skip the funnel and get the live all-teams dashboard. */}
+      {session?.isSuperAdmin ? <AdminDashboard /> : <FunnelInner />}
+    </>
+  );
+}
+
+function DemoBadge() {
+  return (
+    <div className="fixed bottom-4 left-4 z-50 rounded-full border border-gold/50 bg-gold-soft px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-gold-deep shadow-[0_8px_20px_-12px_rgba(224,164,54,0.8)]">
+      🧪 demo mode · pick any name
+    </div>
+  );
 }
 
 function FunnelInner() {
