@@ -8,32 +8,7 @@ export function Landing({ onNext }: { onNext: () => void }) {
   const c = event.landing;
 
   return (
-    <div className="flex w-full max-w-2xl flex-col items-center text-center">
-      {/* Courier transmission motif */}
-      <motion.div
-        initial={{ opacity: 0, rotate: -3, y: 10 }}
-        animate={{ opacity: 1, rotate: -2, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="surface-card mb-8 w-72 max-w-[85vw] rounded-2xl p-4 text-left"
-      >
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="eyebrow">Courier drop</p>
-            <p className="mt-1 font-mono text-[11px] leading-relaxed text-muted">
-              TO: A trusted recruit
-              <br />
-              RE: {event.eventName}
-            </p>
-          </div>
-          <div className="grid h-12 w-10 place-items-center rounded border border-dashed border-gold font-mono text-[10px] text-gold-deep">
-            VRV
-          </div>
-        </div>
-        <div className="mt-3 border-t border-line pt-2 font-mono text-[10px] tracking-wider text-faint">
-          ▸ PORTAL UNLOCKED · PROCEED
-        </div>
-      </motion.div>
-
+    <div className="flex w-full max-w-3xl flex-col items-center text-center lg:max-w-4xl">
       <motion.p
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -47,7 +22,7 @@ export function Landing({ onNext }: { onNext: () => void }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.22, duration: 0.5 }}
-        className="mt-3 bg-gradient-to-br from-verve to-gold bg-clip-text font-display text-5xl font-extrabold leading-[1.04] tracking-tight text-transparent sm:text-6xl"
+        className="mt-3 bg-gradient-to-br from-verve to-gold bg-clip-text font-display text-5xl font-extrabold leading-[1.04] tracking-tight text-transparent sm:text-6xl lg:text-7xl xl:text-8xl"
       >
         {c.title}
       </motion.h1>
@@ -55,8 +30,17 @@ export function Landing({ onNext }: { onNext: () => void }) {
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.32 }}
-        className="mt-5 max-w-xl text-[15px] leading-relaxed text-muted"
+        transition={{ delay: 0.3 }}
+        className="mt-5 max-w-2xl font-display text-lg font-semibold leading-snug text-navy sm:text-xl lg:text-2xl"
+      >
+        {c.tagline}
+      </motion.p>
+
+      <motion.p
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.38 }}
+        className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg lg:text-xl"
       >
         {c.subtitle}
       </motion.p>
@@ -64,8 +48,8 @@ export function Landing({ onNext }: { onNext: () => void }) {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.42 }}
-        className="mt-9"
+        transition={{ delay: 0.46 }}
+        className="mt-10"
       >
         <Button variant="gold" onClick={onNext}>
           {c.cta} →

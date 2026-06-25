@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
-  Operation Getaway — permanent LIGHT Verve theme.
+  Operation Prompt & Co. — permanent LIGHT Verve theme.
   No dark mode, no "dark=X / light=Y" metaphor. Clean, bright, professional.
   Palette: Verve blue #2F6BFF, gold #E0A436, deep navy #0E1A33 on white/very-light.
 */
@@ -49,7 +49,7 @@ body {
 /* Thin "mission" eyebrow label, monospace + tracked-out */
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.95rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--color-gold-deep);

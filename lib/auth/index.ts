@@ -1,22 +1,25 @@
+import { GoogleAuthBackend } from "./googleBackend";
+import { EmailAuthBackend } from "./emailBackend";
 import { MockAuthBackend } from "./mockBackend";
 import type { AuthBackend } from "./types";
 
 /*
-  Factory: chooses the auth backend by env. Default is the mock.
-  Phase 2: add lib/auth/googleBackend.ts implementing AuthBackend, then set
-  NEXT_PUBLIC_AUTH_MODE=google. Nothing in the UI changes.
+  Factory: chooses the auth backend by env (NEXT_PUBLIC_AUTH_MODE).
+    "google" (default) — real Google sign-in via Supabase. Free, no email.
+    "email"            — Supabase email OTP (needs SMTP for volume).
+    "mock"             — synthetic name picker, for offline demos.
 */
 export function getAuthBackend(): AuthBackend {
-  const mode = process.env.NEXT_PUBLIC_AUTH_MODE ?? "mock";
+  const mode = process.env.NEXT_PUBLIC_AUTH_MODE ?? "google";
   switch (mode) {
-    case "google":
-      throw new Error(
-        "NEXT_PUBLIC_AUTH_MODE=google is not implemented yet — add lib/auth/googleBackend.ts.",
-      );
     case "mock":
-    default:
       return new MockAuthBackend();
+    case "email":
+      return new EmailAuthBackend();
+    case "google":
+    default:
+      return new GoogleAuthBackend();
   }
 }
 
-export type { AuthBackend, Session } from "./types";
+export type { AuthBackend, AuthMode, Session } from "./types";

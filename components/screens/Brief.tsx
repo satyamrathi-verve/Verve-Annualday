@@ -10,7 +10,7 @@ export function Brief({ onNext }: { onNext: () => void }) {
   const [played, setPlayed] = useState(false);
 
   return (
-    <div className="flex w-full max-w-2xl flex-col items-center text-center">
+    <div className="flex w-full max-w-3xl flex-col items-center text-center">
       <p className="eyebrow">{c.eyebrow}</p>
 
       {/* Video placeholder — drop in the founder/host clip here later */}
@@ -18,7 +18,7 @@ export function Brief({ onNext }: { onNext: () => void }) {
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="surface-card relative mt-5 grid aspect-video w-full max-w-xl place-items-center overflow-hidden rounded-2xl"
+        className="surface-card relative mt-5 grid aspect-video w-full max-w-2xl place-items-center overflow-hidden rounded-2xl"
       >
         <div className="absolute left-4 top-3 flex items-center gap-2 font-mono text-[10px] tracking-widest text-gold-deep">
           <span className="h-2 w-2 animate-pulse rounded-full bg-gold" />
@@ -40,11 +40,11 @@ export function Brief({ onNext }: { onNext: () => void }) {
         </p>
       </motion.div>
 
-      <h1 className="mt-7 font-display text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl">
+      <h1 className="mt-7 font-display text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
         {c.title}
       </h1>
 
-      <blockquote className="mt-5 max-w-xl border-l-2 border-gold pl-4 text-left font-mono text-[13px] leading-relaxed text-muted">
+      <blockquote className="mt-5 max-w-2xl border-l-2 border-gold pl-4 text-left font-mono text-sm leading-relaxed text-muted lg:text-base">
         {c.quote}
       </blockquote>
 

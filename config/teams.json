@@ -1,36 +1,136 @@
 [
   {
-    "id": "aurora",
-    "name": "Team Aurora",
+    "id": "team1",
+    "name": "Team 1",
     "color": "#2f6bff",
     "memberIds": [
-      "aria.menon",
-      "dev.iyer",
-      "sana.kapoor",
-      "rohan.pillai",
-      "meera.joshi",
-      "kabir.shah",
-      "tara.nair",
-      "arjun.reddy",
-      "nisha.verma",
-      "faiz.khan",
-      "priya.desai",
-      "sameer.gupta"
+      "ganesh.somvanshi",
+      "aditi.jain",
+      "palash.somani",
+      "mayank.panchal",
+      "vaishali.malasi",
+      "viren.sunil.khetani",
+      "tarun.ghumnani",
+      "ayush.ghumnani",
+      "ritesh.dilip.chaudhari",
+      "sakshi.desai"
     ]
   },
   {
-    "id": "nimbus",
-    "name": "Team Nimbus",
+    "id": "team2",
+    "name": "Team 2",
     "color": "#e0a436",
     "memberIds": [
-      "lina.fernandes",
-      "vikram.rao",
-      "anika.bose",
-      "karthik.nambiar",
-      "ria.malhotra",
-      "omar.sheikh",
-      "divya.krishnan",
-      "aditya.saxena"
+      "laxmi.khandelwal",
+      "reena.agrawal",
+      "aman.jalan",
+      "tanvi.agrawal",
+      "sumair",
+      "rohan.patil",
+      "akshata.kolekar",
+      "pushpa.mourya",
+      "asmita.sanjay.lawate",
+      "balaji.prabhu.shinde",
+      "neethu"
+    ]
+  },
+  {
+    "id": "team3",
+    "name": "Team 3",
+    "color": "#16a34a",
+    "memberIds": [
+      "krutanjali.patil",
+      "fiza.rizvi",
+      "shubham.kothari",
+      "vaishnavee.kalantri",
+      "radhika.rathi",
+      "sayam.doshi",
+      "amol.bibwe",
+      "abhishek.sonar",
+      "vishakha.jat",
+      "viren.sunil.khetani-2"
+    ]
+  },
+  {
+    "id": "team4",
+    "name": "Team 4",
+    "color": "#db2777",
+    "memberIds": [
+      "prem.duseja",
+      "sima.jain",
+      "pranay.oswal",
+      "kajal.kale",
+      "ansari.matiullah.ziyaullah",
+      "aditya.agrawal",
+      "shubham.dhanawade",
+      "prashant.sir",
+      "komal.kere",
+      "muskan.daswani"
+    ]
+  },
+  {
+    "id": "team5",
+    "name": "Team 5",
+    "color": "#7c3aed",
+    "memberIds": [
+      "shweta.ghumnani",
+      "namrata.patil",
+      "vidhi.khandelwal",
+      "mansavi.more",
+      "shrikar.moolya",
+      "meenal.suke",
+      "preet.khandelwal",
+      "mahadev.thawani",
+      "harshita.rajput",
+      "arya.magar"
+    ]
+  },
+  {
+    "id": "team6",
+    "name": "Team 6",
+    "color": "#0891b2",
+    "memberIds": [
+      "harsh.jain",
+      "avani.vijay",
+      "priyanka.mantri",
+      "aditi.singh",
+      "sakshi.ghodke",
+      "harsha.rajput",
+      "arya.magar-2",
+      "gagandeep.singh",
+      "debarima.paul"
+    ]
+  },
+  {
+    "id": "team7",
+    "name": "Team 7",
+    "color": "#ea580c",
+    "memberIds": [
+      "rukaiya.rangoonwala",
+      "ronit.dilip.jadhav",
+      "vikaram.bhist",
+      "shashank.channawar",
+      "harshvardhan.patil",
+      "trinath.kethavath",
+      "shubhangi",
+      "kajal.yadav",
+      "aastha.chandwani"
+    ]
+  },
+  {
+    "id": "team8",
+    "name": "Team 8",
+    "color": "#4f46e5",
+    "memberIds": [
+      "anjali.yadav",
+      "pratik.nilakhe",
+      "vidya.khandelwal",
+      "atharv.kale",
+      "shailesh.chavan",
+      "rajvir.arya",
+      "rajat.sonkar",
+      "pooja.mahto",
+      "om.anil.bhombe"
     ]
   }
 ]

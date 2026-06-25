@@ -50,9 +50,6 @@ export function GodModePanel({ members, onReveal, onReset }: GodModePanelProps) 
                   className="flex items-center gap-3 rounded-lg border border-line bg-white px-3 py-2"
                 >
                   <span className="text-sm text-navy">{m.displayName}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-faint">
-                    {m.dailyGroup}
-                  </span>
                   <button
                     type="button"
                     onClick={() => onReveal(m.id)}
