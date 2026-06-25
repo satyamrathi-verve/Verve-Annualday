@@ -62,8 +62,6 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
         }
         roomRef.current = room;
         setReady(true);
-        // You know yourself — light your own canister.
-        void room.light(selfMemberId, "self", selfMemberId);
       })
       .catch(() => {
         if (active) setReady(true);
@@ -75,6 +73,17 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
       roomRef.current = null;
     };
   }, [teamId, selfMemberId]);
+
+  // Self-heal: keep our own canister lit in the SHARED state. Fires on join and
+  // again whenever a snapshot lacks our self-row (e.g. a God-Mode reset wiped
+  // the team). Each client only ever re-asserts its OWN self, so the wheel
+  // converges across everyone instead of desyncing after a reset.
+  useEffect(() => {
+    if (!ready || !roomRef.current) return;
+    if (!litMap[selfMemberId]) {
+      void roomRef.current.light(selfMemberId, "self", selfMemberId);
+    }
+  }, [ready, litMap, selfMemberId]);
 
   const members: WheelMember[] = useMemo(() => {
     return getTeamMembers(teamId).map((m) => {
