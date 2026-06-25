@@ -20,7 +20,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function GuessYourCrew() {
-  const { session } = useAuth();
+  const { session, mode } = useAuth();
 
   if (!session) {
     return (
@@ -45,17 +45,26 @@ export function GuessYourCrew() {
     );
   }
 
-  return <CrewBoard teamId={session.teamId} selfId={session.memberId} isManager={session.isManager} />;
+  return (
+    <CrewBoard
+      teamId={session.teamId}
+      selfId={session.memberId}
+      isManager={session.isManager}
+      demo={mode === "mock"}
+    />
+  );
 }
 
 function CrewBoard({
   teamId,
   selfId,
   isManager,
+  demo,
 }: {
   teamId: string;
   selfId: string;
   isManager: boolean;
+  demo: boolean;
 }) {
   const c = event.guess;
   const team = getTeam(teamId);
@@ -208,6 +217,7 @@ function CrewBoard({
                 clues={current.clues}
                 candidates={candidates}
                 onGuess={onGuess}
+                revealAnswer={demo ? current.displayName : undefined}
               />
             </>
           ) : (

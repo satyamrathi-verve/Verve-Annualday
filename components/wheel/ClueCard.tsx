@@ -17,6 +17,9 @@ interface ClueCardProps {
   candidates: Candidate[];
   /** Returns true if the guess was correct. */
   onGuess: (candidateId: string) => boolean;
+  /** Demo/testing only: the correct name, shown as a hint so the guess→light
+      animation is easy to trigger before real clues exist. */
+  revealAnswer?: string;
 }
 
 function ClueRow({ label, items }: { label: string; items: string[] }) {
@@ -31,7 +34,14 @@ function ClueRow({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardProps) {
+export function ClueCard({
+  index,
+  total,
+  clues,
+  candidates,
+  onGuess,
+  revealAnswer,
+}: ClueCardProps) {
   const [query, setQuery] = useState("");
   const [wrongId, setWrongId] = useState<string | null>(null);
   const [tried, setTried] = useState<Set<string>>(new Set());
@@ -81,6 +91,13 @@ export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardP
             </p>
           )}
         </div>
+
+        {revealAnswer && (
+          <div className="mt-3 rounded-lg border border-gold/40 bg-gold-soft/40 px-3 py-2 font-mono text-[11px] leading-relaxed text-gold-deep">
+            🧪 Demo: this is <span className="font-bold text-navy">{revealAnswer}</span> — tap their
+            name below to light the canister.
+          </div>
+        )}
       </motion.div>
 
       <input
