@@ -36,7 +36,10 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
         .from("canister_state")
         .select("member_id, lit, lit_by, method")
         .eq("team_id", teamId);
-      if (error) return;
+      if (error) {
+        console.error("[wheel] snapshot read failed:", error.message);
+        return;
+      }
       const rows = (data ?? []) as CanisterRow[];
       const states: CanisterState[] = rows.map((r) => ({
         memberId: r.member_id,
@@ -70,18 +73,39 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
     });
 
     await new Promise<void>((resolve) => {
+      let settled = false;
+      const done = () => {
+        if (!settled) {
+          settled = true;
+          resolve();
+        }
+      };
       channel.subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           await channel.track({ memberId: selfMemberId, at: new Date().toISOString() });
           await snapshot();
-          resolve();
+          done();
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          // Realtime didn't come up — still return a usable room (direct reads /
+          // writes work; we just won't get live echoes). Better than a dead wheel.
+          console.warn(`[wheel] realtime channel ${status}; continuing without live echo`);
+          await snapshot();
+          done();
         }
       });
+      // Safety net: never hang the wheel forever if realtime never connects.
+      setTimeout(() => {
+        if (!settled) {
+          console.warn("[wheel] realtime subscribe timed out; continuing without live echo");
+          void snapshot();
+          done();
+        }
+      }, 4000);
     });
 
     return {
       light: async (memberId, method, byMemberId) => {
-        await supabase.from("canister_state").upsert(
+        const { error } = await supabase.from("canister_state").upsert(
           {
             team_id: teamId,
             member_id: memberId,
@@ -92,9 +116,22 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
           },
           { onConflict: "team_id,member_id" },
         );
+        if (error) {
+          console.error("[wheel] light write failed:", error.message);
+          return;
+        }
+        // Optimistic: refresh our OWN view immediately so the guesser sees their
+        // canister light + animate without waiting on the realtime round-trip.
+        // Other clients still update via their postgres_changes subscription.
+        await snapshot();
       },
       reset: async () => {
-        await supabase.from("canister_state").delete().eq("team_id", teamId);
+        const { error } = await supabase.from("canister_state").delete().eq("team_id", teamId);
+        if (error) {
+          console.error("[wheel] reset failed:", error.message);
+          return;
+        }
+        await snapshot();
       },
       leave: () => {
         void supabase.removeChannel(channel);

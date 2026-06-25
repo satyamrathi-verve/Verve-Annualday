@@ -6,6 +6,41 @@ import { useAuth } from "@/components/providers/AuthContext";
 import { getRosterSorted } from "@/lib/data/config";
 import { event } from "@/lib/data/config";
 
+export function SignIn({ onNext }: { onNext: () => void }) {
+  const c = event.signIn;
+  const { session, mode, signOut } = useAuth();
+
+  if (session) {
+    return (
+      <div className="flex w-full max-w-lg flex-col items-center text-center">
+        <p className="eyebrow">{c.eyebrow}</p>
+        <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+          Welcome, {session.displayName.split(" ")[0]}.
+        </h1>
+        <p className="mt-4 text-base text-muted lg:text-lg">
+          Signed in as {session.email}. Onward.
+        </p>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Button variant="gold" onClick={onNext}>
+            Continue →
+          </Button>
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="font-mono text-[11px] tracking-wider text-faint hover:text-verve"
+          >
+            not you? sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "mock") return <MockPicker onNext={onNext} />;
+  if (mode === "email") return <EmailSignIn />;
+  return <GoogleSignIn />;
+}
+
 function GoogleMark() {
   return (
     <svg viewBox="0 0 48 48" className="h-[18px] w-[18px]" aria-hidden>
@@ -17,11 +52,166 @@ function GoogleMark() {
   );
 }
 
-export function SignIn({ onNext }: { onNext: () => void }) {
+/* Real Google sign-in (Supabase Auth → Google). Redirects to Google; on return
+   the session arrives and this screen flips to the "Welcome" state. */
+function GoogleSignIn() {
   const c = event.signIn;
-  const { session, signInAs, signInWithGoogle, signOut } = useAuth();
+  const { signInWithGoogle } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const go = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      await signInWithGoogle();
+      // Browser redirects to Google here.
+    } catch (e) {
+      setError((e as Error).message || "Couldn't start Google sign-in.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
+      <p className="eyebrow">{c.eyebrow}</p>
+      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        {c.title}
+      </h1>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
+
+      <button
+        type="button"
+        onClick={go}
+        disabled={busy}
+        className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-white py-4 font-display text-base font-semibold text-ink shadow-[0_10px_24px_-16px_rgba(14,26,51,0.5)] transition-colors hover:border-verve disabled:opacity-50 lg:text-lg"
+      >
+        <GoogleMark />
+        {busy ? "Redirecting…" : c.googleLabel}
+      </button>
+      <p className="mt-3 font-mono text-[11px] tracking-wider text-faint">
+        Verve Google accounts only · @{c.allowedDomain}
+      </p>
+      {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+/* Real Verve-email sign-in (Supabase OTP / magic link). */
+function EmailSignIn() {
+  const c = event.signIn;
+  const { sendCode, verifyCode } = useAuth();
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [stage, setStage] = useState<"email" | "code">("email");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const trimmed = email.trim().toLowerCase();
+  const domainOk = trimmed.endsWith(`@${c.allowedDomain.toLowerCase()}`);
+
+  const send = async () => {
+    setError(null);
+    if (!domainOk) {
+      setError(c.domainError);
+      return;
+    }
+    setBusy(true);
+    try {
+      await sendCode(trimmed);
+      setStage("code");
+    } catch (e) {
+      setError((e as Error).message || "Couldn't send the code — try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verify = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      await verifyCode(trimmed, code.trim());
+      // On success, onAuthStateChange flips the session and this screen
+      // re-renders into the "Welcome" state with a Continue button.
+    } catch (e) {
+      setError((e as Error).message || "That code didn't work — check and retry.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
+      <p className="eyebrow">{c.eyebrow}</p>
+      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        {c.title}
+      </h1>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
+
+      {stage === "email" ? (
+        <div className="mt-8 flex w-full flex-col gap-3">
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder={c.emailPlaceholder}
+            className="w-full rounded-xl border border-line bg-white px-4 py-3.5 text-center text-base text-ink outline-none transition-colors focus:border-verve"
+          />
+          <Button variant="gold" onClick={send} disabled={busy || trimmed.length === 0}>
+            {busy ? "Sending…" : `${c.sendLabel} →`}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-8 flex w-full flex-col gap-3">
+          <p className="font-mono text-[12px] leading-relaxed text-muted">
+            {c.checkEmail.replace("{email}", trimmed)}
+          </p>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onKeyDown={(e) => e.key === "Enter" && code.length >= 6 && verify()}
+            placeholder={c.codeLabel}
+            className="w-full rounded-xl border border-line bg-white px-4 py-3.5 text-center font-mono text-2xl tracking-[0.4em] text-ink outline-none transition-colors focus:border-verve"
+          />
+          <Button variant="gold" onClick={verify} disabled={busy || code.length < 6}>
+            {busy ? "Verifying…" : c.verifyLabel}
+          </Button>
+          <div className="mt-1 flex items-center justify-center gap-4 font-mono text-[11px] text-faint">
+            <button
+              type="button"
+              onClick={() => {
+                setStage("email");
+                setCode("");
+                setError(null);
+              }}
+              className="tracking-wider hover:text-verve"
+            >
+              ← different email
+            </button>
+            <button type="button" onClick={send} className="tracking-wider hover:text-verve">
+              resend code
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+/* Offline fallback: synthetic-roster name picker (NEXT_PUBLIC_AUTH_MODE=mock). */
+function MockPicker({ onNext }: { onNext: () => void }) {
+  const c = event.signIn;
+  const { signInAs } = useAuth();
   const [query, setQuery] = useState("");
-  const [note, setNote] = useState<string | null>(null);
 
   const roster = useMemo(() => getRosterSorted(), []);
   const filtered = useMemo(
@@ -29,78 +219,48 @@ export function SignIn({ onNext }: { onNext: () => void }) {
     [roster, query],
   );
 
-  const handleGoogle = async () => {
-    try {
-      await signInWithGoogle();
-      onNext();
-    } catch {
-      setNote("Google sign-in arrives in Phase 2 — pick your name below to step in.");
-    }
+  const pick = async (id: string) => {
+    if (await signInAs(id)) onNext();
   };
-
-  const handlePick = (id: string) => {
-    if (signInAs(id)) onNext();
-  };
-
-  if (session) {
-    return (
-      <div className="flex w-full max-w-md flex-col items-center text-center">
-        <p className="eyebrow">{c.eyebrow}</p>
-        <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy">
-          Welcome back, {session.displayName.split(" ")[0]}.
-        </h1>
-        <p className="mt-4 text-[15px] text-muted">You&apos;re already signed in. Onward.</p>
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <Button variant="gold" onClick={onNext}>
-            Continue →
-          </Button>
-          <button
-            type="button"
-            onClick={signOut}
-            className="font-mono text-[11px] tracking-wider text-faint hover:text-verve"
-          >
-            not you? sign out
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex w-full max-w-md flex-col items-center text-center">
+    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
       <p className="eyebrow">{c.eyebrow}</p>
-      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">
-        {c.title}
+      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        Demo mode · pick your name
       </h1>
-      <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-muted">{c.subtitle}</p>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
 
-      <button
-        type="button"
-        onClick={handleGoogle}
-        className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-white py-3.5 font-display text-[15px] font-semibold text-ink shadow-[0_10px_24px_-16px_rgba(14,26,51,0.5)] transition-colors hover:border-verve"
-      >
-        <GoogleMark />
-        {c.googleLabel}
-      </button>
-      {note && <p className="mt-3 font-mono text-[11px] leading-relaxed text-gold-deep">{note}</p>}
-
-      <div className="my-6 flex w-full items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="font-mono text-[10px] uppercase tracking-widest text-faint">
-          {c.pickLabel}
-        </span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      {event.superAdmins.length > 0 && (
+        <div className="mt-8 flex w-full flex-col gap-2">
+          {event.superAdmins.map((a) => (
+            <button
+              key={a.email}
+              type="button"
+              onClick={() => void pick(a.email)}
+              className="flex w-full items-center gap-3 rounded-xl border border-gold/40 bg-gold-soft/30 px-4 py-3 text-left transition-colors hover:border-gold"
+            >
+              <span className="grid h-8 w-8 flex-none place-items-center rounded-md bg-gold text-navy">
+                ⚡
+              </span>
+              <span className="text-sm font-semibold text-navy lg:text-base">{a.name}</span>
+              <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-gold-deep">
+                super admin
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search your name…"
-        className="w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-verve"
+        className="mt-3 w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors focus:border-verve"
       />
 
-      <div className="mt-3 max-h-64 w-full divide-y divide-line overflow-auto rounded-xl border border-line bg-white text-left">
+      <div className="mt-3 max-h-64 w-full divide-y divide-line overflow-auto rounded-xl border border-line bg-white text-left lg:max-h-80">
         {filtered.length === 0 && (
           <p className="px-4 py-6 text-center font-mono text-[12px] text-faint">no match</p>
         )}
@@ -108,7 +268,7 @@ export function SignIn({ onNext }: { onNext: () => void }) {
           <button
             key={m.id}
             type="button"
-            onClick={() => handlePick(m.id)}
+            onClick={() => void pick(m.id)}
             className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-verve-soft"
           >
             <span className="grid h-8 w-8 flex-none place-items-center rounded-full bg-verve-soft font-display text-[12px] font-bold text-verve">
@@ -118,10 +278,7 @@ export function SignIn({ onNext }: { onNext: () => void }) {
                 .join("")
                 .slice(0, 2)}
             </span>
-            <span className="text-sm font-medium text-ink">{m.displayName}</span>
-            <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-faint">
-              {m.dailyGroup}
-            </span>
+            <span className="text-sm font-medium text-ink lg:text-base">{m.displayName}</span>
           </button>
         ))}
       </div>

@@ -1,242 +1,938 @@
 [
   {
-    "id": "aria.menon",
-    "displayName": "Aria Menon",
-    "dailyGroup": "Finance",
-    "teamId": "aurora",
+    "id": "ganesh.somvanshi",
+    "email": "ganesh.somvanshi@verveadvisory.com",
+    "displayName": "Ganesh Somvanshi",
+    "teamId": "team1",
     "isManager": true,
     "clues": {
-      "hobbies": ["Competitive Scrabble", "Bakes sourdough every weekend"],
-      "quirks": ["Colour-codes absolutely everything"],
-      "funFacts": ["Once recited pi to 100 digits at a friend's wedding"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "dev.iyer",
-    "displayName": "Dev Iyer",
-    "dailyGroup": "IT",
-    "teamId": "aurora",
+    "id": "aditi.jain",
+    "email": "aditi.jain@verveadvisory.com",
+    "displayName": "Aditi Jain",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Builds custom mechanical keyboards", "Trail running"],
-      "quirks": ["Names his houseplants after famous auditors"],
-      "funFacts": ["Trekked to Everest Base Camp last winter"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "sana.kapoor",
-    "displayName": "Sana Kapoor",
-    "dailyGroup": "HR",
-    "teamId": "aurora",
+    "id": "palash.somani",
+    "email": "palash.somani@verveadvisory.com",
+    "displayName": "Palash Somani",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Salsa dancing", "Wheel-throwing pottery"],
-      "quirks": ["Always carries exactly three pens"],
-      "funFacts": ["Was a national-level swimmer in school"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "rohan.pillai",
-    "displayName": "Rohan Pillai",
-    "dailyGroup": "Operations",
-    "teamId": "aurora",
+    "id": "mayank.panchal",
+    "email": "mayank.panchal@verveadvisory.com",
+    "displayName": "Mayank Panchal",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Cooks a legendary Kerala fish curry", "Long-distance cycling"],
-      "quirks": ["Point-blank refuses to take the elevator"],
-      "funFacts": ["Can solve a Rubik's cube one-handed"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "meera.joshi",
-    "displayName": "Meera Joshi",
-    "dailyGroup": "Finance",
-    "teamId": "aurora",
+    "id": "vaishali.malasi",
+    "email": "vaishali.malasi@verveadvisory.com",
+    "displayName": "Vaishali Malasi",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Birdwatching", "Watercolour painting"],
-      "quirks": ["Hums softly while reconciling ledgers"],
-      "funFacts": ["Has visited 19 national parks"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "kabir.shah",
-    "displayName": "Kabir Shah",
-    "dailyGroup": "IT",
-    "teamId": "aurora",
+    "id": "viren.sunil.khetani",
+    "email": "viren.khetani@verveadvisory.com",
+    "displayName": "Viren Sunil Khetani",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Collects retro video games", "Brews his own kombucha"],
-      "quirks": ["Keeps a rubber duck on his desk for debugging"],
-      "funFacts": ["Once spent an afternoon with a llama farmer on a road trip"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "tara.nair",
-    "displayName": "Tara Nair",
-    "dailyGroup": "HR",
-    "teamId": "aurora",
+    "id": "tarun.ghumnani",
+    "email": "tarun.ghumnani@verveadvisory.com",
+    "displayName": "Tarun Ghumnani",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Does stand-up comedy open mics", "Knitting"],
-      "quirks": ["Always laughs at her own jokes first"],
-      "funFacts": ["Once interviewed a Bollywood actor for a college magazine"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "arjun.reddy",
-    "displayName": "Arjun Reddy",
-    "dailyGroup": "Operations",
-    "teamId": "aurora",
+    "id": "ayush.ghumnani",
+    "email": "ayush.ghumnani@verveadvisory.com",
+    "displayName": "Ayush Ghumnani",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Marathon running", "Plays chess online at 2am"],
-      "quirks": ["Drinks exactly four cups of chai a day, never five"],
-      "funFacts": ["Has run the Mumbai marathon twice"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "nisha.verma",
-    "displayName": "Nisha Verma",
-    "dailyGroup": "Finance",
-    "teamId": "aurora",
+    "id": "ritesh.dilip.chaudhari",
+    "email": "ritesh.chaudhari@verveadvisory.com",
+    "displayName": "Ritesh Dilip Chaudhari",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Makes her own hot sauce", "Balcony gardening"],
-      "quirks": ["Labels her tupperware with the date AND the time"],
-      "funFacts": ["Grew a chilli so hot a colleague teared up tasting it"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "faiz.khan",
-    "displayName": "Faiz Khan",
-    "dailyGroup": "IT",
-    "teamId": "aurora",
+    "id": "sakshi.desai",
+    "email": "sakshi.desai@verveadvisory.com",
+    "displayName": "Sakshi Desai",
+    "teamId": "team1",
     "isManager": false,
     "clues": {
-      "hobbies": ["Astrophotography", "Flying camera drones"],
-      "quirks": ["Works a Star Wars quote into every standup"],
-      "funFacts": ["Photographed a total solar eclipse from a rooftop"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "priya.desai",
-    "displayName": "Priya Desai",
-    "dailyGroup": "HR",
-    "teamId": "aurora",
-    "isManager": false,
-    "clues": {
-      "hobbies": ["Trained Bharatanatyam dancer", "Daily journaling"],
-      "quirks": ["Carries a tiny notebook everywhere she goes"],
-      "funFacts": ["Performed classical dance on stage for 12 years"]
-    }
-  },
-  {
-    "id": "sameer.gupta",
-    "displayName": "Sameer Gupta",
-    "dailyGroup": "Operations",
-    "teamId": "aurora",
-    "isManager": false,
-    "clues": {
-      "hobbies": ["Woodworking", "Collects jazz vinyl"],
-      "quirks": ["Is always early by exactly ten minutes"],
-      "funFacts": ["Built his own dining table from scratch"]
-    }
-  },
-  {
-    "id": "lina.fernandes",
-    "displayName": "Lina Fernandes",
-    "dailyGroup": "HR",
-    "teamId": "nimbus",
+    "id": "laxmi.khandelwal",
+    "email": "laxmi.khandelwal@verveadvisory.com",
+    "displayName": "Laxmi Khandelwal",
+    "teamId": "team2",
     "isManager": true,
     "clues": {
-      "hobbies": ["Scuba diving", "Bakes finicky French macarons"],
-      "quirks": ["Colour-codes her calendar by mood"],
-      "funFacts": ["Dived with reef sharks in the Andamans"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "vikram.rao",
-    "displayName": "Vikram Rao",
-    "dailyGroup": "Finance",
-    "teamId": "nimbus",
+    "id": "reena.agrawal",
+    "email": "reena.agrawal@verveadvisory.com",
+    "displayName": "Reena Agrawal",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Runs a fantasy cricket league", "Weekend hiking"],
-      "quirks": ["Narrates spreadsheet formulas out loud"],
-      "funFacts": ["Has a cricket statistic ready for any occasion"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "anika.bose",
-    "displayName": "Anika Bose",
-    "dailyGroup": "IT",
-    "teamId": "nimbus",
+    "id": "aman.jalan",
+    "email": "aman.jalan@verveadvisory.com",
+    "displayName": "Aman Jalan",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Generative art", "Indoor rock climbing"],
-      "quirks": ["Her laptop stickers tell a whole story"],
-      "funFacts": ["Coded a bot that orders her lunch automatically"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "karthik.nambiar",
-    "displayName": "Karthik Nambiar",
-    "dailyGroup": "Operations",
-    "teamId": "nimbus",
+    "id": "tanvi.agrawal",
+    "email": "tanvi.agrawal@verveadvisory.com",
+    "displayName": "Tanvi Agrawal",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Motorcycle touring", "Street photography"],
-      "quirks": ["Guards a thermos of South Indian filter coffee"],
-      "funFacts": ["Rode solo from Bangalore to Leh"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "ria.malhotra",
-    "displayName": "Ria Malhotra",
-    "dailyGroup": "Finance",
-    "teamId": "nimbus",
+    "id": "sumair",
+    "email": "sumair@verveadvisory.com",
+    "displayName": "Sumair",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Ballet", "True-crime podcasts"],
-      "quirks": ["Always finishes the office crossword first"],
-      "funFacts": ["Once won a pub quiz almost single-handed"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "omar.sheikh",
-    "displayName": "Omar Sheikh",
-    "dailyGroup": "HR",
-    "teamId": "nimbus",
+    "id": "rohan.patil",
+    "email": "rohan.patil@verveadvisory.com",
+    "displayName": "Rohan Patil",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Calligraphy", "Five-a-side football"],
-      "quirks": ["Doodles in the margins of every meeting"],
-      "funFacts": ["Loyally supports a club that hasn't won in 30 years"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "divya.krishnan",
-    "displayName": "Divya Krishnan",
-    "dailyGroup": "IT",
-    "teamId": "nimbus",
+    "id": "akshata.kolekar",
+    "email": "akshata.kolekar@verveadvisory.com",
+    "displayName": "Akshata Kolekar",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Aquascaping", "Baking artisan bread"],
-      "quirks": ["Has full conversations with her fish"],
-      "funFacts": ["Keeps a planted aquarium full of tiny shrimp"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   },
   {
-    "id": "aditya.saxena",
-    "displayName": "Aditya Saxena",
-    "dailyGroup": "Operations",
-    "teamId": "nimbus",
+    "id": "pushpa.mourya",
+    "email": "pushpa.mourya@verveadvisory.com",
+    "displayName": "Pushpa Mourya",
+    "teamId": "team2",
     "isManager": false,
     "clues": {
-      "hobbies": ["Himalayan trekking", "Sketching hand-drawn maps"],
-      "quirks": ["Carries a tiny compass keychain"],
-      "funFacts": ["Has trekked across five Himalayan states"]
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "asmita.sanjay.lawate",
+    "email": "asmita.lawate@verveadvisory.com",
+    "displayName": "Asmita Sanjay Lawate",
+    "teamId": "team2",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "balaji.prabhu.shinde",
+    "email": "balaji.shinde@verveadvisory.com",
+    "displayName": "Balaji Prabhu Shinde",
+    "teamId": "team2",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "neethu",
+    "email": "neethu@verveadvisory.com",
+    "displayName": "Neethu",
+    "teamId": "team2",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "krutanjali.patil",
+    "email": "krutanjali.patil@verveadvisory.com",
+    "displayName": "Krutanjali Patil",
+    "teamId": "team3",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "fiza.rizvi",
+    "email": "fiza.rizvi@verveadvisory.com",
+    "displayName": "Fiza Rizvi",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shubham.kothari",
+    "email": "shubham.kothari@verveadvisory.com",
+    "displayName": "Shubham Kothari",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "vaishnavee.kalantri",
+    "email": "vaishnavee.kalantri@verveadvisory.com",
+    "displayName": "Vaishnavee Kalantri",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "radhika.rathi",
+    "email": "radhika.rathi@verveadvisory.com",
+    "displayName": "Radhika Rathi",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "sayam.doshi",
+    "email": "sayam.doshi@verveadvisory.com",
+    "displayName": "Sayam Doshi",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "amol.bibwe",
+    "email": "amol.bibwe@verveadvisory.com",
+    "displayName": "Amol Bibwe",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "abhishek.sonar",
+    "email": "abhishek.sonar@verveadvisory.com",
+    "displayName": "Abhishek Sonar",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "vishakha.jat",
+    "email": "vishakha.jat@verveadvisory.com",
+    "displayName": "Vishakha Jat",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "viren.sunil.khetani-2",
+    "email": "viren.khetani@verveadvisory.com",
+    "displayName": "Viren Sunil Khetani",
+    "teamId": "team3",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "prem.duseja",
+    "email": "prem.duseja@verveadvisory.com",
+    "displayName": "Prem Duseja",
+    "teamId": "team4",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "sima.jain",
+    "email": "sima.jain@verveadvisory.com",
+    "displayName": "Sima Jain",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "pranay.oswal",
+    "email": "pranay.oswal@verveadvisory.com",
+    "displayName": "Pranay Oswal",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "kajal.kale",
+    "email": "kajal.kale@verveadvisory.com",
+    "displayName": "Kajal Kale",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "ansari.matiullah.ziyaullah",
+    "email": "ansari.ziyaullah@verveadvisory.com",
+    "displayName": "Ansari Matiullah Ziyaullah",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "aditya.agrawal",
+    "email": "aditya.agrawal@verveadvisory.com",
+    "displayName": "Aditya Agrawal",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shubham.dhanawade",
+    "email": "shubham.dhanawade@verveadvisory.com",
+    "displayName": "Shubham Dhanawade",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "prashant.sir",
+    "email": "prashant.sir@verveadvisory.com",
+    "displayName": "Prashant Sir",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "komal.kere",
+    "email": "komal.kere@verveadvisory.com",
+    "displayName": "Komal Kere",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "muskan.daswani",
+    "email": "muskan.daswani@verveadvisory.com",
+    "displayName": "Muskan Daswani",
+    "teamId": "team4",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shweta.ghumnani",
+    "email": "shweta.ghumnani@verveadvisory.com",
+    "displayName": "Shweta Ghumnani",
+    "teamId": "team5",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "namrata.patil",
+    "email": "namrata.patil@verveadvisory.com",
+    "displayName": "Namrata Patil",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "vidhi.khandelwal",
+    "email": "vidhi.khandelwal@verveadvisory.com",
+    "displayName": "Vidhi Khandelwal",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "mansavi.more",
+    "email": "mansavi.more@verveadvisory.com",
+    "displayName": "Mansavi More",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shrikar.moolya",
+    "email": "shrikar.moolya@verveadvisory.com",
+    "displayName": "Shrikar Moolya",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "meenal.suke",
+    "email": "meenal.suke@verveadvisory.com",
+    "displayName": "Meenal Suke",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "preet.khandelwal",
+    "email": "preet.khandelwal@verveadvisory.com",
+    "displayName": "Preet Khandelwal",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "mahadev.thawani",
+    "email": "mahadev.thawani@verveadvisory.com",
+    "displayName": "Mahadev Thawani",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "harshita.rajput",
+    "email": "harshita.rajput@verveadvisory.com",
+    "displayName": "Harshita Rajput",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "arya.magar",
+    "email": "arya.magar@verveadvisory.com",
+    "displayName": "Arya Magar",
+    "teamId": "team5",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "harsh.jain",
+    "email": "harsh.jain@verveadvisory.com",
+    "displayName": "Harsh Jain",
+    "teamId": "team6",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "avani.vijay",
+    "email": "avani.vijay@verveadvisory.com",
+    "displayName": "Avani Vijay",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "priyanka.mantri",
+    "email": "priyanka.mantri@verveadvisory.com",
+    "displayName": "Priyanka Mantri",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "aditi.singh",
+    "email": "aditi.singh@verveadvisory.com",
+    "displayName": "Aditi Singh",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "sakshi.ghodke",
+    "email": "sakshi.ghodke@verveadvisory.com",
+    "displayName": "Sakshi Ghodke",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "harsha.rajput",
+    "email": "harsha.rajput@verveadvisory.com",
+    "displayName": "Harsha Rajput",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "arya.magar-2",
+    "email": "arya.magar@verveadvisory.com",
+    "displayName": "Arya Magar",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "gagandeep.singh",
+    "email": "gagandeep.singh@verveadvisory.com",
+    "displayName": "Gagandeep Singh",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "debarima.paul",
+    "email": "debarima.paul@verveadvisory.com",
+    "displayName": "Debarima Paul",
+    "teamId": "team6",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "rukaiya.rangoonwala",
+    "email": "rukaiya.rangoonwala@verveadvisory.com",
+    "displayName": "Rukaiya Rangoonwala",
+    "teamId": "team7",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "ronit.dilip.jadhav",
+    "email": "ronit.jadhav@verveadvisory.com",
+    "displayName": "Ronit Dilip Jadhav",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "vikaram.bhist",
+    "email": "vikaram.bhist@verveadvisory.com",
+    "displayName": "Vikaram Bhist",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shashank.channawar",
+    "email": "shashank.channawar@verveadvisory.com",
+    "displayName": "Shashank Channawar",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "harshvardhan.patil",
+    "email": "harshvardhan.patil@verveadvisory.com",
+    "displayName": "Harshvardhan Patil",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "trinath.kethavath",
+    "email": "trinath.kethavath@verveadvisory.com",
+    "displayName": "Trinath Kethavath",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shubhangi",
+    "email": "shubhangi@verveadvisory.com",
+    "displayName": "Shubhangi",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "kajal.yadav",
+    "email": "kajal.yadav@verveadvisory.com",
+    "displayName": "Kajal Yadav",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "aastha.chandwani",
+    "email": "aastha.chandwani@verveadvisory.com",
+    "displayName": "Aastha Chandwani",
+    "teamId": "team7",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "anjali.yadav",
+    "email": "anjali.yadav@verveadvisory.com",
+    "displayName": "Anjali Yadav",
+    "teamId": "team8",
+    "isManager": true,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "pratik.nilakhe",
+    "email": "pratik.nilakhe@verveadvisory.com",
+    "displayName": "Pratik Nilakhe",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "vidya.khandelwal",
+    "email": "vidya.khandelwal@verveadvisory.com",
+    "displayName": "Vidya Khandelwal",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "atharv.kale",
+    "email": "atharv.kale@verveadvisory.com",
+    "displayName": "Atharv Kale",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "shailesh.chavan",
+    "email": "shailesh.chavan@verveadvisory.com",
+    "displayName": "Shailesh Chavan",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "rajvir.arya",
+    "email": "rajvir.arya@verveadvisory.com",
+    "displayName": "Rajvir Arya",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "rajat.sonkar",
+    "email": "rajat.sonkar@verveadvisory.com",
+    "displayName": "Rajat Sonkar",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "pooja.mahto",
+    "email": "pooja.mahto@verveadvisory.com",
+    "displayName": "Pooja Mahto",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "om.anil.bhombe",
+    "email": "om.bhombe@verveadvisory.com",
+    "displayName": "Om Anil Bhombe",
+    "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
     }
   }
 ]

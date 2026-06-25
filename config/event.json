@@ -1,36 +1,76 @@
 {
-  "eventName": "Operation Getaway",
+  "eventName": "Operation Prompt & Co.",
   "edition": "Verve Advisory · Anniversary 2026",
   "landing": {
-    "eyebrow": "A transmission reached you",
-    "title": "Operation Getaway",
-    "subtitle": "The courier found you. The portal is open. Somewhere in this firm your crew is waiting — scattered, scrambled, hiding in plain sight. Time to assemble.",
+    "eyebrow": "🔓 Access granted",
+    "title": "Operation Prompt & Co.",
+    "tagline": "Welcome to the only project at Verve that will never be audited.",
+    "subtitle": "You cracked the code — but can you guess what happens next?",
     "cta": "Begin the mission"
   },
   "vibe": {
-    "eyebrow": "Before anything serious",
-    "title": "Quick vibe check. No wrong answers, promise.",
-    "subtitle": "The door is right there. First, tell us what kind of adventurer showed up today.",
-    "questions": [
-      {
-        "id": "movie",
-        "prompt": "If this were a movie, it's a…",
-        "options": ["Heist caper", "Slow-burn mystery", "Comedy that escalates", "Epic road trip"]
-      },
-      {
-        "id": "fuel",
-        "prompt": "Your expedition fuel is…",
-        "options": ["Strong black coffee", "Chai, obviously", "Pure adrenaline", "Snacks. So many snacks."]
-      }
+    "eyebrows": [
+      "Suna hai…",
+      "Rumour has it…",
+      "Word on the floor…",
+      "Maybe it is…",
+      "Unconfirmed intel…",
+      "Whispers say…",
+      "Top secret…",
+      "Insider scoop…"
     ],
-    "cta": "Open the door"
+    "reactions": ["Sach hai! 🔥", "Ho sakta hai… 🤔", "Arre nahi yaar 😅"],
+    "helper": "no wrong answers — just react and keep moving",
+    "minCards": 5,
+    "maxCards": 8,
+    "closeEyebrow": "Briefing incoming",
+    "closeTitle": "That's enough conspiracy for one day.",
+    "closeSubtitle": "Whatever it actually is — you're early. Step through.",
+    "cta": "Open the door",
+    "rumours": [
+      { "emoji": "🌕", "text": "Verve ab Chand pe apni pehli advisory branch kholne ki planning kar raha hai?" },
+      { "emoji": "📊", "text": "Kya hum balance sheets, finance aur Saffron ke saath khud ka share market index launch karne wale hain?" },
+      { "emoji": "🚀", "text": "Ye kya sun rahe — Verve ab Public, ya seedha Mars pe listing me ja raha hai?" },
+      { "emoji": "⏳", "text": "Maybe we're secretly building a Time Machine so everyone can finally 'buy back' all their time?" },
+      { "emoji": "💼", "text": "Kya Verve ab Big 4 ko acquire karne wala hai?" },
+      { "emoji": "🎉", "text": "Ya phir… kya hum apni history ka sabse bada, sabse crazy Workation plan kar rahe hain?" },
+      { "emoji": "🤖", "text": "Kya Verve ab Anthropic — Claude ko acquire karne wala hai?" },
+      { "emoji": "🎮", "text": "You've only unlocked Level 1. Keep your eyes on your inbox — this project is just getting started." },
+      { "emoji": "🪐", "text": "Suna hai humari agli team meeting Mars pe hone wali hai, Elon Musk ki sponsorship ke saath?" },
+      { "emoji": "🪙", "text": "Kya Verve ab apna khud ka crypto coin 'VerveCoin' launch karne wala hai?" },
+      { "emoji": "📈", "text": "Suna hai hum Nifty 50 ko replace karke 'Verve 50' index bana rahe hain?" },
+      { "emoji": "📚", "text": "Suna hai CA institute ka naya syllabus ab Verve decide karne wala hai?" },
+      { "emoji": "🏦", "text": "Kya hum secretly RBI ko tax planning sikha rahe hain?" },
+      { "emoji": "🗽", "text": "Kya hum poora US hi kharid rahe hain?" },
+      { "emoji": "👽", "text": "Are we outsourcing all our audits to aliens on Mars?" },
+      { "emoji": "💵", "text": "Kya hum dollar ka rate 1000 karne wale hain?" },
+      { "emoji": "🎬", "text": "Suna hai agle saal se ITR file karne pe clients ko return mein Netflix subscription milega?" },
+      { "emoji": "💰", "text": "Kya Verve ab Swiss Banks ki audit karne wala hai?" },
+      { "emoji": "👯", "text": "Kya 'Buy Back Time' scheme mein company humein apne clones banane de rahi hai?" },
+      { "emoji": "🍿", "text": "Suna hai hum apna khud ka OTT platform launch kar rahe hain: 'Verveflix'?" },
+      { "emoji": "🎥", "text": "Kya hum advisory ke saath Bollywood movies bhi produce karne wale hain?" },
+      { "emoji": "🏏", "text": "Are we sponsoring the next IPL team: 'The Verve Avengers'?" },
+      { "emoji": "🚁", "text": "Kya office ke terrace pe daily commute ke liye ek helipad ban raha hai?" },
+      { "emoji": "📜", "text": "Suna hai desh ke agle budget ki speech humari team likh rahi hai?" },
+      { "emoji": "🧠", "text": "Kya Elon Musk humse time management aur delegation seekhne aa raha hai?" },
+      { "emoji": "🏝️", "text": "Suna hai hum survival mindset se bahar nikalne ke liye ek private island kharid rahe hain?" },
+      { "emoji": "🛂", "text": "Kya Verve ab apna khud ka country banane wala hai, jiska apna passport hoga?" },
+      { "emoji": "🛰️", "text": "Suna hai humare servers data security ke liye Jupiter pe shift ho rahe hain?" },
+      { "emoji": "🕊️", "text": "Kya ab se emails likhne ke baad kabootar se bheje jayenge, for that 'vintage' feel?" }
+    ]
   },
   "signIn": {
     "eyebrow": "Step one · who goes there",
     "title": "Sign in to begin.",
-    "subtitle": "It just tells the mission who you are — so we can point you to your crew. No passwords today.",
+    "subtitle": "Confirm it's really you with your Verve account — then we point you to your crew. No passwords.",
     "googleLabel": "Continue with Verve Google",
-    "pickLabel": "Demo mode · pick your name to step in"
+    "emailPlaceholder": "you@verveadvisory.com",
+    "sendLabel": "Email me a sign-in code",
+    "verifyLabel": "Verify & continue",
+    "codeLabel": "6-digit code",
+    "allowedDomain": "verveadvisory.com",
+    "domainError": "Use your @verveadvisory.com email to continue.",
+    "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page)."
   },
   "brief": {
     "eyebrow": "Eyes only · plays once",
@@ -43,9 +83,13 @@
   "guess": {
     "eyebrow": "Stage one · assemble",
     "title": "Guess your crew.",
-    "subtitle": "Each clue describes one of your teammates. Match it to the right colleague — every correct call lights a canister on your team's wheel, live, for everyone.",
+    "subtitle": "Two clues, two teammates — that's your share. Match each to the right colleague: every correct call lights a canister on the team wheel, live, for everyone.",
     "distractorCount": 6,
+    "guessesPerPlayer": 2,
+    "partDoneTitle": "Your share is lit. ✨",
+    "partDoneSubtitle": "Nice matching. The rest of your crew is on their clues right now — watch the wheel fill in real time.",
     "completeTitle": "Crew assembled.",
     "completeSubtitle": "Your wheel is whole and the centre is lit. Stand by, recruit — the next transmission is already on its way."
-  }
+  },
+  "superAdmins": [{ "name": "Satyam Rathi", "email": "satyam.rathi@verveadvisory.com" }]
 }

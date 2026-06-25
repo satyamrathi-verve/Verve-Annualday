@@ -23,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Operation Getaway · Verve Advisory",
+  title: "Operation Prompt & Co. · Verve Advisory",
   description:
     "The courier found you. Open the portal, pass the vibe check, accept the briefing, and assemble your crew.",
 };

@@ -39,10 +39,24 @@ for (const team of teams) {
 }
 
 const memberById = new Map(roster.map((m) => [m.id, m]));
+const memberByEmail = new Map(
+  roster.filter((m) => m.email).map((m) => [m.email!.toLowerCase(), m]),
+);
 const teamById = new Map(teams.map((t) => [t.id, t]));
 
 export function getMember(id: string): Member | undefined {
   return memberById.get(id);
+}
+
+/** Match a (Google/email-authed) person to their roster entry by email. */
+export function getMemberByEmail(email: string): Member | undefined {
+  return memberByEmail.get(email.toLowerCase());
+}
+
+/** A super admin (all-teams dashboard) matched by email, if any. */
+export function getSuperAdmin(email: string): { name: string; email: string } | undefined {
+  const lower = email.toLowerCase();
+  return event.superAdmins.find((a) => a.email.toLowerCase() === lower);
 }
 
 export function getTeam(id: string): Team | undefined {

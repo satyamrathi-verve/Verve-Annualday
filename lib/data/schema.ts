@@ -14,11 +14,11 @@ export const clueSchema = z.object({
 });
 
 export const memberSchema = z.object({
-  /** Stable id == the (mock) Verve ID used for sign-in and realtime writes. */
+  /** Stable id used for realtime writes and (in mock mode) sign-in. */
   id: z.string().min(1),
+  /** Verve email — how a Google/email-authed person is matched to the roster. */
+  email: z.string().email().optional(),
   displayName: z.string().min(1),
-  /** The person's normal daily working group — teams are deliberately mixed across these. */
-  dailyGroup: z.enum(["Finance", "HR", "Operations", "IT"]),
   teamId: z.string().min(1),
   /** Managers get the God-Mode override on the Guess screen. */
   isManager: z.boolean().default(false),
@@ -34,10 +34,9 @@ export const teamSchema = z.object({
   memberIds: z.array(z.string().min(1)).min(1),
 });
 
-export const vibeQuestionSchema = z.object({
-  id: z.string().min(1),
-  prompt: z.string().min(1),
-  options: z.array(z.string().min(1)).min(2),
+export const rumourSchema = z.object({
+  emoji: z.string().min(1),
+  text: z.string().min(1),
 });
 
 export const eventSchema = z.object({
@@ -46,22 +45,36 @@ export const eventSchema = z.object({
   landing: z.object({
     eyebrow: z.string(),
     title: z.string(),
+    tagline: z.string(),
     subtitle: z.string(),
     cta: z.string(),
   }),
   vibe: z.object({
-    eyebrow: z.string(),
-    title: z.string(),
-    subtitle: z.string(),
-    questions: z.array(vibeQuestionSchema).min(1),
+    eyebrows: z.array(z.string().min(1)).min(1),
+    reactions: z.array(z.string().min(1)).min(2),
+    helper: z.string(),
+    minCards: z.number().int().min(1).default(5),
+    maxCards: z.number().int().min(1).default(8),
+    closeEyebrow: z.string(),
+    closeTitle: z.string(),
+    closeSubtitle: z.string(),
     cta: z.string(),
+    rumours: z.array(rumourSchema).min(1),
   }),
   signIn: z.object({
     eyebrow: z.string(),
     title: z.string(),
     subtitle: z.string(),
     googleLabel: z.string(),
-    pickLabel: z.string(),
+    emailPlaceholder: z.string(),
+    sendLabel: z.string(),
+    verifyLabel: z.string(),
+    codeLabel: z.string(),
+    /** Only emails on this domain may sign in (client-side gate). */
+    allowedDomain: z.string(),
+    domainError: z.string(),
+    /** Shown after the code is sent. Use {email} as a placeholder. */
+    checkEmail: z.string(),
   }),
   brief: z.object({
     eyebrow: z.string(),
@@ -77,9 +90,17 @@ export const eventSchema = z.object({
     subtitle: z.string(),
     /** How many other-team names to mix in as distractors per player. */
     distractorCount: z.number().int().min(0).default(6),
+    /** How many teammates each signed-in player is responsible for guessing. */
+    guessesPerPlayer: z.number().int().min(1).default(2),
+    partDoneTitle: z.string(),
+    partDoneSubtitle: z.string(),
     completeTitle: z.string(),
     completeSubtitle: z.string(),
   }),
+  /** Super admins see a live all-teams dashboard instead of the funnel. */
+  superAdmins: z
+    .array(z.object({ name: z.string(), email: z.string().email() }))
+    .default([]),
 });
 
 export const rosterSchema = z.array(memberSchema).min(1);
@@ -89,4 +110,4 @@ export type Clue = z.infer<typeof clueSchema>;
 export type Member = z.infer<typeof memberSchema>;
 export type Team = z.infer<typeof teamSchema>;
 export type EventConfig = z.infer<typeof eventSchema>;
-export type VibeQuestion = z.infer<typeof vibeQuestionSchema>;
+export type Rumour = z.infer<typeof rumourSchema>;

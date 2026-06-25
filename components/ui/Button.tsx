@@ -6,7 +6,7 @@ import { clsx } from "@/lib/clsx";
 type Variant = "gold" | "blue" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-xl font-display font-semibold text-[15px] px-6 py-3.5 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-verve";
+  "inline-flex items-center justify-center gap-2 rounded-xl font-display font-semibold text-[15px] px-7 py-4 lg:text-base lg:px-8 cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-verve";
 
 const variants: Record<Variant, string> = {
   gold: "bg-gold text-navy shadow-[0_16px_34px_-14px_rgba(224,164,54,0.7)] hover:bg-[color-mix(in_srgb,var(--color-gold)_82%,white)]",

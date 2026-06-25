@@ -36,6 +36,9 @@ export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardP
   const [wrongId, setWrongId] = useState<string | null>(null);
   const [tried, setTried] = useState<Set<string>>(new Set());
 
+  const hasClues =
+    clues.hobbies.length > 0 || clues.quirks.length > 0 || clues.funFacts.length > 0;
+
   const filtered = useMemo(
     () =>
       candidates.filter((c) =>
@@ -65,9 +68,18 @@ export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardP
         className="surface-card rounded-2xl p-5"
       >
         <div className="flex flex-col gap-2.5">
-          <ClueRow label="Hobbies" items={clues.hobbies} />
-          <ClueRow label="Quirk" items={clues.quirks} />
-          <ClueRow label="Fun fact" items={clues.funFacts} />
+          {hasClues ? (
+            <>
+              <ClueRow label="Hobbies" items={clues.hobbies} />
+              <ClueRow label="Quirk" items={clues.quirks} />
+              <ClueRow label="Fun fact" items={clues.funFacts} />
+            </>
+          ) : (
+            <p className="font-mono text-[12px] leading-relaxed text-faint">
+              Clues coming soon — they&apos;ll show here once added. (Managers can still light this
+              canister from God-Mode.)
+            </p>
+          )}
         </div>
       </motion.div>
 

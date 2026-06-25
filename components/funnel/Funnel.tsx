@@ -8,6 +8,8 @@ import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
 import { Brief } from "@/components/screens/Brief";
 import { GuessYourCrew } from "@/components/screens/GuessYourCrew";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { useAuth } from "@/components/providers/AuthContext";
 
 const STEPS: StepDef[] = [
   { key: "landing", title: "Cold open" },
@@ -17,11 +19,43 @@ const STEPS: StepDef[] = [
   { key: "guess", title: "Guess your crew" },
 ];
 
-export function Funnel() {
-  const [index, setIndex] = useState(0);
+const RESUME_KEY = "getaway.funnel.index";
 
-  const next = () => setIndex((i) => Math.min(STEPS.length - 1, i + 1));
-  const back = () => setIndex((i) => Math.max(0, i - 1));
+export function Funnel() {
+  // Wait for the persisted/auth session check before rendering the funnel. This
+  // also means the resume-from-storage below runs only on the client (after the
+  // OAuth redirect returns), so there's no hydration mismatch.
+  const { ready, session } = useAuth();
+  if (!ready) {
+    return (
+      <div className="grid min-h-dvh place-items-center">
+        <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+          loading…
+        </span>
+      </div>
+    );
+  }
+  // Super admins skip the funnel entirely and get the live all-teams dashboard.
+  if (session?.isSuperAdmin) return <AdminDashboard />;
+  return <FunnelInner />;
+}
+
+function FunnelInner() {
+  // Resume where we left off — so a Google/email redirect lands the user back on
+  // the step they were on (signed in), instead of all the way at the start.
+  const [index, setIndex] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const saved = window.sessionStorage.getItem(RESUME_KEY);
+    const n = saved ? parseInt(saved, 10) : 0;
+    return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
+  });
+
+  const go = (n: number) => {
+    if (typeof window !== "undefined") window.sessionStorage.setItem(RESUME_KEY, String(n));
+    setIndex(n);
+  };
+  const next = () => go(Math.min(STEPS.length - 1, index + 1));
+  const back = () => go(Math.max(0, index - 1));
 
   const key = STEPS[index].key;
   const screen = (() => {

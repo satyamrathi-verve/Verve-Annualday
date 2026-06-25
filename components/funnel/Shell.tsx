@@ -22,27 +22,27 @@ export function Shell({ steps, index, canGoBack, onBack, children }: ShellProps)
 
   return (
     <div className="relative flex min-h-dvh flex-col">
-      <header className="flex flex-none items-center gap-3 px-5 py-4 sm:px-8">
+      <header className="flex flex-none items-center gap-4 px-5 py-5 sm:px-8 lg:gap-6 lg:px-12 lg:py-6">
         <Image
           src="/verve-logo.png"
           alt="Verve Advisory"
-          width={584}
-          height={358}
+          width={313}
+          height={135}
           priority
-          className="h-9 w-auto"
+          className="h-16 w-auto sm:h-20 lg:h-24"
         />
         <span className="eyebrow ml-1 hidden text-faint sm:block">{event.edition}</span>
         <div className="ml-auto flex items-center gap-4">
-          <span className="hidden font-mono text-[11px] tracking-widest text-faint sm:block">
+          <span className="hidden font-mono text-sm tracking-widest text-faint sm:block lg:text-base">
             {current?.title}
           </span>
-          <span className="font-mono text-[11px] tracking-widest text-muted">
+          <span className="font-mono text-sm tracking-widest text-muted lg:text-base">
             {String(index + 1).padStart(2, "0")} / {String(steps.length).padStart(2, "0")}
           </span>
         </div>
       </header>
 
-      <div className="flex flex-none items-center gap-3 px-5 sm:px-8">
+      <div className="flex flex-none items-center gap-3 px-5 sm:px-8 lg:px-12">
         <div className="flex gap-1.5">
           {steps.map((s, i) => (
             <span
@@ -66,7 +66,7 @@ export function Shell({ steps, index, canGoBack, onBack, children }: ShellProps)
         )}
       </div>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-5 py-8 sm:px-8">
+      <main className="flex flex-1 flex-col items-center justify-center px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
         {children}
       </main>
     </div>
