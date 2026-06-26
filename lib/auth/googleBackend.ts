@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabase/client";
-import { sessionFromEmail } from "./session";
+import { sessionFromEmail, validatedSessionFromSupabase } from "./session";
 import type { AuthBackend, Session } from "./types";
 
 const ALLOWED_DOMAIN = "verveadvisory.com";
@@ -17,8 +17,7 @@ export class GoogleAuthBackend implements AuthBackend {
   async getSession(): Promise<Session | null> {
     const supabase = getSupabase();
     if (!supabase) return null;
-    const { data } = await supabase.auth.getSession();
-    return sessionFromEmail(data.session?.user?.email);
+    return validatedSessionFromSupabase(supabase);
   }
 
   onChange(cb: (session: Session | null) => void): () => void {

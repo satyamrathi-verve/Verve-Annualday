@@ -47,12 +47,17 @@ function FunnelInner() {
   const { session } = useAuth();
 
   // Resume where we left off — so a Google/email redirect lands the user back on
-  // the step they were on (signed in), instead of all the way at the start.
+  // the step they were on (signed in), instead of all the way at the start. But
+  // never resume onto the auth-gated "Now We Wait" step without a session (e.g.
+  // the cached session failed server validation on reload), which would strand a
+  // logged-out device on an inner screen — start at sign-in instead.
   const [index, setIndex] = useState(() => {
     if (typeof window === "undefined") return 0;
     const saved = window.sessionStorage.getItem(RESUME_KEY);
-    const n = saved ? parseInt(saved, 10) : 0;
-    return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
+    const parsed = saved ? parseInt(saved, 10) : 0;
+    const n = Number.isFinite(parsed) && parsed >= 0 && parsed < STEPS.length ? parsed : 0;
+    if (!session && STEPS[n].key === "wait") return SIGNIN_INDEX;
+    return n;
   });
 
   const go = (n: number) => {
@@ -62,8 +67,10 @@ function FunnelInner() {
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
 
-  // When the session ends (manual or 15-min idle auto-logout), throw back to the
-  // Google sign-in screen so a logged-out device doesn't linger on an inner step.
+  // When the session ENDS while the tab is open (15-min idle auto-logout, manual
+  // sign-out, or a token refresh that discovers the user was deleted), throw back
+  // to the Google sign-in screen. The reload/fresh-load case is handled by the
+  // index initializer above.
   const wasSignedIn = useRef(Boolean(session));
   useEffect(() => {
     const signedIn = Boolean(session);
