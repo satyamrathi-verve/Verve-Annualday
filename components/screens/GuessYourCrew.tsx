@@ -155,39 +155,52 @@ function CrewBoard({
     return false;
   };
 
+  const header = (align: "center" | "left") => (
+    <div className={align === "center" ? "text-center" : "text-left"}>
+      <p className="eyebrow">{c.eyebrow}</p>
+      <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        {c.title}
+      </h1>
+      <div
+        className={clsx(
+          "mt-3 flex flex-wrap items-center gap-3 font-mono text-[11px] text-muted lg:text-xs",
+          align === "center" ? "justify-center" : "justify-start",
+        )}
+      >
+        <span className="font-bold" style={{ color }}>
+          {team?.name ?? teamId}
+        </span>
+        <span className="text-line">|</span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-verve" />
+          {online.length} in the room
+        </span>
+        <span className="text-line">|</span>
+        <span className={backendKind === "supabase" ? "text-verve" : "text-faint"}>
+          {backendKind === "supabase" ? "● LIVE" : "○ local demo"}
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full max-w-5xl lg:max-w-6xl">
-      <div className="text-center">
-        <p className="eyebrow">{c.eyebrow}</p>
-        <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-          {c.title}
-        </h1>
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 font-mono text-[11px] text-muted lg:text-xs">
-          <span className="font-bold" style={{ color }}>
-            {team?.name ?? teamId}
-          </span>
-          <span className="text-line">|</span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-verve" />
-            {online.length} in the room
-          </span>
-          <span className="text-line">|</span>
-          <span className={backendKind === "supabase" ? "text-verve" : "text-faint"}>
-            {backendKind === "supabase" ? "● LIVE" : "○ local demo"}
-          </span>
-        </div>
-      </div>
-
       {!ready ? (
-        <LoadingPanel lines={c.loading} />
+        <>
+          {header("center")}
+          <LoadingPanel lines={c.loading} />
+        </>
       ) : total === 0 ? (
-        <div className="surface-card mx-auto mt-10 max-w-md rounded-2xl p-6 text-center">
-          <p className="font-display text-xl font-bold text-navy">{c.errorTitle}</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{c.errorBody}</p>
-        </div>
+        <>
+          {header("center")}
+          <div className="surface-card mx-auto mt-10 max-w-md rounded-2xl p-6 text-center">
+            <p className="font-display text-xl font-bold text-navy">{c.errorTitle}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{c.errorBody}</p>
+          </div>
+        </>
       ) : (
-        <div className="mt-8 grid items-start gap-8 lg:grid-cols-2">
-          {/* Wheel */}
+        <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
+          {/* Wheel — left, enlarged to fill the column */}
           <div className="flex flex-col items-center">
             <Wheel
               members={members}
@@ -205,8 +218,9 @@ function CrewBoard({
             </p>
           </div>
 
-          {/* Status card (mirrors wheel state) */}
+          {/* Content column: title → your share → status */}
           <div className="flex flex-col gap-5">
+            {header("left")}
             {/* Your share tracker */}
             {!complete && myShare > 0 && (
               <div className="flex items-center gap-3">

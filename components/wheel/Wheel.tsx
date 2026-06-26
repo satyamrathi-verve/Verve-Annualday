@@ -50,7 +50,7 @@ export function Wheel({
   });
 
   return (
-    <div className="relative mx-auto aspect-square w-[min(440px,88vw)]">
+    <div className="relative mx-auto aspect-square w-full max-w-[540px]">
       <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-full w-full overflow-visible">
         <defs>
           <radialGradient id="wheel-amber" cx="38%" cy="34%" r="72%">
