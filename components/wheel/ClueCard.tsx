@@ -1,22 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { clsx } from "@/lib/clsx";
 import type { Clue } from "@/lib/data/schema";
-
-interface Candidate {
-  id: string;
-  displayName: string;
-}
 
 interface ClueCardProps {
   index: number;
   total: number;
   clues: Clue;
-  candidates: Candidate[];
-  /** Returns true if the guess was correct. */
-  onGuess: (candidateId: string) => boolean;
+  /** Validate a typed name. Returns true if it matches the teammate this clue points to. */
+  onGuess: (name: string) => boolean;
+  /** Copy shown after a wrong guess. */
+  wrongNote: string;
 }
 
 function ClueRow({ label, items }: { label: string; items: string[] }) {
@@ -31,28 +26,23 @@ function ClueRow({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardProps) {
-  const [query, setQuery] = useState("");
-  const [wrongId, setWrongId] = useState<string | null>(null);
-  const [tried, setTried] = useState<Set<string>>(new Set());
+export function ClueCard({ index, total, clues, onGuess, wrongNote }: ClueCardProps) {
+  const [value, setValue] = useState("");
+  const [wrong, setWrong] = useState(false);
 
   const hasClues =
     clues.hobbies.length > 0 || clues.quirks.length > 0 || clues.funFacts.length > 0;
 
-  const filtered = useMemo(
-    () =>
-      candidates.filter((c) =>
-        c.displayName.toLowerCase().includes(query.trim().toLowerCase()),
-      ),
-    [candidates, query],
-  );
-
-  const handleTap = (id: string) => {
-    const ok = onGuess(id);
-    if (!ok) {
-      setWrongId(id);
-      setTried((t) => new Set(t).add(id));
-      window.setTimeout(() => setWrongId((w) => (w === id ? null : w)), 500);
+  const submit = () => {
+    const name = value.trim();
+    if (!name) return;
+    const ok = onGuess(name);
+    if (ok) {
+      setValue("");
+      setWrong(false);
+    } else {
+      setWrong(true);
+      window.setTimeout(() => setWrong(false), 600);
     }
   };
 
@@ -63,7 +53,7 @@ export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardP
       </p>
 
       <motion.div
-        animate={wrongId ? { x: [0, -7, 7, -5, 5, 0] } : { x: 0 }}
+        animate={wrong ? { x: [0, -7, 7, -5, 5, 0] } : { x: 0 }}
         transition={{ duration: 0.4 }}
         className="surface-card rounded-2xl p-5"
       >
@@ -76,47 +66,40 @@ export function ClueCard({ index, total, clues, candidates, onGuess }: ClueCardP
             </>
           ) : (
             <p className="font-mono text-[12px] leading-relaxed text-faint">
-              Clues coming soon — they&apos;ll show here once added. (Managers can still light this
+              Clues coming soon — they&apos;ll show here once added. (Managers can still confirm this
               canister from God-Mode.)
             </p>
           )}
         </div>
       </motion.div>
 
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Filter colleagues…"
-        className="mt-4 w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors focus:border-verve"
-      />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        className="mt-4 flex gap-2"
+      >
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Type their name…"
+          autoComplete="off"
+          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors ${
+            wrong ? "border-red-400 focus:border-red-400" : "border-line focus:border-verve"
+          }`}
+        />
+        <button
+          type="submit"
+          disabled={!value.trim()}
+          className="flex-none rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+        >
+          Guess
+        </button>
+      </form>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {filtered.map((c) => {
-          const isWrong = wrongId === c.id;
-          const wasTried = tried.has(c.id);
-          return (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => handleTap(c.id)}
-              className={clsx(
-                "rounded-full border px-3.5 py-2 text-[13px] font-medium transition-all",
-                isWrong
-                  ? "border-red-400 bg-red-50 text-red-500"
-                  : wasTried
-                    ? "border-line bg-surface-2 text-faint"
-                    : "border-line bg-white text-ink hover:border-verve hover:text-verve",
-              )}
-            >
-              {c.displayName}
-            </button>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="px-1 py-2 font-mono text-[12px] text-faint">no match</p>
-        )}
-      </div>
+      {wrong && <p className="mt-2 font-mono text-[12px] text-red-500">{wrongNote}</p>}
     </div>
   );
 }

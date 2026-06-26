@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useAllWheels } from "@/lib/realtime/useAllWheels";
@@ -7,9 +8,10 @@ import { useAllWheels } from "@/lib/realtime/useAllWheels";
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
   const selfId = `admin:${session?.email ?? "anon"}`;
-  const { teams, backendKind } = useAllWheels(selfId);
+  const { teams, backendKind, resetTeam } = useAllWheels(selfId);
 
-  const litTotal = teams.reduce((s, t) => s + t.litCount, 0);
+  const greenTotal = teams.reduce((s, t) => s + t.greenCount, 0);
+  const yellowTotal = teams.reduce((s, t) => s + t.yellowCount, 0);
   const canisterTotal = teams.reduce((s, t) => s + t.total, 0);
   const teamsComplete = teams.filter((t) => t.complete).length;
   const onlineTotal = teams.reduce((s, t) => s + t.online, 0);
@@ -44,19 +46,16 @@ export function AdminDashboard() {
 
       {/* summary */}
       <div className="mx-auto mt-6 grid w-full max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="canisters lit" value={`${litTotal} / ${canisterTotal}`} />
+        <Stat label="confirmed" value={`${greenTotal} / ${canisterTotal}`} />
+        <Stat label="pending" value={String(yellowTotal)} />
         <Stat label="teams complete" value={`${teamsComplete} / ${teams.length}`} />
         <Stat label="people in rooms" value={String(onlineTotal)} />
-        <Stat
-          label="overall"
-          value={`${canisterTotal ? Math.round((litTotal / canisterTotal) * 100) : 0}%`}
-        />
       </div>
 
       {/* team grid */}
       <div className="mx-auto mt-6 grid w-full max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {teams.map((t) => {
-          const pct = t.total ? Math.round((t.litCount / t.total) * 100) : 0;
+          const pct = t.total ? Math.round((t.greenCount / t.total) * 100) : 0;
           return (
             <div key={t.teamId} className="surface-card rounded-2xl p-5">
               <div className="flex items-center gap-2">
@@ -71,7 +70,7 @@ export function AdminDashboard() {
 
               <div className="mt-4 flex items-end justify-between">
                 <span className="font-display text-3xl font-extrabold leading-none text-navy">
-                  {t.litCount}
+                  {t.greenCount}
                   <span className="text-lg text-faint"> / {t.total}</span>
                 </span>
                 <span className="font-mono text-[11px] text-muted">
@@ -82,18 +81,44 @@ export function AdminDashboard() {
 
               <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-line">
                 <motion.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: t.color }}
+                  className="h-full rounded-full bg-green-600"
                   initial={false}
                   animate={{ width: `${pct}%` }}
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                 />
+              </div>
+
+              <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-faint">
+                <span>{t.yellowCount} pending</span>
+                <ResetButton onConfirm={() => resetTeam(t.teamId)} />
               </div>
             </div>
           );
         })}
       </div>
     </div>
+  );
+}
+
+/** Two-tap reset so a stray click can't wipe a live team mid-event. */
+function ResetButton({ onConfirm }: { onConfirm: () => void }) {
+  const [armed, setArmed] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (armed) {
+          onConfirm();
+          setArmed(false);
+        } else {
+          setArmed(true);
+          window.setTimeout(() => setArmed(false), 2500);
+        }
+      }}
+      className={armed ? "tracking-wider text-red-500" : "tracking-wider hover:text-red-500"}
+    >
+      {armed ? "↻ tap again to wipe" : "↻ reset"}
+    </button>
   );
 }
 

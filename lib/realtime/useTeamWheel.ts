@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getTeamMembers } from "@/lib/data/config";
+import { getGuessTargets, getTeamMembers } from "@/lib/data/config";
 import type { Member } from "@/lib/data/schema";
+import { deriveWheel, type CanisterStatus } from "./derive";
 import { getRealtimeBackend } from "./index";
-import type { CanisterState, LitMethod, TeamRoom } from "./types";
+import type { GuessEdge, TeamRoom } from "./types";
 
 export interface WheelMember extends Member {
-  lit: boolean;
-  method: LitMethod | null;
-  litBy: string | null;
+  /** grey (ungueessed) · yellow (guessed, pending) · green (mutual / revealed). */
+  status: CanisterStatus;
   isSelf: boolean;
   online: boolean;
 }
@@ -17,23 +17,31 @@ export interface WheelMember extends Member {
 export interface TeamWheel {
   members: WheelMember[];
   online: string[];
-  litCount: number;
+  greenCount: number;
+  yellowCount: number;
   total: number;
   complete: boolean;
   ready: boolean;
   backendKind: "supabase" | "mock";
-  light: (memberId: string, method: LitMethod) => Promise<void>;
+  /** The teammates THIS player must guess (their share). */
+  myTargets: string[];
+  /** Of my targets, the ids I've already correctly guessed. */
+  myGuessed: string[];
+  /** Record a correct guess of `targetId` by me. */
+  guess: (targetId: string) => Promise<void>;
+  /** Manager God-Mode: force a member green. */
+  reveal: (memberId: string) => Promise<void>;
   reset: () => Promise<void>;
 }
 
 /*
-  Joins the team's realtime room, auto-lights the player's own canister
-  ("self" — you know who you are), and merges the live lit-state onto the
-  roster. Because every correct guess by ANY teammate lights the shared
-  wheel, the work is parallel and no single person can block the rest.
+  Joins the team's realtime room and derives every canister's colour from the
+  shared guess graph. Each player is responsible for guessing their own targets
+  (getGuessTargets) — a canister turns green only once two members have guessed
+  each other, so no one can complete the wheel alone.
 */
 export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
-  const [litMap, setLitMap] = useState<Record<string, CanisterState>>({});
+  const [edges, setEdges] = useState<GuessEdge[]>([]);
   const [online, setOnline] = useState<string[]>([selfMemberId]);
   const [ready, setReady] = useState(false);
   const roomRef = useRef<TeamRoom | null>(null);
@@ -45,11 +53,8 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
 
     backend
       .joinTeam(teamId, selfMemberId, {
-        onCanisters: (states) => {
-          if (!active) return;
-          const next: Record<string, CanisterState> = {};
-          for (const s of states) next[s.memberId] = s;
-          setLitMap(next);
+        onGuesses: (next) => {
+          if (active) setEdges(next);
         },
         onPresence: (ids) => {
           if (active) setOnline(ids);
@@ -74,55 +79,59 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
     };
   }, [teamId, selfMemberId]);
 
-  // Self-heal: keep our own canister lit in the SHARED state. Fires on join and
-  // again whenever a snapshot lacks our self-row (e.g. a God-Mode reset wiped
-  // the team). Each client only ever re-asserts its OWN self, so the wheel
-  // converges across everyone instead of desyncing after a reset.
-  useEffect(() => {
-    if (!ready || !roomRef.current) return;
-    if (!litMap[selfMemberId]) {
-      void roomRef.current.light(selfMemberId, "self", selfMemberId);
-    }
-  }, [ready, litMap, selfMemberId]);
+  const teamMembers = useMemo(() => getTeamMembers(teamId), [teamId]);
+
+  const derived = useMemo(
+    () => deriveWheel(teamMembers.map((m) => m.id), edges),
+    [teamMembers, edges],
+  );
 
   const members: WheelMember[] = useMemo(() => {
-    return getTeamMembers(teamId).map((m) => {
-      const state = litMap[m.id];
-      const isSelf = m.id === selfMemberId;
-      const lit = state?.lit ?? isSelf;
-      return {
-        ...m,
-        lit,
-        method: state?.method ?? (isSelf ? "self" : null),
-        litBy: state?.litBy ?? null,
-        isSelf,
-        online: online.includes(m.id),
-      };
-    });
-  }, [teamId, selfMemberId, litMap, online]);
+    return teamMembers.map((m) => ({
+      ...m,
+      status: derived.status[m.id] ?? "grey",
+      isSelf: m.id === selfMemberId,
+      online: online.includes(m.id),
+    }));
+  }, [teamMembers, derived, selfMemberId, online]);
 
-  const light = useCallback(
-    async (memberId: string, method: LitMethod) => {
-      await roomRef.current?.light(memberId, method, selfMemberId);
+  const myTargets = useMemo(() => getGuessTargets(selfMemberId), [selfMemberId]);
+
+  const myGuessed = useMemo(() => {
+    const mine = new Set(
+      edges.filter((e) => e.guesserId === selfMemberId).map((e) => e.guessedId),
+    );
+    return myTargets.filter((t) => mine.has(t));
+  }, [edges, selfMemberId, myTargets]);
+
+  const guess = useCallback(
+    async (targetId: string) => {
+      await roomRef.current?.guess(selfMemberId, targetId);
     },
     [selfMemberId],
   );
+
+  const reveal = useCallback(async (memberId: string) => {
+    await roomRef.current?.reveal(memberId);
+  }, []);
 
   const reset = useCallback(async () => {
     await roomRef.current?.reset();
   }, []);
 
-  const litCount = members.filter((m) => m.lit).length;
-
   return {
     members,
     online,
-    litCount,
+    greenCount: derived.greenCount,
+    yellowCount: derived.yellowCount,
     total: members.length,
-    complete: members.length > 0 && litCount === members.length,
+    complete: members.length > 0 && derived.greenCount === members.length,
     ready,
     backendKind,
-    light,
+    myTargets,
+    myGuessed,
+    guess,
+    reveal,
     reset,
   };
 }

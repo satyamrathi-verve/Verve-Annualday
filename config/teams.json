@@ -132,5 +132,19 @@
       "pooja.mahto",
       "om.anil.bhombe"
     ]
+  },
+  {
+    "id": "demo",
+    "name": "Demo Team",
+    "color": "#0d9488",
+    "memberIds": [
+      "satyam.rathi",
+      "sakshi.berwal",
+      "harshal.pahade",
+      "devendra.mandhana",
+      "priya.pahade",
+      "sakshi.jadhav",
+      "sayli.sonone"
+    ]
   }
 ]

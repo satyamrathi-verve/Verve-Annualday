@@ -83,13 +83,14 @@
   "guess": {
     "eyebrow": "Stage one · assemble",
     "title": "Guess your crew.",
-    "subtitle": "Two clues, two teammates — that's your share. Match each to the right colleague: every correct call lights a canister on the team wheel, live, for everyone.",
-    "distractorCount": 6,
-    "guessesPerPlayer": 2,
-    "partDoneTitle": "Your share is lit. ✨",
-    "partDoneSubtitle": "Nice matching. The rest of your crew is on their clues right now — watch the wheel fill in real time.",
+    "subtitle": "Read each clue and name the colleague it points to. A correct call marks them yellow — but a canister only turns green when you and that teammate guess each other.",
+    "pendingNote": "You may be right about {name} — but it depends on what they guess. Their canister turns green only when {name} guesses you back.",
+    "confirmedNote": "Confirmed! You and {name} guessed each other — both canisters are green. 💚",
+    "wrongNote": "Not quite — read the clue again and try another name.",
+    "partDoneTitle": "Your share is in. ✨",
+    "partDoneSubtitle": "Nice work. Your matches turn green the moment those teammates guess you back — watch the wheel.",
     "completeTitle": "Crew assembled.",
-    "completeSubtitle": "Your wheel is whole and the centre is lit. Stand by, recruit — the next transmission is already on its way."
+    "completeSubtitle": "Every canister is green — the whole crew guessed each other. Stand by, recruit — the next transmission is already on its way."
   },
-  "superAdmins": [{ "name": "Satyam Rathi", "email": "satyam.rathi@verveadvisory.com" }]
+  "superAdmins": [{ "name": "Software Admin", "email": "admin.software@verveadvisory.com" }]
 }

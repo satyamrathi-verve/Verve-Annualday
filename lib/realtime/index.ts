@@ -12,4 +12,4 @@ export function getRealtimeBackend(): RealtimeBackend {
   return supabaseEnabled ? new SupabaseRealtimeBackend() : new MockRealtimeBackend();
 }
 
-export type { CanisterState, LitMethod, RealtimeBackend, TeamRoom } from "./types";
+export type { GuessEdge, RealtimeBackend, TeamRoom } from "./types";

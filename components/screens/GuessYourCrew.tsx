@@ -3,20 +3,20 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
-import { useTeamWheel } from "@/lib/realtime/useTeamWheel";
+import { useTeamWheel, type WheelMember } from "@/lib/realtime/useTeamWheel";
 import { Wheel } from "@/components/wheel/Wheel";
 import { ClueCard } from "@/components/wheel/ClueCard";
 import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
-import { event, getTeam, roster } from "@/lib/data/config";
+import { event, getTeam } from "@/lib/data/config";
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+/** Lenient name match: full name or first name, case/space-insensitive. */
+function matchesName(input: string, displayName: string): boolean {
+  const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+  const a = norm(input);
+  const b = norm(displayName);
+  if (!a) return false;
+  return a === b || a === b.split(" ")[0];
 }
 
 export function GuessYourCrew() {
@@ -28,8 +28,7 @@ export function GuessYourCrew() {
     );
   }
 
-  // Email-authed but not yet matched to a roster entry (team + clues). Happens
-  // until the real roster — keyed by email — is added to config.
+  // Email-authed but not yet matched to a roster entry (team + clues).
   if (!session.teamId || !session.memberId) {
     return (
       <div className="w-full max-w-xl text-center">
@@ -60,50 +59,44 @@ function CrewBoard({
   const c = event.guess;
   const team = getTeam(teamId);
   const wheel = useTeamWheel(teamId, selfId);
-  const { members, online, litCount, total, complete, light, reset, backendKind } = wheel;
+  const { members, online, greenCount, yellowCount, total, complete, guess, reveal, reset, backendKind } =
+    wheel;
   const color = team?.color ?? "#2f6bff";
-  const perPlayer = c.guessesPerPlayer;
 
-  // The teammates THIS login has personally guessed right — drives the 2-guess
-  // share. Stays local to the client; the lit canisters themselves are shared.
-  const [myGuessed, setMyGuessed] = useState<Set<string>>(new Set());
-  const myCount = myGuessed.size;
-  const myDone = myCount >= perPlayer;
+  // The teammate I most recently guessed — drives the pending/confirmed banner.
+  const [lastGuessedId, setLastGuessedId] = useState<string | null>(null);
 
-  // Distractors: real colleagues from OTHER teams — make the guess non-trivial
-  // and human-only (an AI can't map a personal quirk to a specific person).
-  const distractors = useMemo(
-    () => shuffle(roster.filter((m) => m.teamId !== teamId)).slice(0, c.distractorCount),
-    [teamId, c.distractorCount],
+  const byId = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
+
+  // My share = the teammates I'm assigned to guess. A target drops off once I've
+  // guessed it OR it's already confirmed green (e.g. a manager revealed it).
+  const myGuessedSet = useMemo(() => new Set(wheel.myGuessed), [wheel.myGuessed]);
+  const pendingTargets = useMemo(
+    () =>
+      wheel.myTargets
+        .map((id) => byId.get(id))
+        .filter((m): m is WheelMember => Boolean(m))
+        .filter((m) => !myGuessedSet.has(m.id) && m.status !== "green"),
+    [wheel.myTargets, byId, myGuessedSet],
   );
 
-  // Personalised teammate order so different logins start on different people —
-  // the work spreads across the crew instead of everyone racing the same clue.
-  const orderedTeammates = useMemo(() => {
-    const ms = members.filter((m) => !m.isSelf);
-    const ids = team?.memberIds ?? [];
-    const off = ms.length ? Math.max(0, ids.indexOf(selfId)) % ms.length : 0;
-    return [...ms.slice(off), ...ms.slice(0, off)];
-  }, [members, team, selfId]);
+  const myShare = wheel.myTargets.length;
+  const myCount = wheel.myGuessed.length;
+  const current = pendingTargets[0];
+  const myDone = pendingTargets.length === 0;
 
-  // My current clue: the next teammate I haven't found, skipping any the crew
-  // already lit in real time — until I've lit my share.
-  const current = myDone
-    ? undefined
-    : orderedTeammates.find((m) => !m.lit && !myGuessed.has(m.id));
+  const lastGuessed = lastGuessedId ? byId.get(lastGuessedId) : undefined;
+  const banner = lastGuessed
+    ? lastGuessed.status === "green"
+      ? { tone: "green" as const, text: c.confirmedNote.replace("{name}", lastGuessed.displayName) }
+      : { tone: "yellow" as const, text: c.pendingNote.replace("{name}", lastGuessed.displayName) }
+    : null;
 
-  const candidates = useMemo(() => {
-    const pool = members.filter((m) => !m.lit && !m.isSelf && !myGuessed.has(m.id));
-    return [...pool, ...distractors]
-      .map((m) => ({ id: m.id, displayName: m.displayName }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [members, distractors, myGuessed]);
-
-  const onGuess = (candidateId: string): boolean => {
+  const onGuess = (name: string): boolean => {
     if (!current) return false;
-    if (candidateId === current.id) {
-      void light(current.id, "guess");
-      setMyGuessed((s) => new Set(s).add(current.id));
+    if (matchesName(name, current.displayName)) {
+      void guess(current.id);
+      setLastGuessedId(current.id);
       return true;
     }
     return false;
@@ -138,25 +131,27 @@ function CrewBoard({
           <Wheel
             members={members}
             color={color}
-            litCount={litCount}
+            greenCount={greenCount}
+            yellowCount={yellowCount}
             total={total}
             complete={complete}
           />
           <p className="mt-4 text-center font-mono text-[11px] text-faint lg:text-xs">
-            {litCount} / {total} canisters lit · updates live as your crew guesses
+            {greenCount} / {total} confirmed · {yellowCount} pending · updates live as your crew
+            guesses
           </p>
         </div>
 
         {/* Guess panel */}
         <div className="flex flex-col gap-5">
           {/* Your share tracker */}
-          {!complete && (
+          {!complete && myShare > 0 && (
             <div className="flex items-center gap-3">
               <span className="font-mono text-[11px] uppercase tracking-wider text-gold-deep lg:text-xs">
                 Your share
               </span>
               <div className="flex gap-1.5">
-                {Array.from({ length: perPlayer }).map((_, i) => (
+                {Array.from({ length: myShare }).map((_, i) => (
                   <span
                     key={i}
                     className={clsx(
@@ -167,9 +162,26 @@ function CrewBoard({
                 ))}
               </div>
               <span className="ml-auto font-mono text-[11px] text-muted lg:text-xs">
-                {myCount} / {perPlayer} found
+                {myCount} / {myShare} guessed
               </span>
             </div>
+          )}
+
+          {/* Pending / confirmed banner for the teammate I just guessed */}
+          {banner && (
+            <motion.div
+              key={`${lastGuessedId}-${banner.tone}`}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={clsx(
+                "rounded-xl border px-4 py-3 text-[13px] leading-relaxed",
+                banner.tone === "green"
+                  ? "border-green-300 bg-green-50 text-green-700"
+                  : "border-gold/50 bg-gold-soft/40 text-gold-deep",
+              )}
+            >
+              {banner.text}
+            </motion.div>
           )}
 
           {complete ? (
@@ -194,7 +206,7 @@ function CrewBoard({
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted">{c.partDoneSubtitle}</p>
               <p className="mt-4 font-mono text-[11px] text-gold-deep lg:text-xs">
-                {total - litCount} still to find · watching the wheel
+                {total - greenCount} still to confirm · watching the wheel
               </p>
             </motion.div>
           ) : current ? (
@@ -204,32 +216,18 @@ function CrewBoard({
               </p>
               <ClueCard
                 index={myCount + 1}
-                total={perPlayer}
+                total={myShare}
                 clues={current.clues}
-                candidates={candidates}
                 onGuess={onGuess}
+                wrongNote={c.wrongNote}
               />
             </>
-          ) : (
-            // Every teammate was lit by the crew before this login finished its share.
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="surface-card rounded-2xl p-6 text-center"
-            >
-              <h2 className="font-display text-2xl font-extrabold text-navy lg:text-3xl">
-                The crew beat you to it!
-              </h2>
-              <p className="mt-3 text-base leading-relaxed text-muted">
-                Every teammate is already lit — your share filled itself. Stand by.
-              </p>
-            </motion.div>
-          )}
+          ) : null}
 
           {isManager && (
             <GodModePanel
               members={members}
-              onReveal={(id) => void light(id, "godmode")}
+              onReveal={(id) => void reveal(id)}
               onReset={() => void reset()}
             />
           )}

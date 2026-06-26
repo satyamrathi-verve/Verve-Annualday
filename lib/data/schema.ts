@@ -22,6 +22,13 @@ export const memberSchema = z.object({
   teamId: z.string().min(1),
   /** Managers get the God-Mode override on the Guess screen. */
   isManager: z.boolean().default(false),
+  /**
+   * Who THIS member is responsible for guessing. When omitted, the player's
+   * targets default to their two "ring neighbours" in the team's declared
+   * order, which guarantees every guess is reciprocated (see getGuessTargets).
+   * A canister only turns green when two members guess each other.
+   */
+  guessTargets: z.array(z.string().min(1)).optional(),
   /** Personal-characteristics clues — human-only / "AI-proof" by design. */
   clues: clueSchema,
 });
@@ -88,10 +95,15 @@ export const eventSchema = z.object({
     eyebrow: z.string(),
     title: z.string(),
     subtitle: z.string(),
-    /** How many other-team names to mix in as distractors per player. */
-    distractorCount: z.number().int().min(0).default(6),
-    /** How many teammates each signed-in player is responsible for guessing. */
-    guessesPerPlayer: z.number().int().min(1).default(2),
+    /**
+     * Shown after a correct-but-not-yet-mutual guess (the target turns yellow).
+     * Use {name} for the teammate the player just identified.
+     */
+    pendingNote: z.string(),
+    /** Shown when the guess completes a mutual pair (both turn green). {name} = teammate. */
+    confirmedNote: z.string(),
+    /** Shown on a wrong guess. */
+    wrongNote: z.string(),
     partDoneTitle: z.string(),
     partDoneSubtitle: z.string(),
     completeTitle: z.string(),

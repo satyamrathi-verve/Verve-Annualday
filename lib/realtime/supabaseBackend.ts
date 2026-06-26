@@ -1,24 +1,17 @@
 import { getSupabase } from "@/lib/supabase/client";
-import type {
-  CanisterState,
-  LitMethod,
-  RealtimeBackend,
-  TeamRoom,
-  TeamRoomCallbacks,
-} from "./types";
+import { GODMODE_GUESSER } from "./derive";
+import type { GuessEdge, RealtimeBackend, TeamRoom, TeamRoomCallbacks } from "./types";
 
-interface CanisterRow {
-  member_id: string;
-  lit: boolean;
-  lit_by: string | null;
-  method: LitMethod | null;
+interface GuessRow {
+  guesser_id: string;
+  guessed_id: string;
 }
 
 /*
-  Real transport. State lives in the `canister_state` table; we subscribe to
-  postgres changes (filtered by team) and re-snapshot on any change — trivial
-  at ~12 rows and avoids fragile per-event merging. Presence rides the same
-  channel so the wheel shows who's currently in the room.
+  Real transport. State lives in the `guesses` table (one row per correct guess);
+  we subscribe to postgres changes (filtered by team) and re-snapshot on any
+  change — trivial at a few dozen rows and avoids fragile per-event merging.
+  Presence rides the same channel so the wheel shows who's currently in the room.
 */
 export class SupabaseRealtimeBackend implements RealtimeBackend {
   readonly kind = "supabase" as const;
@@ -33,21 +26,19 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
 
     const snapshot = async () => {
       const { data, error } = await supabase
-        .from("canister_state")
-        .select("member_id, lit, lit_by, method")
+        .from("guesses")
+        .select("guesser_id, guessed_id")
         .eq("team_id", teamId);
       if (error) {
         console.error("[wheel] snapshot read failed:", error.message);
         return;
       }
-      const rows = (data ?? []) as CanisterRow[];
-      const states: CanisterState[] = rows.map((r) => ({
-        memberId: r.member_id,
-        lit: r.lit,
-        litBy: r.lit_by,
-        method: r.method,
+      const rows = (data ?? []) as GuessRow[];
+      const edges: GuessEdge[] = rows.map((r) => ({
+        guesserId: r.guesser_id,
+        guessedId: r.guessed_id,
       }));
-      cb.onCanisters(states);
+      cb.onGuesses(edges);
     };
 
     const channel = supabase.channel(`team:${teamId}`, {
@@ -59,7 +50,7 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
       {
         event: "*",
         schema: "public",
-        table: "canister_state",
+        table: "guesses",
         filter: `team_id=eq.${teamId}`,
       },
       () => {
@@ -103,30 +94,31 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
       }, 4000);
     });
 
+    const insertEdge = async (guesserId: string, guessedId: string) => {
+      const { error } = await supabase.from("guesses").upsert(
+        {
+          team_id: teamId,
+          guesser_id: guesserId,
+          guessed_id: guessedId,
+          created_at: new Date().toISOString(),
+        },
+        { onConflict: "team_id,guesser_id,guessed_id" },
+      );
+      if (error) {
+        console.error("[wheel] guess write failed:", error.message);
+        return;
+      }
+      // Optimistic: refresh our OWN view immediately so the guesser sees the
+      // canister react without waiting on the realtime round-trip. Other clients
+      // still update via their postgres_changes subscription.
+      await snapshot();
+    };
+
     return {
-      light: async (memberId, method, byMemberId) => {
-        const { error } = await supabase.from("canister_state").upsert(
-          {
-            team_id: teamId,
-            member_id: memberId,
-            lit: true,
-            lit_by: byMemberId,
-            method,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "team_id,member_id" },
-        );
-        if (error) {
-          console.error("[wheel] light write failed:", error.message);
-          return;
-        }
-        // Optimistic: refresh our OWN view immediately so the guesser sees their
-        // canister light + animate without waiting on the realtime round-trip.
-        // Other clients still update via their postgres_changes subscription.
-        await snapshot();
-      },
+      guess: (guesserId, guessedId) => insertEdge(guesserId, guessedId),
+      reveal: (memberId) => insertEdge(GODMODE_GUESSER, memberId),
       reset: async () => {
-        const { error } = await supabase.from("canister_state").delete().eq("team_id", teamId);
+        const { error } = await supabase.from("guesses").delete().eq("team_id", teamId);
         if (error) {
           console.error("[wheel] reset failed:", error.message);
           return;

@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { teams, getTeamMembers } from "@/lib/data/config";
+import { deriveWheel } from "./derive";
 import { getRealtimeBackend } from "./index";
-import type { TeamRoom } from "./types";
+import type { GuessEdge, TeamRoom } from "./types";
 
 export interface TeamProgress {
   teamId: string;
   name: string;
   color: string;
-  litCount: number;
+  greenCount: number;
+  yellowCount: number;
   total: number;
   online: number;
   complete: boolean;
@@ -17,15 +19,18 @@ export interface TeamProgress {
 
 /*
   Super-admin view: joins EVERY team's realtime room at once and reports each
-  team's live progress (lit canisters, who's online, complete?). Reuses the same
-  backend as the player wheel, so it works on Supabase and the local mock alike.
+  team's live progress (green / pending canisters, who's online, complete?).
+  Reuses the same derivation as the player wheel, so it can't disagree on state.
+  Also exposes a per-team reset so a tester can re-run a wheel from the dashboard.
 */
 export function useAllWheels(selfId: string): {
   teams: TeamProgress[];
   backendKind: "supabase" | "mock";
+  resetTeam: (teamId: string) => void;
 } {
-  const [litByTeam, setLitByTeam] = useState<Record<string, string[]>>({});
+  const [edgesByTeam, setEdgesByTeam] = useState<Record<string, GuessEdge[]>>({});
   const [onlineByTeam, setOnlineByTeam] = useState<Record<string, string[]>>({});
+  const roomsRef = useRef<Record<string, TeamRoom>>({});
   const backendKind = useMemo(() => getRealtimeBackend().kind, []);
 
   useEffect(() => {
@@ -36,10 +41,9 @@ export function useAllWheels(selfId: string): {
     for (const team of teams) {
       backend
         .joinTeam(team.id, selfId, {
-          onCanisters: (states) => {
+          onGuesses: (edges) => {
             if (!active) return;
-            const lit = states.filter((s) => s.lit).map((s) => s.memberId);
-            setLitByTeam((prev) => ({ ...prev, [team.id]: lit }));
+            setEdgesByTeam((prev) => ({ ...prev, [team.id]: edges }));
           },
           onPresence: (ids) => {
             if (!active) return;
@@ -47,8 +51,12 @@ export function useAllWheels(selfId: string): {
           },
         })
         .then((room) => {
-          if (active) rooms.push(room);
-          else room.leave();
+          if (!active) {
+            room.leave();
+            return;
+          }
+          rooms.push(room);
+          roomsRef.current[team.id] = room;
         })
         .catch(() => {});
     }
@@ -56,28 +64,34 @@ export function useAllWheels(selfId: string): {
     return () => {
       active = false;
       rooms.forEach((r) => r.leave());
+      roomsRef.current = {};
     };
   }, [selfId]);
+
+  const resetTeam = useCallback((teamId: string) => {
+    void roomsRef.current[teamId]?.reset();
+  }, []);
 
   const progress = useMemo<TeamProgress[]>(() => {
     return teams.map((team) => {
       const members = getTeamMembers(team.id);
-      const ids = new Set(members.map((m) => m.id));
-      const litSet = new Set(litByTeam[team.id] ?? []);
-      const litCount = members.filter((m) => litSet.has(m.id)).length;
+      const ids = members.map((m) => m.id);
+      const idSet = new Set(ids);
+      const { greenCount, yellowCount } = deriveWheel(ids, edgesByTeam[team.id] ?? []);
       // Exclude the admin's own presence key — count only real team members.
-      const online = (onlineByTeam[team.id] ?? []).filter((id) => ids.has(id)).length;
+      const online = (onlineByTeam[team.id] ?? []).filter((id) => idSet.has(id)).length;
       return {
         teamId: team.id,
         name: team.name,
         color: team.color,
-        litCount,
+        greenCount,
+        yellowCount,
         total: members.length,
         online,
-        complete: members.length > 0 && litCount === members.length,
+        complete: members.length > 0 && greenCount === members.length,
       };
     });
-  }, [litByTeam, onlineByTeam]);
+  }, [edgesByTeam, onlineByTeam]);
 
-  return { teams: progress, backendKind };
+  return { teams: progress, backendKind, resetTeam };
 }

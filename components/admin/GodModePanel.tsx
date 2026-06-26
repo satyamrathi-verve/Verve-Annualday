@@ -12,7 +12,7 @@ interface GodModePanelProps {
 
 export function GodModePanel({ members, onReveal, onReset }: GodModePanelProps) {
   const [open, setOpen] = useState(false);
-  const unlit = members.filter((m) => !m.lit);
+  const unlit = members.filter((m) => m.status !== "green");
 
   return (
     <div className="w-full rounded-2xl border border-gold/40 bg-gold-soft/30 p-4">
@@ -24,7 +24,7 @@ export function GodModePanel({ members, onReveal, onReset }: GodModePanelProps) 
         <span className="grid h-6 w-6 place-items-center rounded-md bg-gold text-navy">⚡</span>
         <span className="font-display text-sm font-semibold text-navy">Manager · God-Mode</span>
         <span className="ml-auto font-mono text-[11px] text-gold-deep">
-          {open ? "hide" : `${unlit.length} unlit`}
+          {open ? "hide" : `${unlit.length} to confirm`}
         </span>
       </button>
 
@@ -38,11 +38,12 @@ export function GodModePanel({ members, onReveal, onReset }: GodModePanelProps) 
             className="overflow-hidden"
           >
             <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted">
-              Reveal an absent or stuck member so the chain skips a link instead of breaking.
+              Force-confirm an absent or stuck member (turns their canister green) so the chain
+              skips a link instead of breaking.
             </p>
             <div className="mt-3 flex flex-col gap-1.5">
               {unlit.length === 0 && (
-                <p className="font-mono text-[12px] text-gold-deep">Every canister is lit. 🎉</p>
+                <p className="font-mono text-[12px] text-gold-deep">Every canister is green. 🎉</p>
               )}
               {unlit.map((m) => (
                 <div

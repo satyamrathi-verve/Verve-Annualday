@@ -934,5 +934,96 @@
       "quirks": [],
       "funFacts": []
     }
+  },
+  {
+    "id": "satyam.rathi",
+    "email": "satyam.rathi@verveadvisory.com",
+    "displayName": "Satyam Rathi",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["devendra.mandhana", "harshal.pahade"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue X"]
+    }
+  },
+  {
+    "id": "sakshi.berwal",
+    "email": "sakshi.berwal@verveadvisory.com",
+    "displayName": "Sakshi Berwal",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["harshal.pahade", "priya.pahade"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue Y"]
+    }
+  },
+  {
+    "id": "harshal.pahade",
+    "email": "harshal.pahade@verveadvisory.com",
+    "displayName": "Harshal Pahade",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["sayli.sonone", "sakshi.berwal"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue Z"]
+    }
+  },
+  {
+    "id": "devendra.mandhana",
+    "email": "devendra.mandhana@verveadvisory.com",
+    "displayName": "Devendra Mandhana",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["satyam.rathi", "sakshi.berwal"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue A"]
+    }
+  },
+  {
+    "id": "priya.pahade",
+    "email": "priya.pahade@verveadvisory.com",
+    "displayName": "Priya Pahade",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["sakshi.berwal", "sakshi.jadhav"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue B"]
+    }
+  },
+  {
+    "id": "sakshi.jadhav",
+    "email": "sakshi.jadhav@verveadvisory.com",
+    "displayName": "Sakshi Jadhav",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["priya.pahade", "sayli.sonone"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue C"]
+    }
+  },
+  {
+    "id": "sayli.sonone",
+    "email": "sayli.sonone@verveadvisory.com",
+    "displayName": "Sayli Sonone",
+    "teamId": "demo",
+    "isManager": false,
+    "guessTargets": ["sakshi.jadhav", "harshal.pahade"],
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": ["Clue D"]
+    }
   }
 ]

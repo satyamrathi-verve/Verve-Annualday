@@ -1,22 +1,19 @@
-import type {
-  CanisterState,
-  LitMethod,
-  RealtimeBackend,
-  TeamRoom,
-  TeamRoomCallbacks,
-} from "./types";
+import { GODMODE_GUESSER } from "./derive";
+import type { GuessEdge, RealtimeBackend, TeamRoom, TeamRoomCallbacks } from "./types";
 
 /*
   Local fallback used when Supabase env vars are absent. State persists in
   localStorage and syncs across tabs/windows of the SAME browser via
-  BroadcastChannel — enough to demo the live wheel locally (open two tabs as
-  two teammates). Cross-device realtime needs the Supabase backend.
-*/
+  BroadcastChannel — enough to demo the live wheel locally (open several tabs as
+  different teammates). Cross-device realtime needs the Supabase backend.
 
-type LitMap = Record<string, { litBy: string; method: LitMethod }>;
+  Edges are keyed "guesser>guessed" so the set naturally de-dupes repeats.
+*/
 
 const PING_MS = 3500;
 const STALE_MS = 9000;
+
+const edgeKey = (guesserId: string, guessedId: string) => `${guesserId}>${guessedId}`;
 
 export class MockRealtimeBackend implements RealtimeBackend {
   readonly kind = "mock" as const;
@@ -26,33 +23,30 @@ export class MockRealtimeBackend implements RealtimeBackend {
     selfMemberId: string,
     cb: TeamRoomCallbacks,
   ): Promise<TeamRoom> {
-    const storageKey = `getaway.wheel.${teamId}`;
+    const storageKey = `getaway.guesses.${teamId}`;
     const hasBC = typeof BroadcastChannel !== "undefined";
     const bc = hasBC ? new BroadcastChannel(`getaway.team.${teamId}`) : null;
 
-    const readMap = (): LitMap => {
-      if (typeof window === "undefined") return {};
+    const readKeys = (): string[] => {
+      if (typeof window === "undefined") return [];
       try {
-        return JSON.parse(window.localStorage.getItem(storageKey) ?? "{}") as LitMap;
+        return JSON.parse(window.localStorage.getItem(storageKey) ?? "[]") as string[];
       } catch {
-        return {};
+        return [];
       }
     };
-    const writeMap = (map: LitMap) => {
+    const writeKeys = (keys: string[]) => {
       if (typeof window !== "undefined") {
-        window.localStorage.setItem(storageKey, JSON.stringify(map));
+        window.localStorage.setItem(storageKey, JSON.stringify([...new Set(keys)]));
       }
     };
 
     const snapshot = () => {
-      const map = readMap();
-      const states: CanisterState[] = Object.entries(map).map(([memberId, v]) => ({
-        memberId,
-        lit: true,
-        litBy: v.litBy,
-        method: v.method,
-      }));
-      cb.onCanisters(states);
+      const edges: GuessEdge[] = readKeys().map((k) => {
+        const [guesserId, guessedId] = k.split(">");
+        return { guesserId, guessedId };
+      });
+      cb.onGuesses(edges);
     };
 
     // --- presence (heartbeat) ---
@@ -99,16 +93,17 @@ export class MockRealtimeBackend implements RealtimeBackend {
     snapshot();
     emitPresence();
 
+    const addEdge = async (guesserId: string, guessedId: string) => {
+      writeKeys([...readKeys(), edgeKey(guesserId, guessedId)]);
+      bc?.postMessage({ type: "state" });
+      snapshot();
+    };
+
     return {
-      light: async (memberId, method, byMemberId) => {
-        const map = readMap();
-        map[memberId] = { litBy: byMemberId, method };
-        writeMap(map);
-        bc?.postMessage({ type: "state" });
-        snapshot();
-      },
+      guess: (guesserId, guessedId) => addEdge(guesserId, guessedId),
+      reveal: (memberId) => addEdge(GODMODE_GUESSER, memberId),
       reset: async () => {
-        writeMap({});
+        writeKeys([]);
         bc?.postMessage({ type: "state" });
         snapshot();
       },

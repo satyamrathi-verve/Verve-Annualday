@@ -3,27 +3,30 @@
   TeamRoom; it doesn't know or care whether it's backed by Supabase (real,
   cross-device) or the BroadcastChannel mock (local, cross-tab). Swapping the
   transport later (self-hosted WS, Pusher, …) means one new RealtimeBackend.
+
+  The wheel state is a DIRECTED GUESS GRAPH: each edge says "guesser correctly
+  identified guessed". Canister colour is derived from it (see derive.ts) — a
+  canister turns green only when two members guess each other.
 */
 
-export type LitMethod = "guess" | "godmode" | "self";
-
-export interface CanisterState {
-  memberId: string;
-  lit: boolean;
-  litBy: string | null;
-  method: LitMethod | null;
+/** One correct guess: `guesserId` identified `guessedId`. */
+export interface GuessEdge {
+  guesserId: string;
+  guessedId: string;
 }
 
 export interface TeamRoomCallbacks {
-  /** Full snapshot of currently-lit canisters for the team. */
-  onCanisters: (states: CanisterState[]) => void;
+  /** Full snapshot of the team's guess edges. */
+  onGuesses: (edges: GuessEdge[]) => void;
   /** Member ids currently present in the room. */
   onPresence?: (onlineMemberIds: string[]) => void;
 }
 
 export interface TeamRoom {
-  /** Light a canister for everyone in the room. */
-  light: (memberId: string, method: LitMethod, byMemberId: string) => Promise<void>;
+  /** Record that `guesserId` correctly guessed `guessedId`. */
+  guess: (guesserId: string, guessedId: string) => Promise<void>;
+  /** Manager override: force a member's canister green regardless of guesses. */
+  reveal: (memberId: string) => Promise<void>;
   /** Clear the whole team's wheel (admin / demo re-run). */
   reset: () => Promise<void>;
   leave: () => void;
