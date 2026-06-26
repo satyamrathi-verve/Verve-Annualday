@@ -949,12 +949,12 @@
     }
   },
   {
-    "id": "sakshi.berwal",
-    "email": "sakshi.berwal@verveadvisory.com",
-    "displayName": "Sakshi Berwal",
+    "id": "sakshi.barwal",
+    "email": "sakshi.barwal@verveadvisory.com",
+    "displayName": "Sakshi Barwal",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["harshal.pahade", "priya.pahade"],
+    "guessTargets": ["harshal.pahade", "priya.agrawal"],
     "clues": {
       "hobbies": [],
       "quirks": [],
@@ -967,7 +967,7 @@
     "displayName": "Harshal Pahade",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["sayli.sonone", "sakshi.berwal"],
+    "guessTargets": ["sayli.sonone", "sakshi.barwal"],
     "clues": {
       "hobbies": [],
       "quirks": [],
@@ -980,7 +980,7 @@
     "displayName": "Devendra Mandhana",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["satyam.rathi", "sakshi.berwal"],
+    "guessTargets": ["satyam.rathi", "sakshi.barwal"],
     "clues": {
       "hobbies": [],
       "quirks": [],
@@ -988,12 +988,12 @@
     }
   },
   {
-    "id": "priya.pahade",
-    "email": "priya.pahade@verveadvisory.com",
-    "displayName": "Priya Pahade",
+    "id": "priya.agrawal",
+    "email": "priya.agrawal@verveadvisory.com",
+    "displayName": "Priya Agrawal",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["sakshi.berwal", "sakshi.jadhav"],
+    "guessTargets": ["sakshi.barwal", "sakshi.jadav"],
     "clues": {
       "hobbies": [],
       "quirks": [],
@@ -1001,12 +1001,12 @@
     }
   },
   {
-    "id": "sakshi.jadhav",
-    "email": "sakshi.jadhav@verveadvisory.com",
-    "displayName": "Sakshi Jadhav",
+    "id": "sakshi.jadav",
+    "email": "sakshi.jadav@verveadvisory.com",
+    "displayName": "Sakshi Jadav",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["priya.pahade", "sayli.sonone"],
+    "guessTargets": ["priya.agrawal", "sayli.sonone"],
     "clues": {
       "hobbies": [],
       "quirks": [],
@@ -1019,7 +1019,7 @@
     "displayName": "Sayli Sonone",
     "teamId": "demo",
     "isManager": false,
-    "guessTargets": ["sakshi.jadhav", "harshal.pahade"],
+    "guessTargets": ["sakshi.jadav", "harshal.pahade"],
     "clues": {
       "hobbies": [],
       "quirks": [],
