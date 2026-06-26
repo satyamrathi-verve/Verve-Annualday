@@ -94,6 +94,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
   }, [backend]);
 
+  // 15-minute inactivity auto-logout. Armed only while signed in; any user
+  // activity resets the countdown. On timeout we sign out — the funnel then
+  // returns to the start (and the landing shows a one-time idle notice).
+  useEffect(() => {
+    if (!session) return;
+    const IDLE_MS = 15 * 60 * 1000;
+    let timer: ReturnType<typeof setTimeout>;
+    let last = 0;
+    const arm = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        try {
+          window.sessionStorage.setItem("getaway.idleLogout", "1");
+        } catch {
+          /* sessionStorage may be unavailable — sign out regardless */
+        }
+        void signOut();
+      }, IDLE_MS);
+    };
+    const onActivity = () => {
+      const now = Date.now();
+      if (now - last < 1000) return; // throttle resets to at most once/sec
+      last = now;
+      arm();
+    };
+    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "click"];
+    events.forEach((e) => window.addEventListener(e, onActivity, { passive: true }));
+    arm();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, onActivity));
+    };
+  }, [session, signOut]);
+
   const value = useMemo(
     () => ({
       session,

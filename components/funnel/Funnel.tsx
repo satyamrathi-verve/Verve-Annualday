@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Shell, type StepDef } from "./Shell";
 import { Landing } from "@/components/screens/Landing";
@@ -21,6 +21,8 @@ const STEPS: StepDef[] = [
 ];
 
 const RESUME_KEY = "getaway.funnel.index";
+// Where to land after a sign-out / idle auto-logout — the Google sign-in step.
+const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
 
 export function Funnel() {
   // Wait for the persisted/auth session check before rendering the funnel. This
@@ -42,6 +44,8 @@ export function Funnel() {
 }
 
 function FunnelInner() {
+  const { session } = useAuth();
+
   // Resume where we left off — so a Google/email redirect lands the user back on
   // the step they were on (signed in), instead of all the way at the start.
   const [index, setIndex] = useState(() => {
@@ -57,6 +61,18 @@ function FunnelInner() {
   };
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
+
+  // When the session ends (manual or 15-min idle auto-logout), throw back to the
+  // Google sign-in screen so a logged-out device doesn't linger on an inner step.
+  const wasSignedIn = useRef(Boolean(session));
+  useEffect(() => {
+    const signedIn = Boolean(session);
+    if (wasSignedIn.current && !signedIn) {
+      if (typeof window !== "undefined") window.sessionStorage.setItem(RESUME_KEY, String(SIGNIN_INDEX));
+      setIndex(SIGNIN_INDEX);
+    }
+    wasSignedIn.current = signedIn;
+  }, [session]);
 
   const vibeIndex = STEPS.findIndex((s) => s.key === "vibe");
 

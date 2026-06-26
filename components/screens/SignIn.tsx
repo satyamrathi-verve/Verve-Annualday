@@ -41,6 +41,24 @@ function GoogleSignIn() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // One-time notice if we got here via the 15-min idle auto-logout.
+  const [idleOut] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.sessionStorage.getItem("getaway.idleLogout") === "1";
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    if (!idleOut) return;
+    try {
+      window.sessionStorage.removeItem("getaway.idleLogout");
+    } catch {
+      /* sessionStorage may be unavailable */
+    }
+  }, [idleOut]);
+
   const go = async () => {
     setError(null);
     setBusy(true);
@@ -55,6 +73,11 @@ function GoogleSignIn() {
 
   return (
     <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
+      {idleOut && (
+        <p className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-2 font-mono text-[11px] tracking-wider text-faint">
+          Signed out after 15 minutes of inactivity. Sign back in to continue.
+        </p>
+      )}
       <p className="eyebrow">{c.eyebrow}</p>
       <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
         {c.title}
