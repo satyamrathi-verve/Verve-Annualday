@@ -30,11 +30,11 @@ export function Wait({ onReplay }: { onReplay: () => void }) {
           <span aria-hidden>{c.emoji}</span>
         </motion.div>
 
-        <h1 className="mt-7 font-display text-3xl font-extrabold leading-[1.05] tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        <h1 className="mt-7 bg-gradient-to-br from-verve-400 to-gold bg-clip-text pb-1 font-display text-3xl font-extrabold leading-[1.05] text-transparent sm:text-4xl lg:text-5xl">
           {c.title}
         </h1>
 
-        <p className="mt-4 text-base text-muted lg:text-lg">{c.subtitle}</p>
+        <p className="mt-4 font-display text-lg font-semibold text-navy">{c.subtitle}</p>
 
         <div className="mt-6 border-l-2 border-gold/70 pl-4 text-[15px] leading-relaxed text-muted lg:text-base">
           {c.body.map((p, i) => (
