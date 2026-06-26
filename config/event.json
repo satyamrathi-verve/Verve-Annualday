@@ -22,7 +22,7 @@
     "reactions": ["Sach hai! 🔥", "Ho sakta hai… 🤔", "Arre nahi yaar 😅"],
     "helper": "this is data we will absolutely never use",
     "minCards": 5,
-    "maxCards": 8,
+    "maxCards": 7,
     "closeEyebrow": "Briefing incoming",
     "closeTitle": "That's enough conspiracy for one day.",
     "closeSubtitle": "Whatever it actually is — you're early. Step through.",
@@ -99,6 +99,95 @@
           "We've advised on systems for years. The whisper is we're about to start building and migrating them — the actual heavy lifting, not just the blueprint.",
           "Stranger still: the partner is said to be one of our own clients. The line between who we serve and who we build with is apparently about to blur.",
           "A move like this isn't a new service line. It's Verve deciding advice was only ever step one."
+        ]
+      },
+      {
+        "emoji": "🌐",
+        "heading": "New Vervians, New Time Zones",
+        "sub": "Is Verve starting to hire across borders?",
+        "body": [
+          "Word is the next wave of Vervians might not share our postcode — or our passport. Roles are reportedly opening across borders and time zones.",
+          "Picture it: new colleagues, new accents, new festivals on the calendar, a stand-up that spans continents — a team that swaps recipes as easily as it swaps spreadsheets."
+        ]
+      },
+      {
+        "emoji": "🎙️",
+        "heading": "Lights, Camera, Cashflow",
+        "sub": "Is Verve launching its own high-production finance podcast?",
+        "body": [
+          "Word is there's a studio being built — proper lights, proper cameras — for a finance show with production values nobody expects from an advisory firm.",
+          "Big names and sharp minds in the guest chair, real conversations, glossy episodes you'd actually queue up on a Sunday. Verve with its own show, its own voice, its own audience.",
+          "Run by Vervians, naturally. If it's real, we stop being the firm with good opinions and become the one with a microphone."
+        ]
+      },
+      {
+        "emoji": "🛠️",
+        "heading": "A Tool That Finally Fits",
+        "sub": "Are we building our own project-management tool — and ditching the clunky one?",
+        "body": [
+          "Every firm runs on software it secretly resents — too many tabs, too many fields nobody fills in. Word is Verve's done resenting it and started building its own.",
+          "Not another dashboard to wrestle. A tool shaped around how we actually work, by the people who actually do the work.",
+          "If it's real, Verve quietly crosses a line — from a firm that uses software to one that makes it."
+        ]
+      },
+      {
+        "emoji": "💡",
+        "heading": "Pitch Your Wildest Idea",
+        "sub": "A monthly \"Verve Tank\" where anyone can pitch — and the boldest ideas get built?",
+        "body": [
+          "The rumour: once a month, a room, a stage, and anyone with an idea too big for a Tuesday meeting. Pitch it — properly — to people who can actually say yes.",
+          "Not a suggestion box that vanishes into the void. Real backing, real budgets, a genuine \"let's build it\" for the ideas that land.",
+          "If it's true, \"I've got an idea\" stops being a daydream — and becomes a slot on next month's stage."
+        ]
+      },
+      {
+        "emoji": "🤖",
+        "heading": "Our Name on a Product",
+        "sub": "Is Verve launching its own AI-powered product this year?",
+        "body": [
+          "For years we've built things for clients and handed them over. The whisper is that this time we're building something that stays ours — an AI product with Verve's name on the box.",
+          "Not a feature, not a side project. A real launch, this year, aimed at the market — the kind of thing that turns an advisory firm into a product company overnight.",
+          "If it's true, the question isn't what it does. It's what Verve becomes the day it ships."
+        ]
+      },
+      {
+        "emoji": "💪",
+        "heading": "VerviFit 4.0?",
+        "sub": "The rumour: VerviFit's next leap — snap one photo, and AI builds your whole plan.",
+        "body": [
+          "VerviFit has always nudged us to stay fit, even from our desks at home. Now the whisper is its boldest leap yet — and it's powered by AI.",
+          "Click one photo of yourself, and the rest is handled: a routine made for your body, a diet plan that fits your life — plus little nudges through the day to move, breathe, and actually take that break.",
+          "If it's real, staying fit stops being something you figure out — and becomes something VerviFit just hands you."
+        ]
+      },
+      {
+        "emoji": "🚢",
+        "heading": "A Workation That Floats",
+        "sub": "Are we doing our workation on a cruise?",
+        "body": [
+          "Forget a resort that stays in one place. The whisper is a ship — the whole firm aboard, working by day, the ocean moving under us, a new port every morning.",
+          "Decks instead of meeting rooms. Sunsets that are different every night. The kind of \"out of office\" that's quite literally somewhere else by the time you wake up.",
+          "If it's real, \"where do you work?\" gets the best answer it's ever had: international waters."
+        ]
+      },
+      {
+        "emoji": "🧭",
+        "heading": "A Coach Who Never Logs Off",
+        "sub": "Is everyone getting a full-time AI coach for professional growth?",
+        "body": [
+          "Not an app you forget you downloaded. The rumour is an always-on coach for every Vervian — there the moment you're stuck, learning right alongside you.",
+          "Guidance tailored to you: the answer when you need it, the next thing worth picking up, a steady push to get a little sharper at what you do.",
+          "If it's real, growing at work stops being something you chase on your own — and becomes something that's with you at every step."
+        ]
+      },
+      {
+        "emoji": "📖",
+        "heading": "From Boardroom to Bookshelf",
+        "sub": "Are the founders publishing a book on modern advisory and business growth?",
+        "body": [
+          "The rumour is a proper, on-the-shelf book — years of how Verve actually thinks about advisory and growth, finally written down.",
+          "Not a whitepaper nobody reads. A real title with the founders' names on the spine, the kind of thing that lands on a CEO's desk and a junior's reading list alike.",
+          "If it's real, the playbook we live by stops being word-of-mouth — and becomes something the whole industry can hold."
         ]
       }
     ]
