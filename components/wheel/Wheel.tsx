@@ -19,7 +19,7 @@ const R = 150;
 
 const GREEN = "#16a34a";
 const YELLOW = "#f5b301";
-const GREY = "#d6deee";
+const GREY = "#2b3754";
 
 function firstName(name: string) {
   return name.split(" ")[0];

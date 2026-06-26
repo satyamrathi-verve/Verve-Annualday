@@ -18,6 +18,21 @@ const edgeKey = (guesserId: string, guessedId: string) => `${guesserId}>${guesse
 export class MockRealtimeBackend implements RealtimeBackend {
   readonly kind = "mock" as const;
 
+  async readTeam(teamId: string): Promise<GuessEdge[]> {
+    if (typeof window === "undefined") return [];
+    try {
+      const keys = JSON.parse(
+        window.localStorage.getItem(`getaway.guesses.${teamId}`) ?? "[]",
+      ) as string[];
+      return keys.map((k) => {
+        const [guesserId, guessedId] = k.split(">");
+        return { guesserId, guessedId };
+      });
+    } catch {
+      return [];
+    }
+  }
+
   async joinTeam(
     teamId: string,
     selfMemberId: string,

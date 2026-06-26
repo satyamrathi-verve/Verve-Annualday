@@ -39,4 +39,11 @@ export interface RealtimeBackend {
     selfMemberId: string,
     callbacks: TeamRoomCallbacks,
   ) => Promise<TeamRoom>;
+  /**
+   * One-shot read of a team's guess edges — NO channel, NO presence. Used by
+   * read-only overview panels (e.g. "other crews" progress) so a player can
+   * watch other teams without joining their rooms and inflating their
+   * presence / "in the room" counts.
+   */
+  readTeam: (teamId: string) => Promise<GuessEdge[]>;
 }

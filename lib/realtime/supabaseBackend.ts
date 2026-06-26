@@ -16,6 +16,23 @@ interface GuessRow {
 export class SupabaseRealtimeBackend implements RealtimeBackend {
   readonly kind = "supabase" as const;
 
+  async readTeam(teamId: string): Promise<GuessEdge[]> {
+    const supabase = getSupabase();
+    if (!supabase) return [];
+    const { data, error } = await supabase
+      .from("guesses")
+      .select("guesser_id, guessed_id")
+      .eq("team_id", teamId);
+    if (error) {
+      console.error("[wheel] readTeam failed:", error.message);
+      return [];
+    }
+    return ((data ?? []) as GuessRow[]).map((r) => ({
+      guesserId: r.guesser_id,
+      guessedId: r.guessed_id,
+    }));
+  }
+
   async joinTeam(
     teamId: string,
     selfMemberId: string,

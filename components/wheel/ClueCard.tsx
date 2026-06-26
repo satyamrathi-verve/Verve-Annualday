@@ -86,14 +86,14 @@ export function ClueCard({ index, total, clues, onGuess, wrongNote }: ClueCardPr
           onChange={(e) => setValue(e.target.value)}
           placeholder="Type their name…"
           autoComplete="off"
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors ${
+          className={`w-full rounded-xl border bg-surface px-4 py-2.5 text-sm text-ink outline-none transition-colors ${
             wrong ? "border-red-400 focus:border-red-400" : "border-line focus:border-verve"
           }`}
         />
         <button
           type="submit"
           disabled={!value.trim()}
-          className="flex-none rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+          className="flex-none rounded-xl bg-verve px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
         >
           Guess
         </button>

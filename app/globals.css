@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 /*
-  Operation Prompt & Co. — permanent LIGHT Verve theme.
-  No dark mode, no "dark=X / light=Y" metaphor. Clean, bright, professional.
-  Palette: Verve blue #2F6BFF, gold #E0A436, deep navy #0E1A33 on white/very-light.
+  Operation Prompt & Co. — permanent DARK Verve theme.
+  Deep navy canvas, Verve blue #2F6BFF + gold #E0A436 accents, light ink.
+  Semantic tokens below carry the same MEANING as the old light theme
+  (navy/ink = primary text, surface = panel, line = border) — only their
+  values flipped — so components keep using text-navy / bg-surface / etc.
 */
 @theme {
-  --color-verve: #2f6bff;
-  --color-verve-glow: #5c8cff;
-  --color-verve-soft: #eaf1ff;
+  --color-verve: #3d77ff;
+  --color-verve-glow: #6f9bff;
+  --color-verve-soft: #16224a;
   --color-gold: #e0a436;
   --color-gold-soft: #f7e3bd;
-  --color-gold-deep: #b97f18;
-  --color-navy: #0e1a33;
-  --color-ink: #0e1a33;
-  --color-muted: #5b6b85;
-  --color-faint: #8a97ad;
-  --color-surface: #ffffff;
-  --color-surface-2: #f4f7ff;
-  --color-line: #e4eaf5;
+  --color-gold-deep: #e8b552;
+  --color-navy: #eef2fb;
+  --color-ink: #e7edf8;
+  --color-muted: #9fadc6;
+  --color-faint: #6d7c98;
+  --color-surface: #131c30;
+  --color-surface-2: #0f1626;
+  --color-line: #27314c;
 
   --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -26,7 +28,7 @@
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
@@ -36,9 +38,9 @@ body {
 
 body {
   background:
-    radial-gradient(1100px 720px at 50% -18%, rgba(47, 107, 255, 0.07), transparent 60%),
-    radial-gradient(900px 680px at 50% 118%, rgba(224, 164, 54, 0.06), transparent 55%),
-    #ffffff;
+    radial-gradient(1100px 720px at 50% -18%, rgba(47, 107, 255, 0.16), transparent 60%),
+    radial-gradient(900px 680px at 50% 118%, rgba(224, 164, 54, 0.1), transparent 55%),
+    #0a0f1c;
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -57,9 +59,9 @@ body {
 
 /* Soft card surface used across screens */
 .surface-card {
-  background: linear-gradient(180deg, #ffffff, var(--color-surface-2));
+  background: linear-gradient(180deg, #16213a, var(--color-surface-2));
   border: 1px solid var(--color-line);
-  box-shadow: 0 24px 60px -38px rgba(14, 26, 51, 0.45);
+  box-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.8);
 }
 
 @media (prefers-reduced-motion: reduce) {

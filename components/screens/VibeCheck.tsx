@@ -97,7 +97,7 @@ export function VibeCheck({ onNext }: { onNext: () => void }) {
                   key={r}
                   type="button"
                   onClick={advance}
-                  className="rounded-xl border border-line bg-white px-5 py-3 text-sm font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-verve hover:text-verve hover:shadow-[0_10px_24px_-16px_rgba(47,107,255,0.6)] lg:text-base"
+                  className="rounded-xl border border-line bg-surface px-5 py-3 text-sm font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-verve hover:text-verve hover:shadow-[0_10px_24px_-16px_rgba(47,107,255,0.6)] lg:text-base"
                 >
                   {r}
                 </button>

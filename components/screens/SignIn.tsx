@@ -84,7 +84,7 @@ function GoogleSignIn() {
         type="button"
         onClick={go}
         disabled={busy}
-        className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-white py-4 font-display text-base font-semibold text-ink shadow-[0_10px_24px_-16px_rgba(14,26,51,0.5)] transition-colors hover:border-verve disabled:opacity-50 lg:text-lg"
+        className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-surface py-4 font-display text-base font-semibold text-ink shadow-[0_10px_24px_-16px_rgba(14,26,51,0.5)] transition-colors hover:border-verve disabled:opacity-50 lg:text-lg"
       >
         <GoogleMark />
         {busy ? "Redirecting…" : c.googleLabel}
@@ -159,7 +159,7 @@ function EmailSignIn() {
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder={c.emailPlaceholder}
-            className="w-full rounded-xl border border-line bg-white px-4 py-3.5 text-center text-base text-ink outline-none transition-colors focus:border-verve"
+            className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-center text-base text-ink outline-none transition-colors focus:border-verve"
           />
           <Button variant="gold" onClick={send} disabled={busy || trimmed.length === 0}>
             {busy ? "Sending…" : `${c.sendLabel} →`}
@@ -178,7 +178,7 @@ function EmailSignIn() {
             onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
             onKeyDown={(e) => e.key === "Enter" && code.length >= 6 && verify()}
             placeholder={c.codeLabel}
-            className="w-full rounded-xl border border-line bg-white px-4 py-3.5 text-center font-mono text-2xl tracking-[0.4em] text-ink outline-none transition-colors focus:border-verve"
+            className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-center font-mono text-2xl tracking-[0.4em] text-ink outline-none transition-colors focus:border-verve"
           />
           <Button variant="gold" onClick={verify} disabled={busy || code.length < 6}>
             {busy ? "Verifying…" : c.verifyLabel}
@@ -240,7 +240,7 @@ function MockPicker({ onNext }: { onNext: () => void }) {
               onClick={() => void pick(a.email)}
               className="flex w-full items-center gap-3 rounded-xl border border-gold/40 bg-gold-soft/30 px-4 py-3 text-left transition-colors hover:border-gold"
             >
-              <span className="grid h-8 w-8 flex-none place-items-center rounded-md bg-gold text-navy">
+              <span className="grid h-8 w-8 flex-none place-items-center rounded-md bg-gold text-[#0e1a33]">
                 ⚡
               </span>
               <span className="text-sm font-semibold text-navy lg:text-base">{a.name}</span>
@@ -257,10 +257,10 @@ function MockPicker({ onNext }: { onNext: () => void }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search your name…"
-        className="mt-3 w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors focus:border-verve"
+        className="mt-3 w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-base text-ink outline-none transition-colors focus:border-verve"
       />
 
-      <div className="mt-3 max-h-64 w-full divide-y divide-line overflow-auto rounded-xl border border-line bg-white text-left lg:max-h-80">
+      <div className="mt-3 max-h-64 w-full divide-y divide-line overflow-auto rounded-xl border border-line bg-surface text-left lg:max-h-80">
         {filtered.length === 0 && (
           <p className="px-4 py-6 text-center font-mono text-[12px] text-faint">no match</p>
         )}

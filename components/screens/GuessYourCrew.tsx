@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useTeamWheel, type WheelMember } from "@/lib/realtime/useTeamWheel";
+import { useTeamsProgress } from "@/lib/realtime/useTeamsProgress";
 import { Wheel } from "@/components/wheel/Wheel";
 import { ClueCard } from "@/components/wheel/ClueCard";
 import { GodModePanel } from "@/components/admin/GodModePanel";
@@ -176,8 +177,8 @@ function CrewBoard({
               className={clsx(
                 "rounded-xl border px-4 py-3 text-[13px] leading-relaxed",
                 banner.tone === "green"
-                  ? "border-green-300 bg-green-50 text-green-700"
-                  : "border-gold/50 bg-gold-soft/40 text-gold-deep",
+                  ? "border-green-400/40 bg-green-500/15 text-green-300"
+                  : "border-gold/40 bg-gold/15 text-gold-deep",
               )}
             >
               {banner.text}
@@ -232,6 +233,71 @@ function CrewBoard({
             />
           )}
         </div>
+      </div>
+
+      <OtherCrews currentTeamId={teamId} />
+    </div>
+  );
+}
+
+/* Live standings for every crew — read-only (no presence), polled. Lets a
+   player see how the other teams' wheels are filling without leaving theirs. */
+function OtherCrews({ currentTeamId }: { currentTeamId: string }) {
+  const standings = useTeamsProgress();
+
+  return (
+    <div className="mt-12">
+      <p className="text-center font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+        Across the mission · live crew progress
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {standings.map((t) => {
+          const pct = t.total ? Math.round((t.greenCount / t.total) * 100) : 0;
+          const isMine = t.teamId === currentTeamId;
+          return (
+            <div
+              key={t.teamId}
+              className={clsx(
+                "rounded-xl border p-3 transition-colors",
+                isMine ? "border-verve/60 bg-verve-soft/50" : "border-line bg-surface/60",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-2.5 w-2.5 flex-none rounded-full"
+                  style={{ backgroundColor: t.color }}
+                />
+                <span className="truncate font-display text-[13px] font-bold text-navy">
+                  {t.name}
+                </span>
+                {isMine ? (
+                  <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-verve">
+                    you
+                  </span>
+                ) : (
+                  t.complete && <span className="ml-auto text-[12px]">✨</span>
+                )}
+              </div>
+
+              <div className="mt-2 flex items-end justify-between">
+                <span className="font-display text-lg font-extrabold leading-none text-navy">
+                  {t.greenCount}
+                  <span className="text-xs text-faint"> / {t.total}</span>
+                </span>
+                {t.yellowCount > 0 && (
+                  <span className="font-mono text-[10px] text-gold-deep">{t.yellowCount} pending</span>
+                )}
+              </div>
+
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
+                <div
+                  className="h-full rounded-full bg-green-500 transition-[width] duration-700"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
