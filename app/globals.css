@@ -40,6 +40,12 @@
   /* Liquid-glass card sheen sweep (see GlassCard). v4 equivalent of a
      theme.extend keyframes/animation pair → generates the `animate-sheen` util. */
   --animate-sheen: sheen 4.2s ease-in-out infinite;
+
+  /* Vegas marquee wheel — chasing bulbs, amber/green wedge glow, hub medallion. */
+  --animate-bulb: bulb 2s linear infinite;
+  --animate-glow-green: glowG 2.4s ease-in-out infinite;
+  --animate-glow-amber: glowA 1.8s ease-in-out infinite;
+  --animate-medallion: medallion 2.6s ease-in-out infinite;
 }
 
 @keyframes sheen {
@@ -49,6 +55,46 @@
   55%,
   100% {
     transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+@keyframes bulb {
+  0%,
+  100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes glowG {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(91, 230, 160, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 13px rgba(91, 230, 160, 0.9));
+  }
+}
+
+@keyframes glowA {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(224, 164, 54, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(224, 164, 54, 0.95));
+  }
+}
+
+@keyframes medallion {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(224, 164, 54, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(224, 164, 54, 0.8));
   }
 }
 
