@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/components/providers/AuthContext";
 import { getRosterSorted } from "@/lib/data/config";
@@ -11,23 +12,43 @@ export function SignIn({ onNext }: { onNext: () => void }) {
   const { session, mode, signOut } = useAuth();
 
   if (session) {
+    const first = session.displayName.split(" ")[0];
+    const initials = session.displayName
+      .split(" ")
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
     return (
       <div className="flex w-full max-w-lg flex-col items-center text-center">
         <p className="eyebrow">{c.eyebrow}</p>
-        <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-          Welcome, {session.displayName.split(" ")[0]}.
+
+        {/* Gold identity avatar — a small "clearance badge" for the recruit. */}
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 18 }}
+          className="mt-6 grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-gold-400 to-gold-500 font-display text-2xl font-extrabold text-[#0e1a33] shadow-[0_18px_40px_-16px_rgba(224,164,54,0.7)]"
+        >
+          {initials}
+        </motion.div>
+
+        <h1 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+          Pehchaan confirmed, {first}.
         </h1>
-        <p className="mt-4 text-base text-muted lg:text-lg">
-          Signed in as {session.email}. Onward.
+        <p className="mt-3 text-base text-muted lg:text-lg">
+          Clearance confirmed. Good to have you on the op.
         </p>
+        <p className="mt-2 font-mono text-[12px] tracking-wider text-faint">{session.email}</p>
+
         <div className="mt-8 flex flex-col items-center gap-3">
-          <Button variant="gold" onClick={onNext}>
+          <Button variant="gold" glow onClick={onNext}>
             Continue →
           </Button>
           <button
             type="button"
             onClick={() => void signOut()}
-            className="font-mono text-[11px] tracking-wider text-faint hover:text-verve"
+            className="font-mono text-[11px] tracking-wider text-faint transition-colors hover:text-verve"
           >
             not you? sign out
           </button>

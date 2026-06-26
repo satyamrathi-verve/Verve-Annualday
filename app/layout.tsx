@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sora, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Grain } from "@/components/ui/Grain";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -23,7 +24,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Operation Prompt & Co. · Verve Advisory",
+  title: "Project Off The Books · Verve Advisory",
   description:
     "The courier found you. Open the portal, pass the vibe check, accept the briefing, and assemble your crew.",
 };
@@ -38,7 +39,10 @@ export default function RootLayout({
       lang="en"
       className={`${sora.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <Grain />
+      </body>
     </html>
   );
 }

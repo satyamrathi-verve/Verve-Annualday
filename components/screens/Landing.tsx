@@ -22,7 +22,7 @@ export function Landing({ onNext }: { onNext: () => void }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.22, duration: 0.5 }}
-        className="mt-3 bg-gradient-to-br from-verve to-gold bg-clip-text font-display text-5xl font-extrabold leading-[1.04] tracking-tight text-transparent sm:text-6xl lg:text-7xl xl:text-8xl"
+        className="display-tight mt-3 bg-gradient-to-br from-verve-400 to-gold bg-clip-text font-display text-6xl font-extrabold leading-[1.02] text-transparent sm:text-7xl lg:text-8xl xl:text-[8.5rem]"
       >
         {c.title}
       </motion.h1>
@@ -51,7 +51,7 @@ export function Landing({ onNext }: { onNext: () => void }) {
         transition={{ delay: 0.46 }}
         className="mt-10"
       >
-        <Button variant="gold" onClick={onNext}>
+        <Button variant="gold" glow onClick={onNext}>
           {c.cta} →
         </Button>
       </motion.div>

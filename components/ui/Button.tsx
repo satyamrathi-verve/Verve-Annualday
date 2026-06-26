@@ -16,14 +16,22 @@ const variants: Record<Variant, string> = {
 
 interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: Variant;
+  /** Slow gold glow-pulse loop for the primary mission CTA (degrades w/ reduced-motion). */
+  glow?: boolean;
 }
 
-export function Button({ variant = "gold", className, children, ...props }: ButtonProps) {
+export function Button({
+  variant = "gold",
+  glow = false,
+  className,
+  children,
+  ...props
+}: ButtonProps) {
   return (
     <motion.button
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.98 }}
-      className={clsx(base, variants[variant], className)}
+      className={clsx(base, variants[variant], glow && "cta-glow", className)}
       {...props}
     >
       {children}

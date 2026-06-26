@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { clsx } from "@/lib/clsx";
 import { event } from "@/lib/data/config";
 import type { Rumour } from "@/lib/data/schema";
 
@@ -73,9 +74,22 @@ export function VibeCheck({ onNext }: { onNext: () => void }) {
           <motion.div key={step} {...fade} className="flex flex-col">
             <div className="flex items-center justify-between gap-4">
               <p className="eyebrow">{c.eyebrows[step % c.eyebrows.length]}</p>
-              <span className="font-mono text-[11px] tracking-widest text-faint lg:text-xs">
+              <span className="font-mono text-[11px] tracking-[0.28em] text-faint lg:text-xs">
                 {pad(step + 1)} / {pad(deck.length)}
               </span>
+            </div>
+
+            {/* progress pips — one per rumour in this player's reel */}
+            <div className="mt-4 flex gap-1.5" aria-hidden>
+              {deck.map((_, i) => (
+                <span
+                  key={i}
+                  className={clsx(
+                    "h-1.5 flex-1 rounded-full transition-all duration-300",
+                    i < step ? "bg-verve" : i === step ? "bg-gold" : "bg-line",
+                  )}
+                />
+              ))}
             </div>
 
             <motion.div
@@ -87,20 +101,22 @@ export function VibeCheck({ onNext }: { onNext: () => void }) {
               <span aria-hidden>{deck[step].emoji}</span>
             </motion.div>
 
-            <h1 className="mt-7 font-display text-3xl font-extrabold leading-[1.12] tracking-tight text-navy sm:text-4xl lg:text-5xl">
+            <h1 className="mt-7 font-display text-3xl font-extrabold leading-[1.1] text-navy sm:text-4xl lg:text-[2.9rem]">
               {deck[step].text}
             </h1>
 
             <div className="mt-9 flex flex-wrap gap-3">
               {c.reactions.map((r) => (
-                <button
+                <motion.button
                   key={r}
                   type="button"
                   onClick={advance}
-                  className="rounded-xl border border-line bg-surface px-5 py-3 text-sm font-medium text-ink transition-all hover:-translate-y-0.5 hover:border-verve hover:text-verve hover:shadow-[0_10px_24px_-16px_rgba(47,107,255,0.6)] lg:text-base"
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-xl border border-line bg-card px-5 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-verve-400 hover:text-verve-400 hover:shadow-[0_14px_30px_-16px_rgba(91,141,255,0.7)] lg:text-base"
                 >
                   {r}
-                </button>
+                </motion.button>
               ))}
             </div>
 

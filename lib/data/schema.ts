@@ -90,6 +90,8 @@ export const eventSchema = z.object({
     videoLabel: z.string(),
     quote: z.string(),
     cta: z.string(),
+    /** Optional real briefing clip. When set, the poster swaps to a <video> on play. */
+    videoSrc: z.string().optional(),
   }),
   guess: z.object({
     eyebrow: z.string(),
@@ -108,6 +110,21 @@ export const eventSchema = z.object({
     partDoneSubtitle: z.string(),
     completeTitle: z.string(),
     completeSubtitle: z.string(),
+    /** Loading lines while the secure channel / org chart decrypts. */
+    loading: z.array(z.string().min(1)).min(1).default(["Decrypting your crew… don't tell HR."]),
+    /** Status-card hint when nothing is lit yet. */
+    emptyHint: z.string().default("No canisters lit. Yet. Click a node to begin."),
+    /** Status-card hint while the wheel is warming up. */
+    clickHint: z.string().default("Click a glowing node to decode it."),
+    /** Mono header for the decode bottom sheet. */
+    clueSheetTitle: z.string().default("Decode the canister"),
+    /** Mutual celebration toast. Use {name} for the teammate who named you back. */
+    mutualToast: z.string().default("Mutual! {name} named you back. 🟢"),
+    /** Shown if the wheel can't be assembled (no members resolved). */
+    errorTitle: z.string().default("Signal lost."),
+    errorBody: z
+      .string()
+      .default("Couldn't assemble this crew's wheel. Refresh — and if it persists, ping the host."),
   }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z

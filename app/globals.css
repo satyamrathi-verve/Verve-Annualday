@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 /*
-  Operation Prompt & Co. — permanent DARK Verve theme.
-  Deep navy canvas, Verve blue #2F6BFF + gold #E0A436 accents, light ink.
-  Semantic tokens below carry the same MEANING as the old light theme
-  (navy/ink = primary text, surface = panel, line = border) — only their
-  values flipped — so components keep using text-navy / bg-surface / etc.
+  Operation Prompt & Co. — permanent DARK Verve theme (elevated).
+  Deep void canvas, Verve blue + gold accents, light ink. Existing semantic
+  tokens (navy/ink/surface/line…) are kept verbatim so every component keeps
+  working; the "elevated" palette below is ADDED alongside them (void/card,
+  verve-400/500, gold-400/500, node idle/live) for the redesigned surfaces.
 */
 @theme {
+  /* — Existing semantic tokens (unchanged: components depend on these) — */
   --color-verve: #3d77ff;
   --color-verve-glow: #6f9bff;
   --color-verve-soft: #16224a;
@@ -21,6 +22,16 @@
   --color-surface: #131c30;
   --color-surface-2: #0f1626;
   --color-line: #27314c;
+
+  /* — Elevated palette (new) — */
+  --color-void: #06090f; /* base canvas */
+  --color-card: #101a2e; /* raised card */
+  --color-verve-400: #5b8dff; /* electric / glow accent */
+  --color-verve-500: #3d77ff;
+  --color-gold-400: #e8b04b;
+  --color-gold-500: #e0a436;
+  --color-node-idle: #2e3950; /* grey canister */
+  --color-node-live: #34d17f; /* mutual green */
 
   --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -38,9 +49,9 @@ body {
 
 body {
   background:
-    radial-gradient(1100px 720px at 50% -18%, rgba(47, 107, 255, 0.16), transparent 60%),
-    radial-gradient(900px 680px at 50% 118%, rgba(224, 164, 54, 0.1), transparent 55%),
-    #0a0f1c;
+    radial-gradient(125% 78% at 50% -10%, rgba(61, 119, 255, 0.15), transparent 56%),
+    radial-gradient(80% 52% at 94% 110%, rgba(224, 164, 54, 0.1), transparent 60%),
+    #06090f;
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -48,20 +59,68 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Thin "mission" eyebrow label, monospace + tracked-out */
+/* Sora display headings, tightened per the design brief. */
+.font-display {
+  letter-spacing: -0.03em;
+}
+.display-tight {
+  letter-spacing: -0.04em;
+}
+
+/* Thin "mission" eyebrow label, monospace + tracked-out (system-line feel). */
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
-  letter-spacing: 0.22em;
+  font-size: 0.92rem;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--color-gold-deep);
 }
 
-/* Soft card surface used across screens */
+/* Soft card surface used across screens — raised onto the new card colour. */
 .surface-card {
   background: linear-gradient(180deg, #16213a, var(--color-surface-2));
   border: 1px solid var(--color-line);
-  box-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.85);
+}
+
+/* Fixed full-screen film grain — fractal noise, overlay-blended, ~4.5%. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+}
+
+/* Primary-CTA gold glow-pulse (3s loop). Degrades via the reduced-motion rule. */
+@keyframes ctaGlow {
+  0%,
+  100% {
+    box-shadow: 0 16px 34px -14px rgba(224, 164, 54, 0.55), 0 0 0 0 rgba(232, 176, 75, 0);
+  }
+  50% {
+    box-shadow: 0 18px 40px -12px rgba(224, 164, 54, 0.7), 0 0 26px 2px rgba(232, 176, 75, 0.35);
+  }
+}
+.cta-glow {
+  animation: ctaGlow 3s ease-in-out infinite;
+}
+
+/* Amber canister lock — soft gold glow breathing. */
+@keyframes amberPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(232, 176, 75, 0.55));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(232, 176, 75, 0.9));
+  }
+}
+.amber-pulse {
+  animation: amberPulse 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
