@@ -272,7 +272,7 @@ function CrewBoard({
                 className="surface-card rounded-2xl p-6"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-gold-deep">
-                  {nothingLit ? "Quiet on the wheel" : "Warming up"}
+                  {nothingLit ? "Standing by" : "Warming up"}
                 </p>
                 <p className="mt-3 text-base leading-relaxed text-muted">
                   {nothingLit ? c.emptyHint : c.clickHint}
