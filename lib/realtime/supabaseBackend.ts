@@ -94,6 +94,16 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
       }, 4000);
     });
 
+    // Convergence poll: realtime can miss a postgres_changes echo during the
+    // subscription's cold-start bind window. In the guess model a watching player
+    // never writes, so a missed echo would leave their wheel stale until THEY act
+    // (which looked like "green only appears after my own next guess"). A light
+    // periodic re-snapshot guarantees every client converges within a few seconds
+    // regardless. Cheap at a few dozen rows.
+    const poll = setInterval(() => {
+      void snapshot();
+    }, 4000);
+
     const insertEdge = async (guesserId: string, guessedId: string) => {
       const { error } = await supabase.from("guesses").upsert(
         {
@@ -126,6 +136,7 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
         await snapshot();
       },
       leave: () => {
+        clearInterval(poll);
         void supabase.removeChannel(channel);
       },
     };
