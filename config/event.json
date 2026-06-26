@@ -5,8 +5,8 @@
     "eyebrow": "🔓 You're in. Barely.",
     "title": "Project Off The Books",
     "tagline": "Welcome to the only project at Verve that will never be audited.",
-    "subtitle": "You cracked the code — but can you guess what happens next?",
-    "cta": "Chalo, shuru karein"
+    "subtitle": "Knocking was the easy part. What's behind the door, no one knows.",
+    "cta": "Step inside"
   },
   "vibe": {
     "eyebrows": [
@@ -27,50 +27,99 @@
     "closeTitle": "That's enough conspiracy for one day.",
     "closeSubtitle": "Whatever it actually is — you're early. Step through.",
     "cta": "Open the door",
+    "teaserEyebrow": "Maybe it is…",
+    "teaserCta": "Or maybe not.",
+    "closer": "Is this what's behind the door?",
     "rumours": [
-      { "emoji": "🌕", "text": "Verve ab Chand pe apni pehli advisory branch kholne ki planning kar raha hai?" },
-      { "emoji": "📊", "text": "Kya hum balance sheets, finance aur Saffron ke saath khud ka share market index launch karne wale hain?" },
-      { "emoji": "🚀", "text": "Ye kya sun rahe — Verve ab Public, ya seedha Mars pe listing me ja raha hai?" },
-      { "emoji": "⏳", "text": "Maybe we're secretly building a Time Machine so everyone can finally 'buy back' all their time?" },
-      { "emoji": "💼", "text": "Kya Verve ab Big 4 ko acquire karne wala hai?" },
-      { "emoji": "🎉", "text": "Ya phir… kya hum apni history ka sabse bada, sabse crazy Workation plan kar rahe hain?" },
-      { "emoji": "🤖", "text": "Kya Verve ab Anthropic — Claude ko acquire karne wala hai?" },
-      { "emoji": "🎮", "text": "You've only unlocked Level 1. Keep your eyes on your inbox — this project is just getting started." },
-      { "emoji": "🪐", "text": "Suna hai humari agli team meeting Mars pe hone wali hai, Elon Musk ki sponsorship ke saath?" },
-      { "emoji": "🪙", "text": "Kya Verve ab apna khud ka crypto coin 'VerveCoin' launch karne wala hai?" },
-      { "emoji": "📈", "text": "Suna hai hum Nifty 50 ko replace karke 'Verve 50' index bana rahe hain?" },
-      { "emoji": "📚", "text": "Suna hai CA institute ka naya syllabus ab Verve decide karne wala hai?" },
-      { "emoji": "🏦", "text": "Kya hum secretly RBI ko tax planning sikha rahe hain?" },
-      { "emoji": "🗽", "text": "Kya hum poora US hi kharid rahe hain?" },
-      { "emoji": "👽", "text": "Are we outsourcing all our audits to aliens on Mars?" },
-      { "emoji": "💵", "text": "Kya hum dollar ka rate 1000 karne wale hain?" },
-      { "emoji": "🎬", "text": "Suna hai agle saal se ITR file karne pe clients ko return mein Netflix subscription milega?" },
-      { "emoji": "💰", "text": "Kya Verve ab Swiss Banks ki audit karne wala hai?" },
-      { "emoji": "👯", "text": "Kya 'Buy Back Time' scheme mein company humein apne clones banane de rahi hai?" },
-      { "emoji": "🍿", "text": "Suna hai hum apna khud ka OTT platform launch kar rahe hain: 'Verveflix'?" },
-      { "emoji": "🎥", "text": "Kya hum advisory ke saath Bollywood movies bhi produce karne wale hain?" },
-      { "emoji": "🏏", "text": "Are we sponsoring the next IPL team: 'The Verve Avengers'?" },
-      { "emoji": "🚁", "text": "Kya office ke terrace pe daily commute ke liye ek helipad ban raha hai?" },
-      { "emoji": "📜", "text": "Suna hai desh ke agle budget ki speech humari team likh rahi hai?" },
-      { "emoji": "🧠", "text": "Kya Elon Musk humse time management aur delegation seekhne aa raha hai?" },
-      { "emoji": "🏝️", "text": "Suna hai hum survival mindset se bahar nikalne ke liye ek private island kharid rahe hain?" },
-      { "emoji": "🛂", "text": "Kya Verve ab apna khud ka country banane wala hai, jiska apna passport hoga?" },
-      { "emoji": "🛰️", "text": "Suna hai humare servers data security ke liye Jupiter pe shift ho rahe hain?" },
-      { "emoji": "🕊️", "text": "Kya ab se emails likhne ke baad kabootar se bheje jayenge, for that 'vintage' feel?" }
+      {
+        "emoji": "🤝",
+        "heading": "A Giant Came Knocking",
+        "sub": "A partnership in the making.",
+        "body": [
+          "A name you'd recognise has been quietly calling — one of the big multinational consultancies — not to send us work, but to put their name beside ours.",
+          "This isn't about who's bigger. It's two firms deciding they're worth more together than apart.",
+          "The real question isn't whether it happens — it's what changes for the rest of us when it does."
+        ]
+      },
+      {
+        "emoji": "🌉",
+        "heading": "An Address in the Valley",
+        "sub": "Are we opening a Verve branch in Silicon Valley?",
+        "body": [
+          "\"San Francisco\" keeps turning up — on a whiteboard nobody will explain, in calls that happen at odd hours.",
+          "A US office isn't about prestige. It's a firm deciding it's done flying to a market and ready to live in it.",
+          "Whatever's being set up out west, the interesting part isn't the address — it's who gets sent to sit at it."
+        ]
+      },
+      {
+        "emoji": "🧮",
+        "heading": "AI, for Every CA in the Country",
+        "sub": "An ICAI initiative to put AI in the whole profession's hands?",
+        "body": [
+          "Word is there's a conversation happening with the institute itself — not about one firm's tools, but the profession's.",
+          "Helping every CA work with AI isn't a product. It's a position: becoming the name attached to the shift before anyone else claims it.",
+          "If it's real, the question isn't whether the profession changes — it's who's standing at the front of the room when it does."
+        ]
+      },
+      {
+        "emoji": "🌴",
+        "heading": "Bali Is Calling",
+        "sub": "An international workation — the thing that's topped everyone's wishlist for years?",
+        "body": [
+          "Picture it: the whole firm working out of a villa, stand-ups by the pool, deadlines that somehow feel lighter with the ocean in earshot.",
+          "Word is it might be more than a daydream this time — maybe someone should start a list of who's actually got a valid passport.",
+          "Sunset team dinners, a beach instead of a boardroom, stories nobody back home will believe. If it's real, this is the trip we'll never stop talking about."
+        ]
+      },
+      {
+        "emoji": "🎓",
+        "heading": "A School That Doesn't Exist Yet",
+        "sub": "An academy for finance and AI — staff swear it's real; HR's gone quiet.",
+        "body": [
+          "Every firm says it's \"investing in AI.\" Almost none turn that into a building, a syllabus, and a name over the door.",
+          "An academy isn't a training budget — it's a firm deciding to grow its own talent instead of hunting for it.",
+          "If it's real, the question isn't what they'll teach. It's what they're quietly preparing us for."
+        ]
+      },
+      {
+        "emoji": "🌱",
+        "heading": "From Sambhaji Nagar to Europe?",
+        "sub": "Word is VerviGreen's indoor saffron farm is crossing a border.",
+        "body": [
+          "Priya's saffron project was never meant to be ordinary — growing the world's costliest spice indoors, while everyone insisted it couldn't scale.",
+          "A year of headlines later, the whisper is a second farm. In Europe. The kind of move you only make when the first one quietly worked.",
+          "The question isn't whether VerviGreen can grow saffron. It's how far one out-of-the-box idea is allowed to travel."
+        ]
+      },
+      {
+        "emoji": "🔧",
+        "heading": "When a Client Becomes a Partner",
+        "sub": "A joint venture to move into SAP implementation and migration?",
+        "body": [
+          "We've advised on systems for years. The whisper is we're about to start building and migrating them — the actual heavy lifting, not just the blueprint.",
+          "Stranger still: the partner is said to be one of our own clients. The line between who we serve and who we build with is apparently about to blur.",
+          "A move like this isn't a new service line. It's Verve deciding advice was only ever step one."
+        ]
+      }
     ]
   },
   "signIn": {
-    "eyebrow": "Step one · who goes there",
-    "title": "Sign in to begin.",
-    "subtitle": "Confirm it's really you with your Verve account — then we point you to your crew. No passwords.",
-    "googleLabel": "Continue with Verve Google",
+    "eyebrow": "Enough guessing.",
+    "title": "There's Only One Way In.",
+    "subtitle": "We won't tell you which one is the real project. You'll have to come inside and see for yourself.",
+    "body": [
+      "Everyone is guessing. Almost no one will know — until they knock.",
+      "It will ask who you are. Give it only the name Verve gave you."
+    ],
+    "googleLabel": "Sign up with Google",
     "emailPlaceholder": "you@verveadvisory.com",
     "sendLabel": "Email me a sign-in code",
     "verifyLabel": "Verify & continue",
     "codeLabel": "6-digit code",
     "allowedDomain": "verveadvisory.com",
     "domainError": "Use your @verveadvisory.com email to continue.",
-    "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page)."
+    "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page).",
+    "fine": "Off the record, naturally. Use your Verve account."
   },
   "brief": {
     "eyebrow": "Top secret · do not forward",
@@ -101,6 +150,17 @@
     "mutualToast": "Mutual! {name} named you back. 🟢",
     "errorTitle": "Signal lost.",
     "errorBody": "Couldn't assemble this crew's wheel. Refresh — and if it persists, ping the host."
+  },
+  "wait": {
+    "eyebrow": "You're in.",
+    "emoji": "🤫",
+    "title": "Now We Wait.",
+    "subtitle": "The rest stays off the books — until the morning of the 1st.",
+    "body": [
+      "The rumours will keep spinning. Let them — none of them are the whole story.",
+      "On the 1st, the door opens for real, and you'll be among the first through it. Watch your inbox. Tell no one."
+    ],
+    "replayCta": "See what they're whispering today →"
   },
   "superAdmins": [{ "name": "Software Admin", "email": "admin.software@verveadvisory.com" }]
 }

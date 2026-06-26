@@ -102,6 +102,12 @@
   color-scheme: dark;
 }
 
+/* Default the whole app to 75% — document-level zoom (recomputes viewport units,
+   keeps the grain + fixed toasts anchored, no left-shift). */
+html {
+  zoom: 0.75;
+}
+
 html,
 body {
   height: 100%;

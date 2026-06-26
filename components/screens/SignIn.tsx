@@ -101,6 +101,16 @@ function GoogleSignIn() {
       </h1>
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
 
+      {c.body.length > 0 && (
+        <div className="mt-5 max-w-md border-l-2 border-gold/70 pl-4 text-left text-[15px] leading-relaxed text-muted">
+          {c.body.map((p, i) => (
+            <p key={i} className={i > 0 ? "mt-3" : undefined}>
+              {p}
+            </p>
+          ))}
+        </div>
+      )}
+
       <button
         type="button"
         onClick={go}
@@ -110,8 +120,8 @@ function GoogleSignIn() {
         <GoogleMark />
         {busy ? "Redirecting…" : c.googleLabel}
       </button>
-      <p className="mt-3 font-mono text-[11px] tracking-wider text-faint">
-        Verve Google accounts only · @{c.allowedDomain}
+      <p className="mt-3 font-mono text-[11px] leading-relaxed tracking-wider text-faint">
+        {c.fine} · @{c.allowedDomain}
       </p>
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
     </div>

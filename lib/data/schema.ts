@@ -41,9 +41,13 @@ export const teamSchema = z.object({
   memberIds: z.array(z.string().min(1)).min(1),
 });
 
+/* A teaser "question" — emoji, headline, the one-line question, and the
+   intrigue body (one or more paragraphs). Shown in the Vibe Check reel. */
 export const rumourSchema = z.object({
   emoji: z.string().min(1),
-  text: z.string().min(1),
+  heading: z.string().min(1),
+  sub: z.string().min(1),
+  body: z.array(z.string().min(1)).min(1),
 });
 
 export const eventSchema = z.object({
@@ -66,12 +70,20 @@ export const eventSchema = z.object({
     closeTitle: z.string(),
     closeSubtitle: z.string(),
     cta: z.string(),
+    /** Eyebrow shown above every teaser. */
+    teaserEyebrow: z.string().default("Maybe it is…"),
+    /** Single advance button under each teaser. */
+    teaserCta: z.string().default("Or maybe not."),
+    /** Closing rhetorical line under each teaser, before the button. */
+    closer: z.string().default("Is this what's behind the door?"),
     rumours: z.array(rumourSchema).min(1),
   }),
   signIn: z.object({
     eyebrow: z.string(),
     title: z.string(),
     subtitle: z.string(),
+    /** Optional extra paragraphs shown under the subtitle on the Google screen. */
+    body: z.array(z.string().min(1)).default([]),
     googleLabel: z.string(),
     emailPlaceholder: z.string(),
     sendLabel: z.string(),
@@ -82,6 +94,8 @@ export const eventSchema = z.object({
     domainError: z.string(),
     /** Shown after the code is sent. Use {email} as a placeholder. */
     checkEmail: z.string(),
+    /** Fine-print line under the Google button. */
+    fine: z.string().default("Off the record, naturally. Use your Verve account."),
   }),
   brief: z.object({
     eyebrow: z.string(),
@@ -125,6 +139,15 @@ export const eventSchema = z.object({
     errorBody: z
       .string()
       .default("Couldn't assemble this crew's wheel. Refresh — and if it persists, ping the host."),
+  }),
+  /** Pre-event "Now We Wait." holding screen (shown after sign-in). */
+  wait: z.object({
+    eyebrow: z.string(),
+    emoji: z.string(),
+    title: z.string(),
+    subtitle: z.string(),
+    body: z.array(z.string().min(1)).min(1),
+    replayCta: z.string(),
   }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z

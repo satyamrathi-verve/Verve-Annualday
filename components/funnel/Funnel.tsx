@@ -6,17 +6,18 @@ import { Shell, type StepDef } from "./Shell";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
-import { Brief } from "@/components/screens/Brief";
-import { GuessYourCrew } from "@/components/screens/GuessYourCrew";
+import { Wait } from "@/components/screens/Wait";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useAuth } from "@/components/providers/AuthContext";
 
+// Pre-event teaser funnel. The Brief + Guess-Your-Crew (event-day) screens are
+// parked — their components still live under components/screens/ and can be
+// re-added here when the door opens for real on the 1st.
 const STEPS: StepDef[] = [
   { key: "landing", title: "Cold open" },
-  { key: "vibe", title: "Vibe check" },
+  { key: "vibe", title: "The teasers" },
   { key: "signin", title: "The door" },
-  { key: "brief", title: "The briefing" },
-  { key: "guess", title: "Guess your crew" },
+  { key: "wait", title: "Now we wait" },
 ];
 
 const RESUME_KEY = "getaway.funnel.index";
@@ -57,6 +58,8 @@ function FunnelInner() {
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
 
+  const vibeIndex = STEPS.findIndex((s) => s.key === "vibe");
+
   const key = STEPS[index].key;
   const screen = (() => {
     switch (key) {
@@ -66,10 +69,8 @@ function FunnelInner() {
         return <VibeCheck onNext={next} />;
       case "signin":
         return <SignIn onNext={next} />;
-      case "brief":
-        return <Brief onNext={next} />;
-      case "guess":
-        return <GuessYourCrew />;
+      case "wait":
+        return <Wait onReplay={() => go(vibeIndex)} />;
       default:
         return null;
     }
