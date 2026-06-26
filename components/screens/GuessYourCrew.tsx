@@ -7,6 +7,7 @@ import { useTeamWheel, type WheelMember } from "@/lib/realtime/useTeamWheel";
 import { useTeamsProgress } from "@/lib/realtime/useTeamsProgress";
 import { Wheel } from "@/components/wheel/Wheel";
 import { ClueCard } from "@/components/wheel/ClueCard";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
 import { event, getTeam } from "@/lib/data/config";
@@ -250,47 +251,43 @@ function CrewBoard({
             </AnimatePresence>
 
             {complete ? (
-              <FinaleCard title={c.completeTitle} subtitle={c.completeSubtitle} reduce={reduce} />
+              <FinaleCard title={c.completeTitle} subtitle={c.completeSubtitle} />
             ) : myDone ? (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="surface-card rounded-2xl p-6 text-center"
-              >
-                <h2 className="font-display text-2xl font-extrabold text-navy lg:text-3xl">
-                  {c.partDoneTitle}
-                </h2>
-                <p className="mt-3 text-base leading-relaxed text-muted">{c.partDoneSubtitle}</p>
-                <p className="mt-4 font-mono text-[11px] tracking-wider text-gold-deep lg:text-xs">
-                  {total - greenCount} still to confirm · watching the wheel
-                </p>
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+                <GlassCard accent className="p-6 text-center">
+                  <h2 className="font-display text-2xl font-extrabold text-navy lg:text-3xl">
+                    {c.partDoneTitle}
+                  </h2>
+                  <p className="mt-3 text-base leading-relaxed text-muted">{c.partDoneSubtitle}</p>
+                  <p className="mt-4 font-mono text-[11px] tracking-wider text-gold-deep lg:text-xs">
+                    {total - greenCount} still to confirm · watching the wheel
+                  </p>
+                </GlassCard>
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="surface-card rounded-2xl p-6"
-              >
-                <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-gold-deep">
-                  {nothingLit ? "Standing by" : "Warming up"}
-                </p>
-                <p className="mt-3 text-base leading-relaxed text-muted">
-                  {nothingLit ? c.emptyHint : c.clickHint}
-                </p>
-                <div className="mt-4 flex items-center gap-4 font-mono text-[11px] text-faint">
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-node-idle ring-1 ring-verve-400" />
-                    idle
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-gold-400" />
-                    yours
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-node-live" />
-                    mutual
-                  </span>
-                </div>
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+                <GlassCard accent className="p-6">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-gold-deep">
+                    {nothingLit ? "Standing by" : "Warming up"}
+                  </p>
+                  <p className="mt-3 text-base leading-relaxed text-muted">
+                    {nothingLit ? c.emptyHint : c.clickHint}
+                  </p>
+                  <div className="mt-4 flex items-center gap-4 font-mono text-[11px] text-faint">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-node-idle ring-1 ring-verve-400" />
+                      idle
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-gold-400" />
+                      yours
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-node-live" />
+                      mutual
+                    </span>
+                  </div>
+                </GlassCard>
               </motion.div>
             )}
 
@@ -361,34 +358,16 @@ function LoadingPanel({ lines }: { lines: string[] }) {
   );
 }
 
-function FinaleCard({
-  title,
-  subtitle,
-  reduce,
-}: {
-  title: string;
-  subtitle: string;
-  reduce: boolean | null;
-}) {
+function FinaleCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-2xl border border-node-live/45 bg-gradient-to-b from-[#0f2a20] to-surface-2 p-6 text-center shadow-[0_24px_60px_-30px_rgba(52,209,127,0.6)]"
-    >
-      <motion.span
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={reduce ? { opacity: 0.4 } : { opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        style={{ background: "radial-gradient(circle at 50% 0%, rgba(52,209,127,0.18), transparent 60%)" }}
-      />
-      <h2 className="relative font-display text-2xl font-extrabold text-navy lg:text-3xl">{title}</h2>
-      <p className="relative mt-3 text-base leading-relaxed text-muted">{subtitle}</p>
-      <p className="relative mt-4 font-mono text-[11px] uppercase tracking-[0.28em] text-node-live">
-        next transmission incoming
-      </p>
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+      <GlassCard accent className="p-6 text-center">
+        <h2 className="font-display text-2xl font-extrabold text-navy lg:text-3xl">{title}</h2>
+        <p className="mt-3 text-base leading-relaxed text-muted">{subtitle}</p>
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.28em] text-node-live">
+          next transmission incoming
+        </p>
+      </GlassCard>
     </motion.div>
   );
 }
@@ -452,19 +431,8 @@ function OtherCrews({ currentTeamId }: { currentTeamId: string }) {
         {standings.map((t) => {
           const pct = t.total ? Math.round((t.greenCount / t.total) * 100) : 0;
           const isMine = t.teamId === currentTeamId;
-          const mineDone = isMine && t.complete;
           return (
-            <div
-              key={t.teamId}
-              className={clsx(
-                "rounded-xl border p-3 transition-colors",
-                mineDone
-                  ? "border-node-live/70 bg-node-live/10 shadow-[0_0_28px_-8px_rgba(52,209,127,0.8)]"
-                  : isMine
-                    ? "border-verve-400/70 bg-verve-soft/50"
-                    : "border-line bg-surface/60",
-              )}
-            >
+            <GlassCard key={t.teamId} accent={isMine} className="p-3">
               <div className="flex items-center gap-2">
                 <span
                   className="h-2.5 w-2.5 flex-none rounded-full"
@@ -501,7 +469,7 @@ function OtherCrews({ currentTeamId }: { currentTeamId: string }) {
                   style={{ width: `${pct}%` }}
                 />
               </div>
-            </div>
+            </GlassCard>
           );
         })}
       </div>
