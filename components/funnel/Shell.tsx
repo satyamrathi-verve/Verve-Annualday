@@ -26,10 +26,10 @@ export function Shell({ steps, index, canGoBack, onBack, children }: ShellProps)
         <Image
           src="/verve-logo.png"
           alt="Verve Advisory"
-          width={313}
-          height={135}
+          width={720}
+          height={250}
           priority
-          className="h-16 w-auto sm:h-20 lg:h-24"
+          className="h-12 w-auto sm:h-14 lg:h-16"
         />
         <span className="eyebrow ml-1 hidden text-faint sm:block">{event.edition}</span>
         <div className="ml-auto flex items-center gap-4">
