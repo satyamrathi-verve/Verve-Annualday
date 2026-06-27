@@ -1,6 +1,6 @@
 {
   "eventName": "Project Off The Books",
-  "edition": "Verve Advisory · Anniversary 2026",
+  "edition": "Verve Advisory · Off the Record",
   "landing": {
     "eyebrow": "🔓 You're in. Barely.",
     "title": "Project Off The Books",
@@ -22,7 +22,7 @@
     "reactions": ["Sach hai! 🔥", "Ho sakta hai… 🤔", "Arre nahi yaar 😅"],
     "helper": "this is data we will absolutely never use",
     "minCards": 5,
-    "maxCards": 7,
+    "maxCards": 5,
     "closeEyebrow": "Briefing incoming",
     "closeTitle": "That's enough conspiracy for one day.",
     "closeSubtitle": "Whatever it actually is — you're early. Step through.",

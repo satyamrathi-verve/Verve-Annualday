@@ -14,7 +14,8 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// Pick a random 5–8 (clamped to the list) and shuffle. Kept as a module-level
+// Pick a random count between minCards/maxCards (clamped to the list) and
+// shuffle — with both set to 5 in config, that's exactly 5 random. Kept as a module-level
 // helper so the randomness lives outside the component render (same convention
 // as the shuffle used on the Guess screen).
 function buildDeck(rumours: Rumour[], minCards: number, maxCards: number): Rumour[] {
@@ -34,7 +35,7 @@ const fade = {
 export function VibeCheck({ onNext }: { onNext: () => void }) {
   const c = event.vibe;
 
-  // Each player gets a different random 5–8 teaser reel, shuffled, picked once
+  // Each player gets a different random teaser reel (5 cards per config), shuffled, picked once
   // on mount. This screen never server-renders (it mounts only after the Landing
   // CTA), so client-side randomness is safe — no hydration mismatch. All copy is
   // config-driven: swap the list in config/event.json, nothing is hard-coded.
