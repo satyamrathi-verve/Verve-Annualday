@@ -1,133 +1,124 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
-import { useAllWheels } from "@/lib/realtime/useAllWheels";
+import { supabaseEnabled } from "@/lib/supabase/client";
+import { clsx } from "@/lib/clsx";
+import { AttendeesPanel } from "./AttendeesPanel";
+import { LiveProgressPanel } from "./LiveProgressPanel";
 
+type Tab = "signins" | "progress";
+
+const TABS: Array<{ key: Tab; label: string; title: string }> = [
+  { key: "signins", label: "Sign-ins", title: "Who's in the portal." },
+  { key: "progress", label: "Live progress", title: "All crews, live." },
+];
+
+/*
+  Super-admin mission control. Two views share one themed shell:
+    · Sign-ins (default) — who has logged into the portal, with a CSV export.
+    · Live progress      — each crew's game-day wheel (goes live on game day).
+  Routed here from the funnel for any session flagged isSuperAdmin.
+*/
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
-  const selfId = `admin:${session?.email ?? "anon"}`;
-  const { teams, backendKind, resetTeam } = useAllWheels(selfId);
-
-  const greenTotal = teams.reduce((s, t) => s + t.greenCount, 0);
-  const yellowTotal = teams.reduce((s, t) => s + t.yellowCount, 0);
-  const canisterTotal = teams.reduce((s, t) => s + t.total, 0);
-  const teamsComplete = teams.filter((t) => t.complete).length;
-  const onlineTotal = teams.reduce((s, t) => s + t.online, 0);
+  const [tab, setTab] = useState<Tab>("signins");
+  const active = TABS.find((t) => t.key === tab)!;
 
   return (
     <div className="min-h-dvh px-5 py-8 sm:px-8 lg:px-12">
       {/* header */}
       <header className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-4">
-        <div>
-          <p className="eyebrow">Mission control · super admin</p>
-          <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-            All crews, live.
-          </h1>
-        </div>
+        <Image
+          src="/verve-logo.png"
+          alt="Verve Advisory"
+          width={720}
+          height={250}
+          priority
+          className="h-10 w-auto sm:h-12"
+        />
         <div className="ml-auto flex items-center gap-4">
           <span
-            className={`font-mono text-xs tracking-widest ${
-              backendKind === "supabase" ? "text-verve" : "text-faint"
-            }`}
+            className={clsx(
+              "font-mono text-xs tracking-widest",
+              supabaseEnabled ? "text-verve" : "text-faint",
+            )}
           >
-            {backendKind === "supabase" ? "● LIVE" : "○ local demo"}
+            {supabaseEnabled ? "● LIVE" : "○ local demo"}
           </span>
+          {session?.email && (
+            <span className="hidden font-mono text-[11px] tracking-wider text-faint sm:inline">
+              {session.email}
+            </span>
+          )}
           <button
             type="button"
             onClick={() => void signOut()}
-            className="font-mono text-[11px] tracking-wider text-faint hover:text-verve"
+            className="font-mono text-[11px] tracking-wider text-faint transition-colors hover:text-verve"
           >
             sign out
           </button>
         </div>
       </header>
 
-      {/* summary */}
-      <div className="mx-auto mt-6 grid w-full max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat label="confirmed" value={`${greenTotal} / ${canisterTotal}`} />
-        <Stat label="pending" value={String(yellowTotal)} />
-        <Stat label="teams complete" value={`${teamsComplete} / ${teams.length}`} />
-        <Stat label="people in rooms" value={String(onlineTotal)} />
-      </div>
+      {/* title + tabs */}
+      <div className="mx-auto mt-7 w-full max-w-6xl">
+        <p className="eyebrow">Mission control · super admin</p>
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={active.key}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-1 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl"
+          >
+            {active.title}
+          </motion.h1>
+        </AnimatePresence>
 
-      {/* team grid */}
-      <div className="mx-auto mt-6 grid w-full max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {teams.map((t) => {
-          const pct = t.total ? Math.round((t.greenCount / t.total) * 100) : 0;
-          return (
-            <div key={t.teamId} className="surface-card rounded-2xl p-5">
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: t.color }} />
-                <span className="font-display text-base font-bold text-navy">{t.name}</span>
-                {t.complete && (
-                  <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-gold-deep">
-                    ✨ complete
-                  </span>
+        <div className="mt-5 inline-flex rounded-full border border-line bg-surface-2/60 p-1">
+          {TABS.map((t) => {
+            const isActive = t.key === tab;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className={clsx(
+                  "relative rounded-full px-4 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors sm:text-[12px]",
+                  isActive ? "text-[#0e1a33]" : "text-faint hover:text-navy",
                 )}
-              </div>
-
-              <div className="mt-4 flex items-end justify-between">
-                <span className="font-display text-3xl font-extrabold leading-none text-navy">
-                  {t.greenCount}
-                  <span className="text-lg text-faint"> / {t.total}</span>
-                </span>
-                <span className="font-mono text-[11px] text-muted">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-verve" /> {t.online} in
-                  room
-                </span>
-              </div>
-
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-line">
-                <motion.div
-                  className="h-full rounded-full bg-green-600"
-                  initial={false}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                />
-              </div>
-
-              <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-faint">
-                <span>{t.yellowCount} pending</span>
-                <ResetButton onConfirm={() => resetTeam(t.teamId)} />
-              </div>
-            </div>
-          );
-        })}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="admin-tab-pill"
+                    className="absolute inset-0 rounded-full bg-gold"
+                    transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-}
 
-/** Two-tap reset so a stray click can't wipe a live team mid-event. */
-function ResetButton({ onConfirm }: { onConfirm: () => void }) {
-  const [armed, setArmed] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        if (armed) {
-          onConfirm();
-          setArmed(false);
-        } else {
-          setArmed(true);
-          window.setTimeout(() => setArmed(false), 2500);
-        }
-      }}
-      className={armed ? "tracking-wider text-red-500" : "tracking-wider hover:text-red-500"}
-    >
-      {armed ? "↻ tap again to wipe" : "↻ reset"}
-    </button>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="surface-card rounded-2xl px-4 py-3 text-center">
-      <div className="font-display text-2xl font-extrabold text-navy">{value}</div>
-      <div className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-gold-deep">
-        {label}
+      {/* active panel */}
+      <div className="mt-7">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {tab === "signins" ? <AttendeesPanel /> : <LiveProgressPanel />}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

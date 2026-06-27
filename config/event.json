@@ -251,5 +251,8 @@
     ],
     "replayCta": "See what they're whispering today →"
   },
-  "superAdmins": [{ "name": "Software Admin", "email": "admin.software@verveadvisory.com" }]
+  "superAdmins": [
+    { "name": "Verve Advisory", "email": "info@verveadvisory.com" },
+    { "name": "Software Admin", "email": "admin.software@verveadvisory.com" }
+  ]
 }
