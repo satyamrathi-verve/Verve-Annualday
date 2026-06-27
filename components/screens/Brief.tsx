@@ -73,7 +73,7 @@ export function Brief({ onNext }: { onNext: () => void }) {
       </h1>
 
       {/* Gold quote-rule on Captain Wanderlust's monologue. */}
-      <blockquote className="relative mx-auto mt-5 max-w-2xl pl-5 text-left font-mono text-sm leading-relaxed text-muted lg:text-base">
+      <blockquote className="relative mx-auto mt-5 max-w-2xl pl-5 text-left font-mono text-[15px] leading-relaxed text-body lg:text-base">
         <span className="absolute left-0 top-0 h-full w-[3px] rounded-full bg-gradient-to-b from-gold-400 to-gold-500 shadow-[0_0_18px_-2px_rgba(232,176,75,0.6)]" />
         {c.quote}
       </blockquote>

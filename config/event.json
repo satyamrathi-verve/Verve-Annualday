@@ -215,7 +215,7 @@
     "captain": "Captain Wanderlust",
     "title": "If you choose to accept it.",
     "videoLabel": "Captain Wanderlust · the briefing",
-    "quote": "Listen closely, recruit. Your crew isn't who you sit with every day — I've scrambled finance, HR, ops and IT into something new. You'll find them not by their desk, but by what makes them them. The quirks. The hobbies. The little legends. Light up every canister on your wheel, and the real adventure begins.",
+    "quote": "You knocked, you guessed, you came in. Now the part that's actually off the books: the people you're looking for were never the ones beside you. We took finance, HR, ops and IT and quietly reshuffled the deck. Find them not by where they sit, but by the quirks and little legends only their crew would know. Light up every canister — and what's behind the door stops being a rumour.",
     "cta": "Spin up the wheel"
   },
   "guess": {
@@ -249,7 +249,7 @@
       "The rumours will keep spinning. Let them — none of them are the whole story.",
       "On the 1st, the door opens for real, and you'll be among the first through it. Watch your inbox. Tell no one."
     ],
-    "replayCta": "See what they're whispering today →"
+    "cta": "Dive into it →"
   },
   "superAdmins": [{ "name": "Software Admin", "email": "admin.software@verveadvisory.com" }]
 }

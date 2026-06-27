@@ -140,14 +140,14 @@ export const eventSchema = z.object({
       .string()
       .default("Couldn't assemble this crew's wheel. Refresh — and if it persists, ping the host."),
   }),
-  /** Pre-event "Now We Wait." holding screen (shown after sign-in). */
+  /** "Now We Wait." screen (shown after sign-in); its CTA dives into the game. */
   wait: z.object({
     eyebrow: z.string(),
     emoji: z.string(),
     title: z.string(),
     subtitle: z.string(),
     body: z.array(z.string().min(1)).min(1),
-    replayCta: z.string(),
+    cta: z.string(),
   }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z

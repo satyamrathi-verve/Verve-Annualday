@@ -85,7 +85,7 @@ function GoogleSignIn() {
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
 
       {c.body.length > 0 && (
-        <div className="mt-5 max-w-md border-l-2 border-gold/70 pl-4 text-left text-[15px] leading-relaxed text-muted">
+        <div className="mt-5 max-w-md border-l-2 border-gold/70 pl-4 text-left text-[15px] leading-relaxed text-body">
           {c.body.map((p, i) => (
             <p key={i} className={i > 0 ? "mt-3" : undefined}>
               {p}

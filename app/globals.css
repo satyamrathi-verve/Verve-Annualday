@@ -19,6 +19,7 @@
   --color-ink: #e7edf8;
   --color-muted: #9fadc6;
   --color-faint: #6d7c98;
+  --color-body: #c4cde6; /* readable body paragraphs — brighter than muted */
   --color-surface: #131c30;
   --color-surface-2: #0f1626;
   --color-line: #27314c;

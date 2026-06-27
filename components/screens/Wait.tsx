@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 import { event } from "@/lib/data/config";
 
 /*
-  Pre-event "Now We Wait." holding screen. Shown after sign-in — the door
-  doesn't open for real until the morning of the 1st. The one action loops the
-  recruit back to the teaser reel ("see what they're whispering today").
+  "Now We Wait." screen, shown after sign-in. Its CTA dives forward into the
+  crew-guessing game (the briefing + the live wheel).
 */
-export function Wait({ onReplay }: { onReplay: () => void }) {
+export function Wait({ onNext }: { onNext: () => void }) {
   const c = event.wait;
 
   return (
@@ -36,7 +35,7 @@ export function Wait({ onReplay }: { onReplay: () => void }) {
 
         <p className="mt-4 font-display text-lg font-semibold text-navy">{c.subtitle}</p>
 
-        <div className="mt-6 border-l-2 border-gold/70 pl-4 text-[15px] leading-relaxed text-muted lg:text-base">
+        <div className="mt-6 border-l-2 border-gold/70 pl-4 text-[15px] leading-relaxed text-body lg:text-base">
           {c.body.map((p, i) => (
             <p key={i} className={i > 0 ? "mt-3" : undefined}>
               {p}
@@ -46,10 +45,10 @@ export function Wait({ onReplay }: { onReplay: () => void }) {
 
         <button
           type="button"
-          onClick={onReplay}
+          onClick={onNext}
           className="mt-9 w-full rounded-xl border border-line bg-transparent px-5 py-3.5 text-sm font-medium text-muted transition-colors hover:border-verve-400 hover:text-ink lg:text-base"
         >
-          {c.replayCta}
+          {c.cta}
         </button>
       </motion.div>
     </div>

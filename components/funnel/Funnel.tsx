@@ -7,22 +7,27 @@ import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
 import { Wait } from "@/components/screens/Wait";
+import { Brief } from "@/components/screens/Brief";
+import { GuessYourCrew } from "@/components/screens/GuessYourCrew";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useAuth } from "@/components/providers/AuthContext";
 
-// Pre-event teaser funnel. The Brief + Guess-Your-Crew (event-day) screens are
-// parked — their components still live under components/screens/ and can be
-// re-added here when the door opens for real on the 1st.
+// Teaser funnel → into the crew-guessing game. "Now We Wait" dives into the
+// briefing and the live wheel (Brief + Guess Your Crew).
 const STEPS: StepDef[] = [
   { key: "landing", title: "Cold open" },
   { key: "vibe", title: "The teasers" },
   { key: "signin", title: "The door" },
   { key: "wait", title: "Now we wait" },
+  { key: "brief", title: "The briefing" },
+  { key: "guess", title: "Guess your crew" },
 ];
 
 const RESUME_KEY = "getaway.funnel.index";
 // Where to land after a sign-out / idle auto-logout — the Google sign-in step.
 const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
+// Steps that require a session — a logged-out reload must not resume onto these.
+const AUTH_GATED = new Set(["wait", "brief", "guess"]);
 
 export function Funnel() {
   // Wait for the persisted/auth session check before rendering the funnel. This
@@ -56,7 +61,7 @@ function FunnelInner() {
     const saved = window.sessionStorage.getItem(RESUME_KEY);
     const parsed = saved ? parseInt(saved, 10) : 0;
     const n = Number.isFinite(parsed) && parsed >= 0 && parsed < STEPS.length ? parsed : 0;
-    if (!session && STEPS[n].key === "wait") return SIGNIN_INDEX;
+    if (!session && AUTH_GATED.has(STEPS[n].key)) return SIGNIN_INDEX;
     return n;
   });
 
@@ -81,8 +86,6 @@ function FunnelInner() {
     wasSignedIn.current = signedIn;
   }, [session]);
 
-  const vibeIndex = STEPS.findIndex((s) => s.key === "vibe");
-
   const key = STEPS[index].key;
   const screen = (() => {
     switch (key) {
@@ -93,7 +96,11 @@ function FunnelInner() {
       case "signin":
         return <SignIn onNext={next} />;
       case "wait":
-        return <Wait onReplay={() => go(vibeIndex)} />;
+        return <Wait onNext={next} />;
+      case "brief":
+        return <Brief onNext={next} />;
+      case "guess":
+        return <GuessYourCrew />;
       default:
         return null;
     }
