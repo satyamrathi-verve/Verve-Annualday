@@ -31,6 +31,26 @@ export function AttendeeLog() {
     return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
   };
 
+  const downloadCsv = () => {
+    const data = rows ?? [];
+    const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const head = ["#", "Name", "Email", "First seen"];
+    const body = data.map((a, i) =>
+      [String(i + 1), a.displayName ?? "", a.email, fmt(a.firstSeen)].map(esc).join(","),
+    );
+    // BOM so Excel reads UTF-8 names correctly.
+    const csv = "﻿" + [head.map(esc).join(","), ...body].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sign-ins-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   if (err) {
     return (
       <div className="surface-card mx-auto mt-6 max-w-2xl rounded-2xl p-6 text-center">
@@ -61,9 +81,17 @@ export function AttendeeLog() {
   return (
     <div className="mx-auto mt-6 w-full max-w-4xl">
       <div className="surface-card rounded-2xl p-5">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <h3 className="font-display text-base font-bold text-navy">Logged into the portal</h3>
-          <span className="ml-auto font-mono text-[11px] text-faint">{rows.length} total</span>
+          <span className="font-mono text-[11px] text-faint">{rows.length} total</span>
+          <button
+            type="button"
+            onClick={downloadCsv}
+            disabled={rows.length === 0}
+            className="ml-auto rounded-lg border border-verve-400/40 px-3 py-1.5 font-mono text-[11px] tracking-wider text-verve transition-colors hover:bg-white/5 disabled:opacity-40"
+          >
+            ↓ download csv
+          </button>
         </div>
         <p className="mt-1 font-mono text-[11px] text-muted">
           Each person&apos;s first sign-in, most recent first.
