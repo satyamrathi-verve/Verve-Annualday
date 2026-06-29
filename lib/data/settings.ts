@@ -12,6 +12,14 @@ import { getSupabase } from "@/lib/supabase/client";
   yet (migration not run), we leave the wheel OPEN so local/mock demos and the
   pre-toggle app keep working. Once the row exists, its value governs.
 */
+
+// The Supabase client caches realtime channels by topic, and `.on()` throws once
+// a channel has been `.subscribe()`d. This hook mounts in several places at once
+// (Funnel, Wait, AdminControls) and re-runs on StrictMode/HMR remounts, so a
+// fixed topic would hand back an already-subscribed channel. A per-subscription
+// counter gives every instance its own topic — they all still watch id=eq.1.
+let channelSeq = 0;
+
 export function useGuessOpen(): { open: boolean; ready: boolean } {
   const [open, setOpen] = useState(true);
   const [ready, setReady] = useState(false);
@@ -39,7 +47,7 @@ export function useGuessOpen(): { open: boolean; ready: boolean } {
     void read();
 
     const channel = supabase
-      .channel("app_settings:1")
+      .channel(`app_settings:1:${++channelSeq}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "app_settings", filter: "id=eq.1" },
