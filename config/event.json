@@ -206,6 +206,7 @@
     "verifyLabel": "Verify & continue",
     "codeLabel": "6-digit code",
     "allowedDomain": "verveadvisory.com",
+    "allowedEmails": ["akshay.deshmukh@infrabeat.com"],
     "domainError": "Use your @verveadvisory.com email to continue.",
     "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page).",
     "fine": "Off the record, naturally. Use your Verve account."
@@ -249,7 +250,18 @@
       "The rumours will keep spinning. Let them — none of them are the whole story.",
       "On the 1st, the door opens for real, and you'll be among the first through it. Watch your inbox. Tell no one."
     ],
-    "cta": "Dive into it →"
+    "cta": "Dive into it →",
+    "lockedCta": "🔒 The host hasn't opened the wheel yet",
+    "lockedNote": "Hang tight — the crew hunt opens any moment. This page lights up the instant the host flips it on.",
+    "openEyebrow": "The wait is over.",
+    "openTitle": "The time has arrived.",
+    "openSubtitle": "The door's open — step through and find your crew.",
+    "openBody": [
+      "No more rumours. No more waiting. Your crew is right behind the door — go assemble them."
+    ]
   },
-  "superAdmins": [{ "name": "Software Admin", "email": "admin.software@verveadvisory.com" }]
+  "superAdmins": [
+    { "name": "Software Admin", "email": "admin.software@verveadvisory.com" },
+    { "name": "Verve Host", "email": "info@verveadvisory.com" }
+  ]
 }

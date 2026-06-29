@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shell, type StepDef } from "./Shell";
+import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
@@ -50,6 +51,9 @@ export function Funnel() {
 
 function FunnelInner() {
   const { session } = useAuth();
+  const reduce = useReducedMotion();
+  // Drives the self-destruct "char" overlay on the briefing → wheel hand-off.
+  const [burning, setBurning] = useState(false);
 
   // Resume where we left off — so a Google/email redirect lands the user back on
   // the step they were on (signed in), instead of all the way at the start. But
@@ -71,6 +75,17 @@ function FunnelInner() {
   };
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
+
+  // Briefing → wheel: play the self-destruct burn, which advances the funnel
+  // under cover. Falls back to a plain advance when motion is reduced or the
+  // browser can't do mask-image.
+  const igniteToGuess = () => {
+    if (reduce || !supportsMask) {
+      next();
+      return;
+    }
+    setBurning(true);
+  };
 
   // When the session ENDS while the tab is open (15-min idle auto-logout, manual
   // sign-out, or a token refresh that discovers the user was deleted), throw back
@@ -98,7 +113,7 @@ function FunnelInner() {
       case "wait":
         return <Wait onNext={next} />;
       case "brief":
-        return <Brief onNext={next} />;
+        return <Brief onNext={igniteToGuess} />;
       case "guess":
         return <GuessYourCrew />;
       default:
@@ -107,19 +122,28 @@ function FunnelInner() {
   })();
 
   return (
-    <Shell steps={STEPS} index={index} canGoBack={index > 0} onBack={back}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={key}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="flex w-full justify-center"
-        >
-          {screen}
-        </motion.div>
-      </AnimatePresence>
-    </Shell>
+    <>
+      <Shell steps={STEPS} index={index} canGoBack={index > 0} onBack={back}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={key}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="flex w-full justify-center"
+          >
+            {screen}
+          </motion.div>
+        </AnimatePresence>
+      </Shell>
+
+      {/* Self-destruct char overlay — covers the brief→guess swap, then chars away
+          to reveal the wheel. Lives outside AnimatePresence so Brief's exit fade
+          can't fade the fire. */}
+      {burning && (
+        <BurnTransition onCovered={next} onComplete={() => setBurning(false)} />
+      )}
+    </>
   );
 }

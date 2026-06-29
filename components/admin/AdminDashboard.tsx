@@ -4,10 +4,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useAllWheels } from "@/lib/realtime/useAllWheels";
+import { AdminControls } from "./AdminControls";
+import { clsx } from "@/lib/clsx";
 
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
   const selfId = `admin:${session?.email ?? "anon"}`;
+  const [tab, setTab] = useState<"live" | "manage">("live");
   const { teams, backendKind, resetTeam } = useAllWheels(selfId);
 
   const greenTotal = teams.reduce((s, t) => s + t.greenCount, 0);
@@ -44,6 +47,29 @@ export function AdminDashboard() {
         </div>
       </header>
 
+      {/* tabs */}
+      <div className="mx-auto mt-5 flex w-full max-w-6xl gap-2">
+        {(["live", "manage"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            className={clsx(
+              "rounded-lg px-4 py-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors",
+              tab === t
+                ? "bg-verve-soft text-verve"
+                : "border border-line text-faint hover:text-verve",
+            )}
+          >
+            {t === "live" ? "● live board" : "⚙ manage"}
+          </button>
+        ))}
+      </div>
+
+      {tab === "manage" ? (
+        <AdminControls />
+      ) : (
+        <>
       {/* summary */}
       <div className="mx-auto mt-6 grid w-full max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="confirmed" value={`${greenTotal} / ${canisterTotal}`} />
@@ -96,6 +122,8 @@ export function AdminDashboard() {
           );
         })}
       </div>
+        </>
+      )}
     </div>
   );
 }

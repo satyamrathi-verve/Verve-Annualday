@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { getAuthBackend, type AuthMode, type Session } from "@/lib/auth";
+import { hydrateRoster } from "@/lib/data/config";
 
 interface AuthContextValue {
   session: Session | null;
@@ -35,8 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    backend
-      .getSession()
+    // Load the live roster/teams (Supabase, falling back to the JSON seed)
+    // BEFORE resolving the session — session enrichment matches the signed-in
+    // email against the roster, so the roster must be current first.
+    hydrateRoster()
+      .then(() => backend.getSession())
       .then((s) => {
         if (active) {
           setSession(s);

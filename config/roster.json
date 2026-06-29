@@ -169,8 +169,8 @@
   },
   {
     "id": "sumair",
-    "email": "sumair@verveadvisory.com",
-    "displayName": "Sumair",
+    "email": "sumair.sadiq@verveadvisory.com",
+    "displayName": "Sumair Sadiq",
     "teamId": "team2",
     "isManager": false,
     "clues": {
@@ -193,7 +193,7 @@
   },
   {
     "id": "akshata.kolekar",
-    "email": "akshata.kolekar@verveadvisory.com",
+    "email": "akashata.kolekar@verveadvisory.com",
     "displayName": "Akshata Kolekar",
     "teamId": "team2",
     "isManager": false,
@@ -241,8 +241,8 @@
   },
   {
     "id": "neethu",
-    "email": "neethu@verveadvisory.com",
-    "displayName": "Neethu",
+    "email": "Neethu.george@verveadvisory.com",
+    "displayName": "Neethu George",
     "teamId": "team2",
     "isManager": false,
     "clues": {
@@ -360,18 +360,6 @@
     }
   },
   {
-    "id": "viren.sunil.khetani-2",
-    "email": "viren.khetani@verveadvisory.com",
-    "displayName": "Viren Sunil Khetani",
-    "teamId": "team3",
-    "isManager": false,
-    "clues": {
-      "hobbies": [],
-      "quirks": [],
-      "funFacts": []
-    }
-  },
-  {
     "id": "prem.duseja",
     "email": "prem.duseja@verveadvisory.com",
     "displayName": "Prem Duseja",
@@ -397,7 +385,7 @@
   },
   {
     "id": "pranay.oswal",
-    "email": "pranay.oswal@verveadvisory.com",
+    "email": "consultant.accounts@verveadvisory.com",
     "displayName": "Pranay Oswal",
     "teamId": "team4",
     "isManager": false,
@@ -421,7 +409,7 @@
   },
   {
     "id": "ansari.matiullah.ziyaullah",
-    "email": "ansari.ziyaullah@verveadvisory.com",
+    "email": "Ansari.Mutiullah@verveadvisory.com",
     "displayName": "Ansari Matiullah Ziyaullah",
     "teamId": "team4",
     "isManager": false,
@@ -457,8 +445,8 @@
   },
   {
     "id": "prashant.sir",
-    "email": "prashant.sir@verveadvisory.com",
-    "displayName": "Prashant Sir",
+    "email": "prashant.joshi@verveadvisory.com",
+    "displayName": "Prashant Joshi",
     "teamId": "team4",
     "isManager": false,
     "clues": {
@@ -506,7 +494,7 @@
   {
     "id": "namrata.patil",
     "email": "namrata.patil@verveadvisory.com",
-    "displayName": "Namrata Patil",
+    "displayName": "Namrata Gajanan Patil",
     "teamId": "team5",
     "isManager": false,
     "clues": {
@@ -529,8 +517,8 @@
   },
   {
     "id": "mansavi.more",
-    "email": "mansavi.more@verveadvisory.com",
-    "displayName": "Mansavi More",
+    "email": "manasvi.more@verveadvisory.com",
+    "displayName": "Manasvi More",
     "teamId": "team5",
     "isManager": false,
     "clues": {
@@ -662,7 +650,7 @@
   {
     "id": "sakshi.ghodke",
     "email": "sakshi.ghodke@verveadvisory.com",
-    "displayName": "Sakshi Ghodke",
+    "displayName": "Sakshi Bharat Ghodke",
     "teamId": "team6",
     "isManager": false,
     "clues": {
@@ -675,18 +663,6 @@
     "id": "harsha.rajput",
     "email": "harsha.rajput@verveadvisory.com",
     "displayName": "Harsha Rajput",
-    "teamId": "team6",
-    "isManager": false,
-    "clues": {
-      "hobbies": [],
-      "quirks": [],
-      "funFacts": []
-    }
-  },
-  {
-    "id": "arya.magar-2",
-    "email": "arya.magar@verveadvisory.com",
-    "displayName": "Arya Magar",
     "teamId": "team6",
     "isManager": false,
     "clues": {
@@ -745,8 +721,8 @@
   },
   {
     "id": "vikaram.bhist",
-    "email": "vikaram.bhist@verveadvisory.com",
-    "displayName": "Vikaram Bhist",
+    "email": "vikramsingh.bisht@verveadvisory.com",
+    "displayName": "Vikram Bisht",
     "teamId": "team7",
     "isManager": false,
     "clues": {
@@ -781,7 +757,7 @@
   },
   {
     "id": "trinath.kethavath",
-    "email": "trinath.kethavath@verveadvisory.com",
+    "email": "trinath.kethav@verveadvisory.com",
     "displayName": "Trinath Kethavath",
     "teamId": "team7",
     "isManager": false,
@@ -793,8 +769,8 @@
   },
   {
     "id": "shubhangi",
-    "email": "shubhangi@verveadvisory.com",
-    "displayName": "Shubhangi",
+    "email": "Shubhangi.Madhikar@verveadvisory.com",
+    "displayName": "Shubhangi Ganesh Madhikar",
     "teamId": "team7",
     "isManager": false,
     "clues": {
@@ -817,7 +793,7 @@
   },
   {
     "id": "aastha.chandwani",
-    "email": "aastha.chandwani@verveadvisory.com",
+    "email": "aashta.chandwani@verveadvisory.com",
     "displayName": "Aastha Chandwani",
     "teamId": "team7",
     "isManager": false,
@@ -928,6 +904,42 @@
     "email": "om.bhombe@verveadvisory.com",
     "displayName": "Om Anil Bhombe",
     "teamId": "team8",
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "aman.paul",
+    "email": "aman.paul@verveadvisory.com",
+    "displayName": "Aman Paul",
+    "teamId": null,
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "tushar.gurnani",
+    "email": "tushar.gurnani@verveadvisory.com",
+    "displayName": "Tushar Kumar Gurnani",
+    "teamId": null,
+    "isManager": false,
+    "clues": {
+      "hobbies": [],
+      "quirks": [],
+      "funFacts": []
+    }
+  },
+  {
+    "id": "akshay.deshmukh",
+    "email": "akshay.deshmukh@infrabeat.com",
+    "displayName": "Akshay Deshmukh",
+    "teamId": null,
     "isManager": false,
     "clues": {
       "hobbies": [],

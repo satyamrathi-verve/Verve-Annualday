@@ -19,7 +19,9 @@ export const memberSchema = z.object({
   /** Verve email — how a Google/email-authed person is matched to the roster. */
   email: z.string().email().optional(),
   displayName: z.string().min(1),
-  teamId: z.string().min(1),
+  /** Team the member belongs to. `null` = "unplaced" — exists in the roster but
+   *  not yet assigned to a crew (placed via the super-admin panel). */
+  teamId: z.string().min(1).nullable(),
   /** Managers get the God-Mode override on the Guess screen. */
   isManager: z.boolean().default(false),
   /**
@@ -91,6 +93,8 @@ export const eventSchema = z.object({
     codeLabel: z.string(),
     /** Only emails on this domain may sign in (client-side gate). */
     allowedDomain: z.string(),
+    /** Specific non-domain emails also allowed through (external guests). */
+    allowedEmails: z.array(z.string()).default([]),
     domainError: z.string(),
     /** Shown after the code is sent. Use {email} as a placeholder. */
     checkEmail: z.string(),
@@ -148,6 +152,20 @@ export const eventSchema = z.object({
     subtitle: z.string(),
     body: z.array(z.string().min(1)).min(1),
     cta: z.string(),
+    /** Button label shown while the host hasn't opened the crew hunt yet. */
+    lockedCta: z.string().default("🔒 The host hasn't opened the wheel yet"),
+    /** Helper line shown under the locked button. */
+    lockedNote: z
+      .string()
+      .default("Hang tight — the crew hunt opens any moment. This page lights up the instant the host flips it on."),
+    /* "Open" variant — shown on this same screen once the host flips the toggle. */
+    openEyebrow: z.string().default("The wait is over."),
+    openTitle: z.string().default("The time has arrived."),
+    openSubtitle: z.string().default("The door's open — step through and find your crew."),
+    openBody: z
+      .array(z.string().min(1))
+      .min(1)
+      .default(["No more rumours. No more waiting. Your crew is right behind the door — go assemble them."]),
   }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z
