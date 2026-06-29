@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppSettings } from "@/lib/data/settings";
 import { setActivityOpen, setGuessOpen } from "@/lib/data/adminApi";
 import { useSubmissions } from "@/lib/data/activity1";
-import { getMember, getTeam } from "@/lib/data/config";
 import { clsx } from "@/lib/clsx";
+import { ActivityStatusBoard, type MemberStatus } from "./ActivityStatusBoard";
+
+const EMPTY_STATUS = new Map<string, MemberStatus>();
 
 /*
   Super-admin "activities" control centre: an open/close toggle + a status panel
@@ -35,7 +37,7 @@ export function ActivitiesAdmin() {
         offText="Closed — hidden from players."
         write={(v) => setActivityOpen(1, v)}
       >
-        <Activity1Status />
+        <Activity1Board />
       </ToggleCard>
 
       <ToggleCard
@@ -46,9 +48,10 @@ export function ActivitiesAdmin() {
         offText="Closed — hidden from players."
         write={(v) => setActivityOpen(2, v)}
       >
-        <p className="font-mono text-[11px] text-faint">
-          Structure only — tasks to be defined. Status will appear here once built.
-        </p>
+        <ActivityStatusBoard
+          doneByMember={EMPTY_STATUS}
+          pendingNote="Structure only — tasks to be defined. Every player will light up here once Activity 2 is built."
+        />
       </ToggleCard>
     </div>
   );
@@ -118,47 +121,19 @@ function ToggleCard({
   );
 }
 
-function Activity1Status() {
+function Activity1Board() {
   const { submissions, ready } = useSubmissions();
+  const doneByMember = useMemo(
+    () =>
+      new Map<string, MemberStatus>(
+        submissions.map((s) => [s.memberId, { href: s.vercelUrl, label: "view →" }]),
+      ),
+    [submissions],
+  );
 
   if (!ready) {
     return <p className="font-mono text-[11px] tracking-wider text-faint">loading submissions…</p>;
   }
 
-  return (
-    <div>
-      <p className="font-mono text-[11px] text-muted">
-        <span className="font-bold text-navy">{submissions.length}</span> profile
-        {submissions.length === 1 ? "" : "s"} submitted
-      </p>
-      {submissions.length > 0 && (
-        <div className="mt-3 flex flex-col divide-y divide-line/60">
-          {submissions.map((sub) => {
-            const m = getMember(sub.memberId);
-            const team = m?.teamId ? getTeam(m.teamId) : undefined;
-            return (
-              <div key={sub.memberId} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
-                <span className="font-display text-sm font-semibold text-navy">
-                  {m?.displayName ?? sub.memberId}
-                </span>
-                {team && (
-                  <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: team.color }}>
-                    {team.name}
-                  </span>
-                )}
-                <a
-                  href={sub.vercelUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-auto max-w-[55%] truncate font-mono text-[12px] text-verve hover:underline"
-                >
-                  {sub.vercelUrl}
-                </a>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+  return <ActivityStatusBoard doneByMember={doneByMember} />;
 }

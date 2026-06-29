@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useSubmissions, submitProfile } from "@/lib/data/activity1";
-import { getTeams, getTeamMembers } from "@/lib/data/config";
+import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { clsx } from "@/lib/clsx";
 
@@ -268,6 +268,13 @@ function Gallery({
   count: number;
 }) {
   const teams = getTeams().filter((t) => t.id !== "demo");
+  const unplaced = getRosterSorted().filter((m) => !m.teamId);
+  const groups = [
+    ...teams.map((t) => ({ id: t.id, name: t.name, color: t.color, members: getTeamMembers(t.id) })),
+    ...(unplaced.length
+      ? [{ id: "__unplaced__", name: "Unplaced", color: "#9aa4b2", members: unplaced }]
+      : []),
+  ];
 
   return (
     <div className="mt-12">
@@ -285,13 +292,13 @@ function Gallery({
         </p>
       ) : (
         <div className="mt-6 flex flex-col gap-8">
-          {teams.map((team) => {
-            const members = getTeamMembers(team.id);
+          {groups.map((group) => {
+            const members = group.members;
             return (
-              <div key={team.id}>
+              <div key={group.id}>
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: team.color }} />
-                  <h3 className="font-display text-base font-bold text-navy">{team.name}</h3>
+                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: group.color }} />
+                  <h3 className="font-display text-base font-bold text-navy">{group.name}</h3>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   {members.map((m, i) => {
@@ -313,11 +320,6 @@ function Gallery({
                             ? "cursor-pointer border-node-live/40 bg-node-live/[0.06] hover:border-node-live"
                             : "cursor-default border-line bg-white/[0.02]",
                         )}
-                        style={
-                          url
-                            ? { boxShadow: `0 0 0 0 ${team.color}` }
-                            : undefined
-                        }
                       >
                         <p className="truncate font-display text-sm font-semibold text-navy">
                           {m.displayName}
