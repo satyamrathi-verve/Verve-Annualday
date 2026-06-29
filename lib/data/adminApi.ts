@@ -107,6 +107,16 @@ export async function setGuessOpen(open: boolean): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+/** Flip an activity's open/close flag (activity 1 or 2). */
+export async function setActivityOpen(activity: 1 | 2, open: boolean): Promise<void> {
+  const supabase = client();
+  const col = activity === 1 ? "activity1_open" : "activity2_open";
+  const { error } = await supabase
+    .from("app_settings")
+    .upsert({ id: 1, [col]: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
+  if (error) throw new Error(error.message);
+}
+
 export interface Attendee {
   id: string;
   email: string;

@@ -4,24 +4,36 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 
 /*
-  Live "is the crew-guessing page open?" flag, backed by public.app_settings
-  (single row, id = 1). The super admin flips it from the control panel; players
-  sitting on the "Now We Wait" screen see it open the instant it changes.
+  Live app settings, backed by public.app_settings (single row, id = 1): the
+  crew-guessing toggle plus each activity's open/close flag. The super admin
+  flips them from the control panel; players see changes instantly.
 
-  Fail-OPEN: if Supabase isn't configured, or the settings table doesn't exist
-  yet (migration not run), we leave the wheel OPEN so local/mock demos and the
-  pre-toggle app keep working. Once the row exists, its value governs.
+  Fail-OPEN for the wheel (so local/mock demos + the pre-toggle app keep working);
+  activities default CLOSED until the host opens them.
 */
 
-// The Supabase client caches realtime channels by topic, and `.on()` throws once
-// a channel has been `.subscribe()`d. This hook mounts in several places at once
-// (Funnel, Wait, AdminControls) and re-runs on StrictMode/HMR remounts, so a
-// fixed topic would hand back an already-subscribed channel. A per-subscription
-// counter gives every instance its own topic — they all still watch id=eq.1.
+// supabase-js throws if a topic is re-subscribed once subscribed, and this hook
+// mounts in several places at once (Funnel, Wait, admin) + on StrictMode/HMR
+// remounts. A per-subscription counter gives every instance its own topic.
 let channelSeq = 0;
 
-export function useGuessOpen(): { open: boolean; ready: boolean } {
-  const [open, setOpen] = useState(true);
+export interface AppSettings {
+  guessOpen: boolean;
+  activity1Open: boolean;
+  activity2Open: boolean;
+  ready: boolean;
+}
+
+type SettingsRow = {
+  guess_page_open?: boolean;
+  activity1_open?: boolean;
+  activity2_open?: boolean;
+};
+
+export function useAppSettings(): AppSettings {
+  const [guessOpen, setGuessOpen] = useState(true);
+  const [activity1Open, setActivity1Open] = useState(false);
+  const [activity2Open, setActivity2Open] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -32,15 +44,22 @@ export function useGuessOpen(): { open: boolean; ready: boolean } {
     }
     let active = true;
 
+    const apply = (row: SettingsRow | null | undefined) => {
+      if (!row) return;
+      if (typeof row.guess_page_open === "boolean") setGuessOpen(row.guess_page_open);
+      if (typeof row.activity1_open === "boolean") setActivity1Open(row.activity1_open);
+      if (typeof row.activity2_open === "boolean") setActivity2Open(row.activity2_open);
+    };
+
     const read = async () => {
+      // select * so it works before AND after the 0007 columns exist.
       const { data, error } = await supabase
         .from("app_settings")
-        .select("guess_page_open")
+        .select("*")
         .eq("id", 1)
         .maybeSingle();
       if (!active) return;
-      // Only a SUCCESSFUL read can lock the wheel; errors (missing table) leave it open.
-      if (!error && data) setOpen(Boolean(data.guess_page_open));
+      if (!error) apply(data as SettingsRow);
       setReady(true);
     };
 
@@ -53,8 +72,8 @@ export function useGuessOpen(): { open: boolean; ready: boolean } {
         { event: "*", schema: "public", table: "app_settings", filter: "id=eq.1" },
         (payload) => {
           if (!active) return;
-          const next = (payload.new as { guess_page_open?: boolean } | null)?.guess_page_open;
-          if (typeof next === "boolean") setOpen(next);
+          const next = payload.new as SettingsRow | null;
+          if (next && Object.keys(next).length) apply(next);
           else void read();
         },
       )
@@ -66,5 +85,11 @@ export function useGuessOpen(): { open: boolean; ready: boolean } {
     };
   }, []);
 
-  return { open, ready };
+  return { guessOpen, activity1Open, activity2Open, ready };
+}
+
+/** Back-compat: the crew-guessing page open flag (used by Wait + Funnel). */
+export function useGuessOpen(): { open: boolean; ready: boolean } {
+  const s = useAppSettings();
+  return { open: s.guessOpen, ready: s.ready };
 }

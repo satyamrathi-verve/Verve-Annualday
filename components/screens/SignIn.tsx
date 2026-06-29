@@ -40,6 +40,9 @@ function GoogleSignIn() {
   const { signInWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Secondary path: whitelisted external/Gmail addresses (e.g. the host) sign in
+  // with an email code instead of Google.
+  const [showCode, setShowCode] = useState(false);
 
   // One-time notice if we got here via the 15-min idle auto-logout.
   const [idleOut] = useState(() => {
@@ -107,12 +110,27 @@ function GoogleSignIn() {
         {c.fine} · @{c.allowedDomain}
       </p>
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+
+      <div className="mt-6 w-full max-w-md border-t border-line/60 pt-5">
+        {showCode ? (
+          <EmailCodeFlow />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowCode(true)}
+            className="font-mono text-[11px] tracking-wider text-faint transition-colors hover:text-verve"
+          >
+            Using a non-Verve email? Sign in with a code →
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
-/* Real Verve-email sign-in (Supabase OTP / magic link). */
-function EmailSignIn() {
+/* Email-code flow (Supabase OTP) — the inner form only. Reused by `email` mode
+   and as a secondary option under Google sign-in for whitelisted addresses. */
+function EmailCodeFlow() {
   const c = event.signIn;
   const { sendCode, verifyCode } = useAuth();
   const [email, setEmail] = useState("");
@@ -148,8 +166,7 @@ function EmailSignIn() {
     setBusy(true);
     try {
       await verifyCode(trimmed, code.trim());
-      // On success, onAuthStateChange flips the session and this screen
-      // re-renders into the "Welcome" state with a Continue button.
+      // On success, onAuthStateChange flips the session and this screen unmounts.
     } catch (e) {
       setError((e as Error).message || "That code didn't work — check and retry.");
     } finally {
@@ -158,15 +175,9 @@ function EmailSignIn() {
   };
 
   return (
-    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
-      <p className="eyebrow">{c.eyebrow}</p>
-      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-        {c.title}
-      </h1>
-      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
-
+    <div className="w-full">
       {stage === "email" ? (
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-3">
           <input
             type="email"
             inputMode="email"
@@ -182,7 +193,7 @@ function EmailSignIn() {
           </Button>
         </div>
       ) : (
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-3">
           <p className="font-mono text-[12px] leading-relaxed text-muted">
             {c.checkEmail.replace("{email}", trimmed)}
           </p>
@@ -219,6 +230,23 @@ function EmailSignIn() {
       )}
 
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+/* Real Verve-email sign-in screen (NEXT_PUBLIC_AUTH_MODE=email). */
+function EmailSignIn() {
+  const c = event.signIn;
+  return (
+    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
+      <p className="eyebrow">{c.eyebrow}</p>
+      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        {c.title}
+      </h1>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
+      <div className="mt-8 w-full">
+        <EmailCodeFlow />
+      </div>
     </div>
   );
 }

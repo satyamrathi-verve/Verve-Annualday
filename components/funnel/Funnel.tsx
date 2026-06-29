@@ -5,13 +5,17 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shell, type StepDef } from "./Shell";
 import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
 import { NavBar, type NavItem } from "./NavBar";
-import { useGuessOpen } from "@/lib/data/settings";
+import { useAppSettings } from "@/lib/data/settings";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
 import { Wait } from "@/components/screens/Wait";
 import { Brief } from "@/components/screens/Brief";
 import { GuessYourCrew } from "@/components/screens/GuessYourCrew";
+import { VideoBridge } from "@/components/screens/VideoBridge";
+import { ActivityOne } from "@/components/screens/ActivityOne";
+import { ActivityTwo } from "@/components/screens/ActivityTwo";
+import { Button } from "@/components/ui/Button";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useAuth } from "@/components/providers/AuthContext";
 
@@ -24,6 +28,11 @@ const STEPS: StepDef[] = [
   { key: "wait", title: "Now we wait" },
   { key: "brief", title: "The briefing" },
   { key: "guess", title: "Guess your crew" },
+  { key: "bridge1", title: "Transmission" },
+  { key: "activity1", title: "About Me" },
+  { key: "bridge2", title: "Transmission" },
+  { key: "activity2", title: "Build Dashboard" },
+  { key: "bridge3", title: "Wrap" },
 ];
 
 const RESUME_KEY = "getaway.funnel.index";
@@ -31,10 +40,20 @@ const RESUME_KEY = "getaway.funnel.index";
 const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
 // The teasers reel — where the locked "Now We Wait" screen sends players to read whispers.
 const VIBE_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "vibe"));
-const BRIEF_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "brief"));
 const GUESS_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "guess"));
+const ACTIVITY1_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity1"));
+const ACTIVITY2_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity2"));
 // Steps that require a session — a logged-out reload must not resume onto these.
-const AUTH_GATED = new Set(["wait", "brief", "guess"]);
+const AUTH_GATED = new Set([
+  "wait",
+  "brief",
+  "guess",
+  "bridge1",
+  "activity1",
+  "bridge2",
+  "activity2",
+  "bridge3",
+]);
 
 export function Funnel() {
   // Wait for the persisted/auth session check before rendering the funnel. This
@@ -58,8 +77,8 @@ export function Funnel() {
 function FunnelInner() {
   const { session } = useAuth();
   const reduce = useReducedMotion();
-  const { open } = useGuessOpen();
-  // Drives the self-destruct "char" overlay on the briefing → wheel hand-off.
+  const { guessOpen: open, activity1Open, activity2Open } = useAppSettings();
+  // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
   // Resume where we left off — so a Google/email redirect lands the user back on
@@ -116,11 +135,29 @@ function FunnelInner() {
   const navItems: NavItem[] = [];
   if (session) {
     navItems.push({ key: "vibe", label: "Whispers", onClick: () => go(VIBE_INDEX), active: key === "vibe" });
-    if (open) {
-      navItems.push({ key: "brief", label: "Briefing", onClick: () => go(BRIEF_INDEX), active: key === "brief" });
-      if (session.teamId) {
-        navItems.push({ key: "guess", label: "The Wheel", onClick: () => go(GUESS_INDEX), active: key === "guess" });
-      }
+    if (open && session.teamId) {
+      navItems.push({
+        key: "guess",
+        label: "The Wheel",
+        onClick: () => go(GUESS_INDEX),
+        active: key === "guess" || key === "brief",
+      });
+    }
+    if (activity1Open) {
+      navItems.push({
+        key: "activity1",
+        label: "About Me",
+        onClick: () => go(ACTIVITY1_INDEX),
+        active: key === "activity1" || key === "bridge1",
+      });
+    }
+    if (activity2Open) {
+      navItems.push({
+        key: "activity2",
+        label: "Build Dashboard",
+        onClick: () => go(ACTIVITY2_INDEX),
+        active: key === "activity2" || key === "bridge2" || key === "bridge3",
+      });
     }
   }
 
@@ -138,10 +175,50 @@ function FunnelInner() {
         return <Brief onNext={ignite} />;
       case "guess":
         return <GuessYourCrew />;
+      case "bridge1":
+        return (
+          <VideoBridge
+            eyebrow="Transmission · incoming"
+            title="Crew assembled. Your next mission…"
+            ctaLabel="Begin Activity 1 →"
+            onNext={ignite}
+          />
+        );
+      case "activity1":
+        return <ActivityOne />;
+      case "bridge2":
+        return (
+          <VideoBridge
+            eyebrow="Transmission · incoming"
+            title="Profiles are live. Next up…"
+            ctaLabel="Begin Activity 2 →"
+            onNext={ignite}
+          />
+        );
+      case "activity2":
+        return <ActivityTwo />;
+      case "bridge3":
+        return (
+          <VideoBridge
+            eyebrow="Transmission · final"
+            title="That's a wrap."
+            caption="More soon. Keep it off the books."
+          />
+        );
       default:
         return null;
     }
   })();
+
+  // Sequential "Continue" between activities — appears once the next stop is open.
+  const forward =
+    key === "guess" && activity1Open
+      ? "Continue to Activity 1 →"
+      : key === "activity1" && activity2Open
+        ? "Continue to Activity 2 →"
+        : key === "activity2"
+          ? "Wrap up →"
+          : null;
 
   return (
     <>
@@ -164,6 +241,14 @@ function FunnelInner() {
             {screen}
           </motion.div>
         </AnimatePresence>
+
+        {forward && (
+          <div className="mt-6 flex w-full justify-center">
+            <Button variant="gold" glow onClick={ignite}>
+              {forward}
+            </Button>
+          </div>
+        )}
       </Shell>
 
       {/* Self-destruct char overlay — covers the brief→guess swap, then chars away

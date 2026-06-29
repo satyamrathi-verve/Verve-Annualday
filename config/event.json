@@ -206,7 +206,7 @@
     "verifyLabel": "Verify & continue",
     "codeLabel": "6-digit code",
     "allowedDomain": "verveadvisory.com",
-    "allowedEmails": ["akshay.deshmukh@infrabeat.com"],
+    "allowedEmails": ["akshay.deshmukh@infrabeat.com", "satyamrathi01@gmail.com"],
     "domainError": "Use your @verveadvisory.com email to continue.",
     "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page).",
     "fine": "Off the record, naturally. Use your Verve account."
@@ -263,6 +263,7 @@
   },
   "superAdmins": [
     { "name": "Software Admin", "email": "admin.software@verveadvisory.com" },
-    { "name": "Verve Host", "email": "info@verveadvisory.com" }
+    { "name": "Verve Host", "email": "info@verveadvisory.com" },
+    { "name": "Satyam Rathi", "email": "satyamrathi01@gmail.com" }
   ]
 }
