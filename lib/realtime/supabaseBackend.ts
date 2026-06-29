@@ -1,4 +1,5 @@
 import { getSupabase } from "@/lib/supabase/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { GODMODE_GUESSER } from "./derive";
 import type { GuessEdge, RealtimeBackend, TeamRoom, TeamRoomCallbacks } from "./types";
 
@@ -6,6 +7,11 @@ interface GuessRow {
   guesser_id: string;
   guessed_id: string;
 }
+
+// Live realtime channel per team topic ON THIS CLIENT. A fast remount must tear
+// down the previous channel before re-subscribing — supabase-js throws if the
+// same topic is subscribed twice. Keyed by topic so each team has at most one.
+const liveChannels = new Map<string, RealtimeChannel>();
 
 /*
   Real transport. State lives in the `guesses` table (one row per correct guess);
@@ -58,69 +64,6 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
       cb.onGuesses(edges);
     };
 
-    const channel = supabase.channel(`team:${teamId}`, {
-      config: { presence: { key: selfMemberId } },
-    });
-
-    channel.on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "guesses",
-        filter: `team_id=eq.${teamId}`,
-      },
-      () => {
-        void snapshot();
-      },
-    );
-
-    channel.on("presence", { event: "sync" }, () => {
-      const state = channel.presenceState();
-      cb.onPresence?.(Object.keys(state));
-    });
-
-    await new Promise<void>((resolve) => {
-      let settled = false;
-      const done = () => {
-        if (!settled) {
-          settled = true;
-          resolve();
-        }
-      };
-      channel.subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ memberId: selfMemberId, at: new Date().toISOString() });
-          await snapshot();
-          done();
-        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
-          // Realtime didn't come up — still return a usable room (direct reads /
-          // writes work; we just won't get live echoes). Better than a dead wheel.
-          console.warn(`[wheel] realtime channel ${status}; continuing without live echo`);
-          await snapshot();
-          done();
-        }
-      });
-      // Safety net: never hang the wheel forever if realtime never connects.
-      setTimeout(() => {
-        if (!settled) {
-          console.warn("[wheel] realtime subscribe timed out; continuing without live echo");
-          void snapshot();
-          done();
-        }
-      }, 4000);
-    });
-
-    // Convergence poll: realtime can miss a postgres_changes echo during the
-    // subscription's cold-start bind window. In the guess model a watching player
-    // never writes, so a missed echo would leave their wheel stale until THEY act
-    // (which looked like "green only appears after my own next guess"). A light
-    // periodic re-snapshot guarantees every client converges within a few seconds
-    // regardless. Cheap at a few dozen rows.
-    const poll = setInterval(() => {
-      void snapshot();
-    }, 4000);
-
     const insertEdge = async (guesserId: string, guessedId: string) => {
       const { error } = await supabase.from("guesses").upsert(
         {
@@ -136,10 +79,54 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
         return;
       }
       // Optimistic: refresh our OWN view immediately so the guesser sees the
-      // canister react without waiting on the realtime round-trip. Other clients
-      // still update via their postgres_changes subscription.
+      // canister react (→ yellow) without waiting on the realtime round-trip.
       await snapshot();
     };
+
+    // Initial load so the wheel renders even if realtime never connects.
+    await snapshot();
+
+    // Convergence poll — the RELIABLE cross-client sync path. Realtime makes
+    // updates instant; this guarantees every client converges (so a teammate's
+    // guess-back flips you green) within a few seconds even if the channel is
+    // down. Cheap at a few dozen rows.
+    const poll = setInterval(() => {
+      void snapshot();
+    }, 3000);
+
+    // Realtime (live echoes + presence) is BEST-EFFORT. supabase-js throws if a
+    // topic is re-subscribed (StrictMode/HMR, or hopping in/out of the wheel via
+    // the nav), which previously rejected joinTeam and left a DEAD room (guesses
+    // were no-ops). Tear down any stale channel for this topic first, and wrap
+    // setup so any failure still leaves a WORKING room (direct writes + poll).
+    const topic = `team:${teamId}`;
+    let channel: RealtimeChannel | null = null;
+    try {
+      const prev = liveChannels.get(topic);
+      if (prev) {
+        liveChannels.delete(topic);
+        await supabase.removeChannel(prev);
+      }
+      channel = supabase.channel(topic, { config: { presence: { key: selfMemberId } } });
+      liveChannels.set(topic, channel);
+
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "guesses", filter: `team_id=eq.${teamId}` },
+        () => void snapshot(),
+      );
+      channel.on("presence", { event: "sync" }, () => {
+        cb.onPresence?.(Object.keys(channel!.presenceState()));
+      });
+      channel.subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          void channel!.track({ memberId: selfMemberId, at: new Date().toISOString() });
+          void snapshot();
+        }
+      });
+    } catch (err) {
+      console.warn("[wheel] realtime unavailable; using poll only:", (err as Error).message);
+    }
 
     return {
       guess: (guesserId, guessedId) => insertEdge(guesserId, guessedId),
@@ -154,7 +141,10 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
       },
       leave: () => {
         clearInterval(poll);
-        void supabase.removeChannel(channel);
+        if (channel) {
+          if (liveChannels.get(topic) === channel) liveChannels.delete(topic);
+          void supabase.removeChannel(channel);
+        }
       },
     };
   }
