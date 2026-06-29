@@ -27,6 +27,8 @@ const STEPS: StepDef[] = [
 const RESUME_KEY = "getaway.funnel.index";
 // Where to land after a sign-out / idle auto-logout — the Google sign-in step.
 const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
+// The teasers reel — where the locked "Now We Wait" screen sends players to read whispers.
+const VIBE_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "vibe"));
 // Steps that require a session — a logged-out reload must not resume onto these.
 const AUTH_GATED = new Set(["wait", "brief", "guess"]);
 
@@ -76,10 +78,10 @@ function FunnelInner() {
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
 
-  // Briefing → wheel: play the self-destruct burn, which advances the funnel
-  // under cover. Falls back to a plain advance when motion is reduced or the
-  // browser can't do mask-image.
-  const igniteToGuess = () => {
+  // Forward hand-off ("Dive into it" → briefing, "Spin up the wheel" → wheel):
+  // play the self-destruct burn, which advances the funnel one step under cover.
+  // Falls back to a plain advance when motion is reduced or mask-image is unsupported.
+  const ignite = () => {
     if (reduce || !supportsMask) {
       next();
       return;
@@ -111,9 +113,9 @@ function FunnelInner() {
       case "signin":
         return <SignIn onNext={next} />;
       case "wait":
-        return <Wait onNext={next} />;
+        return <Wait onNext={ignite} onWhispers={() => go(VIBE_INDEX)} />;
       case "brief":
-        return <Brief onNext={igniteToGuess} />;
+        return <Brief onNext={ignite} />;
       case "guess":
         return <GuessYourCrew />;
       default:

@@ -134,7 +134,7 @@ interface TeamRow {
 
 function normalizeClues(value: unknown): Clue {
   const result = clueSchema.safeParse(value);
-  return result.success ? result.data : { hobbies: [], quirks: [], funFacts: [] };
+  return result.success ? result.data : { hobbies: [], quirks: [], funFacts: [], clue: "" };
 }
 
 /**

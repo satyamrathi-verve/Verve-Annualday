@@ -5,12 +5,13 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useAllWheels } from "@/lib/realtime/useAllWheels";
 import { AdminControls } from "./AdminControls";
+import { AttendeeLog } from "./AttendeeLog";
 import { clsx } from "@/lib/clsx";
 
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
   const selfId = `admin:${session?.email ?? "anon"}`;
-  const [tab, setTab] = useState<"live" | "manage">("live");
+  const [tab, setTab] = useState<"live" | "manage" | "signins">("live");
   const { teams, backendKind, resetTeam } = useAllWheels(selfId);
 
   const greenTotal = teams.reduce((s, t) => s + t.greenCount, 0);
@@ -49,7 +50,7 @@ export function AdminDashboard() {
 
       {/* tabs */}
       <div className="mx-auto mt-5 flex w-full max-w-6xl gap-2">
-        {(["live", "manage"] as const).map((t) => (
+        {(["live", "manage", "signins"] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -61,14 +62,14 @@ export function AdminDashboard() {
                 : "border border-line text-faint hover:text-verve",
             )}
           >
-            {t === "live" ? "● live board" : "⚙ manage"}
+            {t === "live" ? "● live board" : t === "manage" ? "⚙ manage" : "👥 sign-ins"}
           </button>
         ))}
       </div>
 
-      {tab === "manage" ? (
-        <AdminControls />
-      ) : (
+      {tab === "manage" && <AdminControls />}
+      {tab === "signins" && <AttendeeLog />}
+      {tab === "live" && (
         <>
       {/* summary */}
       <div className="mx-auto mt-6 grid w-full max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">

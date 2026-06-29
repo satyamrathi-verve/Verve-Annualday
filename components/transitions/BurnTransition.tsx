@@ -7,8 +7,8 @@ import { motion, useMotionValue, useTransform, animate, useReducedMotion } from 
   Self-destruct "char" transition for the Brief → Guess hand-off.
 
   A themed full-screen "TOP SECRET briefing" overlay (its OWN charred-paper look,
-  NOT a snapshot of the Brief DOM) chars away from the edges + centre inward via
-  an animated mask-image, revealing the live wheel mounted beneath it.
+  NOT a snapshot of the previous page) chars away from a CORNER across the page
+  via an animated mask-image, revealing the next page mounted beneath it.
 
   Owned by Funnel (rendered OUTSIDE the step AnimatePresence) so Brief's exit
   fade can never fade/unmount the fire. Lifecycle:
@@ -35,16 +35,17 @@ export const supportsMask =
   (CSS.supports("mask-image", "radial-gradient(#000,#000)") ||
     CSS.supports("-webkit-mask-image", "radial-gradient(#000,#000)"));
 
-// 8 deterministic embers — tiny transform/opacity sparks lifting off the burn fronts.
+// 8 deterministic embers along the diagonal burn path (top-right → bottom-left),
+// delays spread across the burn so each lifts off as the front passes it.
 const EMBERS = [
-  { x: "12%", y: "14%", dx: 14, rise: 150, delay: 0.18 },
-  { x: "86%", y: "18%", dx: -16, rise: 180, delay: 0.24 },
-  { x: "30%", y: "8%", dx: 10, rise: 140, delay: 0.32 },
-  { x: "68%", y: "10%", dx: -12, rise: 170, delay: 0.4 },
-  { x: "18%", y: "82%", dx: 18, rise: 200, delay: 0.46 },
-  { x: "82%", y: "84%", dx: -14, rise: 190, delay: 0.54 },
-  { x: "48%", y: "50%", dx: 8, rise: 220, delay: 0.6 },
-  { x: "56%", y: "46%", dx: -10, rise: 210, delay: 0.66 },
+  { x: "90%", y: "8%", dx: -10, rise: 150, delay: 0.06 },
+  { x: "80%", y: "18%", dx: 12, rise: 170, delay: 0.16 },
+  { x: "70%", y: "28%", dx: -12, rise: 160, delay: 0.26 },
+  { x: "58%", y: "40%", dx: 10, rise: 185, delay: 0.38 },
+  { x: "46%", y: "52%", dx: -10, rise: 175, delay: 0.5 },
+  { x: "34%", y: "64%", dx: 12, rise: 195, delay: 0.62 },
+  { x: "22%", y: "76%", dx: -8, rise: 180, delay: 0.74 },
+  { x: "12%", y: "88%", dx: 10, rise: 205, delay: 0.86 },
 ];
 
 export function BurnTransition({
@@ -83,37 +84,22 @@ export function BurnTransition({
     }
   };
 
-  // ── Single combined erosion mask (no mask-composite → bulletproof cross-browser).
-  // Four corner holes + a centre hole in ONE mask-image. Each radial keeps the
-  // sheet OPAQUE (#000) outside a growing TRANSPARENT hole; as p: 0→1 every hole
-  // grows past 100%, charring the sheet from edges + centre to nothing.
+  // ── Corner erosion mask — one circle growing from the TOP-RIGHT corner across
+  // the page to the far corner (no mask-composite → bulletproof cross-browser).
+  // The sheet stays OPAQUE (#000) outside a growing TRANSPARENT hole; as p: 0→1
+  // the hole sweeps the whole sheet away from that corner to nothing.
   const mask = useTransform(p, (v) => {
-    const hole = (start: number, end: number) =>
-      `transparent ${(start * v).toFixed(1)}%, #000 ${(end * v).toFixed(1)}%`;
-    return [
-      `radial-gradient(135% 135% at 6% 5%, ${hole(86, 116)})`,
-      `radial-gradient(135% 135% at 95% 7%, ${hole(82, 112)})`,
-      `radial-gradient(135% 135% at 5% 96%, ${hole(88, 118)})`,
-      `radial-gradient(135% 135% at 96% 95%, ${hole(90, 120)})`,
-      `radial-gradient(78% 78% at 50% 50%, ${hole(64, 96)})`,
-    ].join(", ");
+    const inner = (112 * v).toFixed(1);
+    const outer = (132 * v).toFixed(1);
+    return `radial-gradient(circle at 100% 0%, transparent ${inner}%, #000 ${outer}%)`;
   });
 
-  // Burn-front mask runs slightly AHEAD of the paper hole so the amber glow shows
-  // only on the thin advancing edge (this is the only blurred layer).
+  // Burn-front: a thin band riding just ahead of the char hole, so the amber glow
+  // shows only on the advancing diagonal edge (this is the only blurred layer).
   const edgeMask = useTransform(p, (v) => {
-    const ring = (start: number, end: number) => {
-      const a = start * v;
-      const b = end * v;
-      return `transparent ${a.toFixed(1)}%, #000 ${(a + 6).toFixed(1)}%, #000 ${b.toFixed(1)}%, transparent ${(b + 8).toFixed(1)}%`;
-    };
-    return [
-      `radial-gradient(135% 135% at 6% 5%, ${ring(86, 100)})`,
-      `radial-gradient(135% 135% at 95% 7%, ${ring(82, 98)})`,
-      `radial-gradient(135% 135% at 5% 96%, ${ring(88, 102)})`,
-      `radial-gradient(135% 135% at 96% 95%, ${ring(90, 104)})`,
-      `radial-gradient(78% 78% at 50% 50%, ${ring(64, 84)})`,
-    ].join(", ");
+    const a = 112 * v;
+    const b = 132 * v;
+    return `radial-gradient(circle at 100% 0%, transparent ${a.toFixed(1)}%, #000 ${(a + 4).toFixed(1)}%, #000 ${b.toFixed(1)}%, transparent ${(b + 8).toFixed(1)}%)`;
   });
 
   useEffect(() => {
@@ -172,8 +158,7 @@ export function BurnTransition({
       <motion.div
         className="absolute inset-0"
         style={{
-          background:
-            "radial-gradient(circle at 50% 50%, #ffd27a 0%, #e0a436 35%, #7a3a0a 70%, transparent 85%)",
+          background: "linear-gradient(135deg, #ffd27a 0%, #e0a436 45%, #b5631a 100%)",
           mixBlendMode: "screen",
           filter: "blur(7px)",
           maskImage: edgeMask,

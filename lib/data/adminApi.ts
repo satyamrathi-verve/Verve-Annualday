@@ -29,7 +29,7 @@ export interface AdminMember {
 
 function normalizeClues(value: unknown): Clue {
   const r = clueSchema.safeParse(value);
-  return r.success ? r.data : { hobbies: [], quirks: [], funFacts: [] };
+  return r.success ? r.data : { hobbies: [], quirks: [], funFacts: [], clue: "" };
 }
 
 function client() {
@@ -105,4 +105,28 @@ export async function setGuessOpen(open: boolean): Promise<void> {
     .from("app_settings")
     .upsert({ id: 1, guess_page_open: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
   if (error) throw new Error(error.message);
+}
+
+export interface Attendee {
+  id: string;
+  email: string;
+  displayName: string | null;
+  firstSeen: string;
+}
+
+/** The sign-in log — everyone who has logged into the portal, newest first.
+ *  Each row is captured on that person's FIRST sign-in (trigger on auth.users). */
+export async function fetchAttendees(): Promise<Attendee[]> {
+  const supabase = client();
+  const { data, error } = await supabase
+    .from("attendees")
+    .select("id,email,display_name,first_seen")
+    .order("first_seen", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r) => ({
+    id: r.id as string,
+    email: r.email as string,
+    displayName: (r.display_name as string | null) ?? null,
+    firstSeen: r.first_seen as string,
+  }));
 }

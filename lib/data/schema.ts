@@ -11,6 +11,9 @@ export const clueSchema = z.object({
   hobbies: z.array(z.string()).default([]),
   quirks: z.array(z.string()).default([]),
   funFacts: z.array(z.string()).default([]),
+  /** Single free-text clue pointing to this person — the primary clue admins
+   *  edit; shown to whoever must guess them. (The arrays above are legacy.) */
+  clue: z.string().default(""),
 });
 
 export const memberSchema = z.object({
@@ -152,6 +155,8 @@ export const eventSchema = z.object({
     subtitle: z.string(),
     body: z.array(z.string().min(1)).min(1),
     cta: z.string(),
+    /** Locked-state CTA — sends waiting players back to the teasers/whispers reel. */
+    whispersCta: z.string().default("See what they're whispering today →"),
     /** Button label shown while the host hasn't opened the crew hunt yet. */
     lockedCta: z.string().default("🔒 The host hasn't opened the wheel yet"),
     /** Helper line shown under the locked button. */

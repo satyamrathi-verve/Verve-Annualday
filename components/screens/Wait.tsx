@@ -10,7 +10,7 @@ import { useGuessOpen } from "@/lib/data/settings";
   the CTA is locked and players are held here — it unlocks live the moment the
   super admin flips the toggle.
 */
-export function Wait({ onNext }: { onNext: () => void }) {
+export function Wait({ onNext, onWhispers }: { onNext: () => void; onWhispers: () => void }) {
   const c = event.wait;
   const { open, ready } = useGuessOpen();
   // Only reveal the "it's time" state once we KNOW the wheel is open — so the
@@ -61,20 +61,13 @@ export function Wait({ onNext }: { onNext: () => void }) {
             {c.cta}
           </button>
         ) : (
-          <div className="mt-9">
-            <button
-              type="button"
-              disabled
-              aria-disabled
-              className="w-full cursor-not-allowed rounded-xl border border-line bg-transparent px-5 py-3.5 text-sm font-medium text-faint opacity-70 lg:text-base"
-            >
-              {c.lockedCta}
-            </button>
-            <p className="mt-3 flex items-center gap-2 font-mono text-[11px] leading-relaxed tracking-wide text-faint">
-              <span className="h-1.5 w-1.5 flex-none animate-pulse rounded-full bg-gold" />
-              {c.lockedNote}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={onWhispers}
+            className="mt-9 w-full rounded-xl border border-line bg-transparent px-5 py-3.5 text-sm font-medium text-muted transition-colors hover:border-verve-400 hover:text-ink lg:text-base"
+          >
+            {c.whispersCta}
+          </button>
         )}
       </motion.div>
     </div>

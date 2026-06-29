@@ -38,7 +38,8 @@ export function ClueCard({
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
 
-  const hasClues =
+  const single = (clues.clue ?? "").trim();
+  const hasArrays =
     clues.hobbies.length > 0 || clues.quirks.length > 0 || clues.funFacts.length > 0;
 
   const submit = () => {
@@ -79,7 +80,9 @@ export function ClueCard({
         className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
       >
         <div className="flex flex-col gap-2.5">
-          {hasClues ? (
+          {single ? (
+            <p className="text-[15px] leading-relaxed text-navy">{single}</p>
+          ) : hasArrays ? (
             <>
               <ClueRow label="Hobbies" items={clues.hobbies} />
               <ClueRow label="Quirk" items={clues.quirks} />

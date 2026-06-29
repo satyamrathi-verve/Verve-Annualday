@@ -255,13 +255,6 @@ function TeamGroup({
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-function linesToArr(s: string): string[] {
-  return s
-    .split("\n")
-    .map((x) => x.trim())
-    .filter(Boolean);
-}
-
 function MemberRow({
   member,
   teams,
@@ -277,28 +270,21 @@ function MemberRow({
 }) {
   const [name, setName] = useState(member.displayName);
   const [email, setEmail] = useState(member.email ?? "");
-  const [hobbies, setHobbies] = useState(member.clues.hobbies.join("\n"));
-  const [quirks, setQuirks] = useState(member.clues.quirks.join("\n"));
-  const [funFacts, setFunFacts] = useState(member.clues.funFacts.join("\n"));
-  const [openClues, setOpenClues] = useState(false);
+  const [clue, setClue] = useState(member.clues.clue ?? "");
+  const [openClue, setOpenClue] = useState(false);
   const [state, setState] = useState<SaveState>("idle");
   const [err, setErr] = useState<string | null>(null);
 
   const dirty =
     name !== member.displayName ||
     email !== (member.email ?? "") ||
-    hobbies !== member.clues.hobbies.join("\n") ||
-    quirks !== member.clues.quirks.join("\n") ||
-    funFacts !== member.clues.funFacts.join("\n");
+    clue !== (member.clues.clue ?? "");
 
   const save = async () => {
     setState("saving");
     setErr(null);
-    const clues: Clue = {
-      hobbies: linesToArr(hobbies),
-      quirks: linesToArr(quirks),
-      funFacts: linesToArr(funFacts),
-    };
+    // Keep legacy arrays as-is; the single free-text clue is what admins edit.
+    const clues: Clue = { ...member.clues, clue: clue.trim() };
     const patch: MemberPatch = {
       displayName: name.trim() || member.displayName,
       email: email.trim() || null,
@@ -315,8 +301,8 @@ function MemberRow({
     }
   };
 
-  const clueCount =
-    member.clues.hobbies.length + member.clues.quirks.length + member.clues.funFacts.length;
+  const hasClue = Boolean((member.clues.clue ?? "").trim());
+  const firstName = member.displayName.split(" ")[0];
 
   return (
     <div className="rounded-xl border border-line/70 bg-white/[0.02] p-3">
@@ -351,20 +337,27 @@ function MemberRow({
         </select>
         <button
           type="button"
-          onClick={() => setOpenClues((o) => !o)}
+          onClick={() => setOpenClue((o) => !o)}
           className="rounded-lg border border-line px-3 py-2 font-mono text-[11px] tracking-wider text-muted hover:border-gold/50 hover:text-gold-deep"
         >
-          clues{clueCount ? ` (${clueCount})` : ""} {openClues ? "▴" : "▾"}
+          clue{hasClue ? " ✓" : ""} {openClue ? "▴" : "▾"}
         </button>
       </div>
 
-      {openClues && (
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <ClueField label="Hobbies" value={hobbies} onChange={setHobbies} />
-          <ClueField label="Quirks" value={quirks} onChange={setQuirks} />
-          <ClueField label="Fun facts" value={funFacts} onChange={setFunFacts} />
-          <p className="font-mono text-[10px] leading-relaxed text-faint sm:col-span-3">
-            One per line. These show to whoever has to guess {member.displayName.split(" ")[0]}.
+      {openClue && (
+        <div className="mt-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold-deep">
+            Clue
+          </span>
+          <textarea
+            value={clue}
+            onChange={(e) => setClue(e.target.value)}
+            rows={2}
+            className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] leading-relaxed text-ink outline-none focus:border-verve-400/60"
+            placeholder={`A hint that points to ${firstName}…`}
+          />
+          <p className="mt-1 font-mono text-[10px] leading-relaxed text-faint">
+            Shown to whoever has to guess {firstName}.
           </p>
         </div>
       )}
@@ -390,27 +383,3 @@ function MemberRow({
   );
 }
 
-function ClueField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold-deep">
-        {label}
-      </span>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={3}
-        className="rounded-lg border border-line bg-surface px-3 py-2 text-[13px] leading-relaxed text-ink outline-none focus:border-verve-400/60"
-        placeholder="one per line…"
-      />
-    </label>
-  );
-}
