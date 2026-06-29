@@ -6,7 +6,7 @@ import { useAuth } from "@/components/providers/AuthContext";
 import { useAllWheels } from "@/lib/realtime/useAllWheels";
 import { AdminControls } from "./AdminControls";
 import { AttendeeLog } from "./AttendeeLog";
-import { clsx } from "@/lib/clsx";
+import { NavBar } from "@/components/funnel/NavBar";
 
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
@@ -48,23 +48,16 @@ export function AdminDashboard() {
         </div>
       </header>
 
-      {/* tabs */}
-      <div className="mx-auto mt-5 flex w-full max-w-6xl gap-2">
-        {(["live", "manage", "signins"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={clsx(
-              "rounded-lg px-4 py-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors",
-              tab === t
-                ? "bg-verve-soft text-verve"
-                : "border border-line text-faint hover:text-verve",
-            )}
-          >
-            {t === "live" ? "● live board" : t === "manage" ? "⚙ manage" : "👥 sign-ins"}
-          </button>
-        ))}
+      {/* section nav */}
+      <div className="mx-auto mt-5 w-full max-w-6xl">
+        <NavBar
+          items={(["live", "manage", "signins"] as const).map((t) => ({
+            key: t,
+            label: t === "live" ? "● live board" : t === "manage" ? "⚙ manage" : "👥 sign-ins",
+            onClick: () => setTab(t),
+            active: tab === t,
+          }))}
+        />
       </div>
 
       {tab === "manage" && <AdminControls />}

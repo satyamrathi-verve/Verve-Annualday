@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shell, type StepDef } from "./Shell";
 import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
+import { NavBar, type NavItem } from "./NavBar";
+import { useGuessOpen } from "@/lib/data/settings";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
@@ -29,6 +31,8 @@ const RESUME_KEY = "getaway.funnel.index";
 const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
 // The teasers reel — where the locked "Now We Wait" screen sends players to read whispers.
 const VIBE_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "vibe"));
+const BRIEF_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "brief"));
+const GUESS_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "guess"));
 // Steps that require a session — a logged-out reload must not resume onto these.
 const AUTH_GATED = new Set(["wait", "brief", "guess"]);
 
@@ -54,6 +58,7 @@ export function Funnel() {
 function FunnelInner() {
   const { session } = useAuth();
   const reduce = useReducedMotion();
+  const { open } = useGuessOpen();
   // Drives the self-destruct "char" overlay on the briefing → wheel hand-off.
   const [burning, setBurning] = useState(false);
 
@@ -104,6 +109,29 @@ function FunnelInner() {
   }, [session]);
 
   const key = STEPS[index].key;
+
+  // Top nav (page switcher). Shown once signed in; Briefing/Wheel unlock with the
+  // host's open toggle, so the nav can't bypass the "Now We Wait" lock.
+  const navItems: NavItem[] = session
+    ? [
+        { key: "vibe", label: "Whispers", onClick: () => go(VIBE_INDEX), active: key === "vibe" },
+        {
+          key: "brief",
+          label: "Briefing",
+          onClick: () => go(BRIEF_INDEX),
+          active: key === "brief",
+          disabled: !open,
+        },
+        {
+          key: "guess",
+          label: "The Wheel",
+          onClick: () => go(GUESS_INDEX),
+          active: key === "guess",
+          disabled: !(open && Boolean(session.teamId)),
+        },
+      ]
+    : [];
+
   const screen = (() => {
     switch (key) {
       case "landing":
@@ -125,7 +153,13 @@ function FunnelInner() {
 
   return (
     <>
-      <Shell steps={STEPS} index={index} canGoBack={index > 0} onBack={back}>
+      <Shell
+      steps={STEPS}
+      index={index}
+      canGoBack={index > 0}
+      onBack={back}
+      nav={<NavBar items={navItems} />}
+    >
         <AnimatePresence mode="wait">
           <motion.div
             key={key}
