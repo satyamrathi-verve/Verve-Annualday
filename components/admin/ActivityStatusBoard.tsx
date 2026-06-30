@@ -19,11 +19,11 @@ interface Group {
 }
 
 /*
-  Reusable per-activity status dashboard for the super admin: every (non-demo)
-  team as a card, plus an "Unplaced" card for roster members not on a team (they
-  can still do the activity), each player marked done/pending, with per-team
-  completion bars and overall totals. Activity 1 passes submission links;
-  Activity 2 passes an empty map + a note until its tasks are defined.
+  Reusable per-activity status dashboard for the super admin: every team (incl.
+  the demo team — active for all activities) as a card, plus an "Unplaced" card
+  for roster members not on a team (they can still do the activity), each player
+  marked done/pending, with per-team completion bars and overall totals. Activity
+  1 passes submission links; Activity 2 passes an empty map + a note for now.
 */
 export function ActivityStatusBoard({
   doneByMember,
@@ -32,7 +32,7 @@ export function ActivityStatusBoard({
   doneByMember: Map<string, MemberStatus>;
   pendingNote?: string;
 }) {
-  const teams = getTeams().filter((t) => t.id !== "demo");
+  const teams = getTeams(); // demo team included — active for all activities
   const unplaced = getRosterSorted().filter((m) => !m.teamId);
 
   const groups: Group[] = [

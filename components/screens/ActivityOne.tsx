@@ -267,7 +267,7 @@ function Gallery({
   urlByMember: Map<string, string>;
   count: number;
 }) {
-  const teams = getTeams().filter((t) => t.id !== "demo");
+  const teams = getTeams(); // demo team included — active for all activities
   const unplaced = getRosterSorted().filter((m) => !m.teamId);
   const groups = [
     ...teams.map((t) => ({ id: t.id, name: t.name, color: t.color, members: getTeamMembers(t.id) })),
