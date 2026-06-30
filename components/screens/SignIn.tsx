@@ -122,7 +122,9 @@ function EmailSignIn() {
   const [error, setError] = useState<string | null>(null);
 
   const trimmed = email.trim().toLowerCase();
-  const domainOk = trimmed.endsWith(`@${c.allowedDomain.toLowerCase()}`);
+  const allowedEmails = (c.allowedEmails ?? []).map((e) => e.toLowerCase());
+  const domainOk =
+    trimmed.endsWith(`@${c.allowedDomain.toLowerCase()}`) || allowedEmails.includes(trimmed);
 
   const send = async () => {
     setError(null);

@@ -206,6 +206,7 @@
     "verifyLabel": "Verify & continue",
     "codeLabel": "6-digit code",
     "allowedDomain": "verveadvisory.com",
+    "allowedEmails": ["akshay.deshmukh@infrabeat.com"],
     "domainError": "Use your @verveadvisory.com email to continue.",
     "checkEmail": "We emailed a 6-digit code to {email}. Enter it below — the code keeps you right here (no need to leave the page).",
     "fine": "Off the record, naturally. Use your Verve account."

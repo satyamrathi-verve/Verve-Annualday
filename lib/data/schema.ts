@@ -91,6 +91,8 @@ export const eventSchema = z.object({
     codeLabel: z.string(),
     /** Only emails on this domain may sign in (client-side gate). */
     allowedDomain: z.string(),
+    /** Extra individual emails allowed to sign in despite a different domain. */
+    allowedEmails: z.array(z.string()).default([]),
     domainError: z.string(),
     /** Shown after the code is sent. Use {email} as a placeholder. */
     checkEmail: z.string(),
