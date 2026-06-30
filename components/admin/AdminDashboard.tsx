@@ -9,6 +9,7 @@ import { AttendeeLog } from "./AttendeeLog";
 import { ActivitiesAdmin } from "./ActivitiesAdmin";
 import { VideosAdmin } from "./VideosAdmin";
 import { NavBar } from "@/components/funnel/NavBar";
+import { teamEmoji } from "@/lib/data/teamMeta";
 
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
@@ -92,7 +93,7 @@ export function AdminDashboard() {
           return (
             <div key={t.teamId} className="surface-card rounded-2xl p-5">
               <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: t.color }} />
+                <span className="text-lg leading-none" aria-hidden>{teamEmoji(t.teamId)}</span>
                 <span className="font-display text-base font-bold text-navy">{t.name}</span>
                 {t.complete && (
                   <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-gold-deep">

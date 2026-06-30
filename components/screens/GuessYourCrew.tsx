@@ -11,6 +11,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
 import { event, getTeam } from "@/lib/data/config";
+import { teamEmoji } from "@/lib/data/teamMeta";
 
 /** Lenient name match: full name or first name, case/space-insensitive. */
 function matchesName(input: string, displayName: string): boolean {
@@ -168,7 +169,7 @@ function CrewBoard({
         )}
       >
         <span className="font-bold" style={{ color }}>
-          {team?.name ?? teamId}
+          <span aria-hidden>{teamEmoji(teamId)}</span> {team?.name ?? teamId}
         </span>
         <span className="text-line">|</span>
         <span className="flex items-center gap-1.5">
@@ -493,10 +494,9 @@ function OtherCrews({ currentTeamId }: { currentTeamId: string }) {
           return (
             <GlassCard key={t.teamId} accent={isMine} className="p-3">
               <div className="flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 flex-none rounded-full"
-                  style={{ backgroundColor: t.color }}
-                />
+                <span className="flex-none text-sm leading-none" aria-hidden>
+                  {teamEmoji(t.teamId)}
+                </span>
                 <span className="truncate font-display text-[13px] font-bold text-navy">
                   {t.name}
                 </span>

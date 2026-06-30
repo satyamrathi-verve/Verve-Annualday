@@ -12,6 +12,7 @@ import {
 import { useGuessOpen } from "@/lib/data/settings";
 import type { Clue } from "@/lib/data/schema";
 import { clsx } from "@/lib/clsx";
+import { teamEmoji, teamLabel } from "@/lib/data/teamMeta";
 
 const UNPLACED = "__unplaced__";
 
@@ -124,7 +125,7 @@ export function AdminControls() {
         <TeamGroup
           key={UNPLACED}
           title="Unplaced"
-          color="#9aa4b2"
+          emoji="🧩"
           note="Not on a crew yet — pick a team to place them."
           members={unplaced}
           teams={teams}
@@ -137,8 +138,8 @@ export function AdminControls() {
       {teams.map((t) => (
         <TeamGroup
           key={t.id}
-          title={t.name}
-          color={t.color}
+          title={teamLabel(t.id, t.name)}
+          emoji={teamEmoji(t.id)}
           members={byTeam.get(t.id) ?? []}
           teams={teams}
           teamName={teamName}
@@ -210,7 +211,7 @@ function OpenToggle() {
 
 function TeamGroup({
   title,
-  color,
+  emoji,
   note,
   members,
   teams,
@@ -219,7 +220,7 @@ function TeamGroup({
   onSaved,
 }: {
   title: string;
-  color: string;
+  emoji: string;
   note?: string;
   members: AdminMember[];
   teams: AdminTeam[];
@@ -230,7 +231,7 @@ function TeamGroup({
   return (
     <div className="surface-card mt-4 rounded-2xl p-5">
       <div className="flex items-center gap-2">
-        <span className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+        <span className="text-base leading-none" aria-hidden>{emoji}</span>
         <h3 className="font-display text-base font-bold text-navy">{title}</h3>
         <span className="ml-auto font-mono text-[11px] text-faint">{members.length}</span>
       </div>
@@ -331,7 +332,7 @@ function MemberRow({
           <option value={UNPLACED}>Unplaced</option>
           {teams.map((t) => (
             <option key={t.id} value={t.id}>
-              {t.name}
+              {teamLabel(t.id, t.name)}
             </option>
           ))}
         </select>

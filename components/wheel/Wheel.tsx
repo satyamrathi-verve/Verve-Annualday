@@ -36,7 +36,10 @@ const R_MEDALLION = 62;
 // idle pie shading (alternating), status colours, and bulb/pointer gold.
 const IDLE_A = "#13203A";
 const IDLE_B = "#1A2845";
-const IDLE_HOVER = "#26365A";
+// Actionable (clickable) idle wedges — a brighter "active" blue so they clearly
+// stand out from the dark idle wedges and read as tappable.
+const ACTIONABLE = "#21407A";
+const ACTIONABLE_HOVER = "#2E5BA8";
 const YOURS = "#E0A436"; // gold-500
 const MUTUAL = "#34D17E"; // green-500
 const BULB = "#F7D87A";
@@ -130,8 +133,10 @@ export function Wheel({
             ? MUTUAL
             : isYours
               ? YOURS
-              : hovered
-                ? IDLE_HOVER
+              : actionable
+                ? hovered
+                  ? ACTIONABLE_HOVER
+                  : ACTIONABLE
                 : slot % 2 === 0
                   ? IDLE_A
                   : IDLE_B;
@@ -174,18 +179,32 @@ export function Wheel({
                 onMouseLeave={actionable ? () => setHoverId(null) : undefined}
               />
 
-              {/* actionable invite outline — pulses to say "click to decode" */}
+              {/* actionable invite — pulsing outline + a radiating "tap" ring so
+                  it's obvious these wedges are the ones to click. */}
               {actionable && (
-                <motion.path
-                  d={d}
-                  fill="none"
-                  stroke="var(--color-verve-400)"
-                  strokeWidth={2.5}
-                  pointerEvents="none"
-                  initial={false}
-                  animate={reduce ? { strokeOpacity: 0.6 } : { strokeOpacity: [0.25, 0.9, 0.25] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                />
+                <>
+                  <motion.path
+                    d={d}
+                    fill="none"
+                    stroke="var(--color-verve-400)"
+                    strokeWidth={3.5}
+                    pointerEvents="none"
+                    initial={false}
+                    animate={reduce ? { strokeOpacity: 0.85 } : { strokeOpacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.circle
+                    cx={label.x}
+                    cy={label.y}
+                    fill="none"
+                    stroke="var(--color-verve-400)"
+                    strokeWidth={2}
+                    pointerEvents="none"
+                    initial={false}
+                    animate={reduce ? { r: 12, opacity: 0.6 } : { r: [9, 17, 9], opacity: [0.85, 0, 0.85] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+                  />
+                </>
               )}
 
               <text

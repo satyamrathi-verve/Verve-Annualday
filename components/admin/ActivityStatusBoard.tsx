@@ -1,6 +1,7 @@
 "use client";
 
 import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
+import { teamEmoji } from "@/lib/data/teamMeta";
 import { clsx } from "@/lib/clsx";
 
 /** Presence of a member id in the map = that player is "done". */
@@ -74,7 +75,7 @@ export function ActivityStatusBoard({
           return (
             <div key={g.id} className="rounded-xl border border-line/70 bg-white/[0.02] p-3">
               <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: g.color }} />
+                <span className="text-base leading-none" aria-hidden>{teamEmoji(g.id)}</span>
                 <span className="font-display text-sm font-bold text-navy">{g.name}</span>
                 <span className="ml-auto font-mono text-[11px] text-faint">
                   {done}/{g.members.length}

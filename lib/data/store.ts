@@ -2,6 +2,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import rosterJson from "@/config/roster.json";
 import teamsJson from "@/config/teams.json";
 import { clueSchema, rosterSchema, teamsSchema, type Clue, type Member } from "./schema";
+import { teamLabel } from "./teamMeta";
 
 /*
   Live roster/teams store.
@@ -187,11 +188,14 @@ export async function hydrateRoster(): Promise<void> {
 /* ---- accessors (read the current snapshot) ----------------------------- */
 
 export function getTeamsSnapshot(): StoreTeam[] {
-  return [...teams].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+  return [...teams]
+    .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))
+    .map((t) => ({ ...t, name: teamLabel(t.id, t.name) }));
 }
 
 export function getTeamSnapshot(id: string): StoreTeam | undefined {
-  return teamById.get(id);
+  const t = teamById.get(id);
+  return t ? { ...t, name: teamLabel(t.id, t.name) } : undefined;
 }
 
 export function getMemberSnapshot(id: string): StoreMember | undefined {

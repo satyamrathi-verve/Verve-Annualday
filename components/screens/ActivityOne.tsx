@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useSubmissions, submitProfile } from "@/lib/data/activity1";
 import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
+import { teamEmoji } from "@/lib/data/teamMeta";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { clsx } from "@/lib/clsx";
 
@@ -297,7 +298,7 @@ function Gallery({
             return (
               <div key={group.id}>
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: group.color }} />
+                  <span className="text-lg leading-none" aria-hidden>{teamEmoji(group.id)}</span>
                   <h3 className="font-display text-base font-bold text-navy">{group.name}</h3>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
