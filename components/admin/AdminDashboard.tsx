@@ -7,12 +7,13 @@ import { useAllWheels } from "@/lib/realtime/useAllWheels";
 import { AdminControls } from "./AdminControls";
 import { AttendeeLog } from "./AttendeeLog";
 import { ActivitiesAdmin } from "./ActivitiesAdmin";
+import { VideosAdmin } from "./VideosAdmin";
 import { NavBar } from "@/components/funnel/NavBar";
 
 export function AdminDashboard() {
   const { session, signOut } = useAuth();
   const selfId = `admin:${session?.email ?? "anon"}`;
-  const [tab, setTab] = useState<"live" | "activities" | "manage" | "signins">("live");
+  const [tab, setTab] = useState<"live" | "activities" | "videos" | "manage" | "signins">("live");
   const { teams, backendKind, resetTeam } = useAllWheels(selfId);
 
   const greenTotal = teams.reduce((s, t) => s + t.greenCount, 0);
@@ -52,16 +53,18 @@ export function AdminDashboard() {
       {/* section nav */}
       <div className="mx-auto mt-5 w-full max-w-6xl">
         <NavBar
-          items={(["live", "activities", "manage", "signins"] as const).map((t) => ({
+          items={(["live", "activities", "videos", "manage", "signins"] as const).map((t) => ({
             key: t,
             label:
               t === "live"
                 ? "● live board"
                 : t === "activities"
                   ? "🎯 activities"
-                  : t === "manage"
-                    ? "⚙ manage"
-                    : "👥 sign-ins",
+                  : t === "videos"
+                    ? "🎬 videos"
+                    : t === "manage"
+                      ? "⚙ manage"
+                      : "👥 sign-ins",
             onClick: () => setTab(t),
             active: tab === t,
           }))}
@@ -70,6 +73,7 @@ export function AdminDashboard() {
 
       {tab === "manage" && <AdminControls />}
       {tab === "activities" && <ActivitiesAdmin />}
+      {tab === "videos" && <VideosAdmin />}
       {tab === "signins" && <AttendeeLog />}
       {tab === "live" && (
         <>

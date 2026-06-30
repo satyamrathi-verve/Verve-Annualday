@@ -6,6 +6,7 @@ import { Shell, type StepDef } from "./Shell";
 import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
 import { NavBar, type NavItem } from "./NavBar";
 import { useAppSettings } from "@/lib/data/settings";
+import { useVideos } from "@/lib/data/videos";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
@@ -78,6 +79,7 @@ function FunnelInner() {
   const { session } = useAuth();
   const reduce = useReducedMotion();
   const { guessOpen: open, activity1Open, activity2Open } = useAppSettings();
+  const { videos } = useVideos();
   // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
@@ -182,6 +184,7 @@ function FunnelInner() {
             title="Crew assembled. Your next mission…"
             ctaLabel="Begin Activity 1 →"
             onNext={ignite}
+            src={videos.bridge1}
           />
         );
       case "activity1":
@@ -193,6 +196,7 @@ function FunnelInner() {
             title="Profiles are live. Next up…"
             ctaLabel="Begin Activity 2 →"
             onNext={ignite}
+            src={videos.bridge2}
           />
         );
       case "activity2":
@@ -203,6 +207,7 @@ function FunnelInner() {
             eyebrow="Transmission · final"
             title="That's a wrap."
             caption="More soon. Keep it off the books."
+            src={videos.bridge3}
           />
         );
       default:

@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { VideoFrame } from "./VideoFrame";
 
 /*
-  Reusable "transmission" bridge between activities — a placeholder video frame
-  (real clip drops in later) with a CTA that advances the funnel. Modelled on the
-  briefing screen. When `onNext` is omitted it's a closing screen (no CTA).
+  "Transmission" bridge between activities — a video frame (admin-set URL, or a
+  placeholder until one is added) with a CTA that advances the funnel. When
+  `onNext` is omitted it's a closing screen (no CTA).
 */
 export function VideoBridge({
   eyebrow,
@@ -15,12 +16,14 @@ export function VideoBridge({
   caption,
   ctaLabel = "Continue →",
   onNext,
+  src,
 }: {
   eyebrow: string;
   title: string;
   caption?: string;
   ctaLabel?: string;
   onNext?: () => void;
+  src?: string;
 }) {
   const [played, setPlayed] = useState(false);
 
@@ -28,35 +31,13 @@ export function VideoBridge({
     <div className="flex w-full max-w-3xl flex-col items-center text-center">
       <p className="eyebrow">{eyebrow}</p>
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="surface-card relative mt-5 grid aspect-video w-full max-w-2xl place-items-center overflow-hidden rounded-2xl"
-      >
-        <div className="absolute left-4 top-3 z-10 flex items-center gap-2 font-mono text-[10px] tracking-[0.28em] text-gold-deep">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-gold" />
-          REC · TRANSMISSION
-        </div>
-
-        <motion.button
-          type="button"
-          onClick={() => setPlayed(true)}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.96 }}
-          className="group grid h-20 w-20 place-items-center rounded-full border border-verve-400 bg-verve-soft shadow-[0_0_38px_-6px_rgba(91,141,255,0.7)] lg:h-24 lg:w-24"
-          aria-label="Play transmission"
-        >
-          <span
-            className="ml-1.5 border-y-[13px] border-l-[21px] border-y-transparent border-l-verve-400 transition-colors group-hover:border-l-verve-glow"
-            style={{ opacity: played ? 0.3 : 1 }}
-          />
-        </motion.button>
-
-        <p className="absolute bottom-3 font-mono text-[10px] tracking-wider text-faint">
-          {played ? "▸ transmission placeholder — clip drops in later" : "tap to play"}
-        </p>
-      </motion.div>
+      <VideoFrame
+        className="mt-5"
+        src={src}
+        recLabel="TRANSMISSION"
+        posterLabel="tap to play"
+        onPlayed={() => setPlayed(true)}
+      />
 
       <h1 className="mt-7 font-display text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
         {title}
