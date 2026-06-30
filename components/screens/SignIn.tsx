@@ -43,8 +43,6 @@ function GoogleSignIn() {
   // Fallback for allowlisted guests who can't use a Verve Google account.
   const [useEmail, setUseEmail] = useState(false);
 
-  if (useEmail) return <EmailSignIn onUseGoogle={() => setUseEmail(false)} />;
-
   // One-time notice if we got here via the 15-min idle auto-logout.
   const [idleOut] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -62,6 +60,10 @@ function GoogleSignIn() {
       /* sessionStorage may be unavailable */
     }
   }, [idleOut]);
+
+  // Every hook above must run on every render — only switch to the email
+  // fallback AFTER them (an earlier return would skip hooks and crash React).
+  if (useEmail) return <EmailSignIn onUseGoogle={() => setUseEmail(false)} />;
 
   const go = async () => {
     setError(null);
