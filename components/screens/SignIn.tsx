@@ -40,6 +40,10 @@ function GoogleSignIn() {
   const { signInWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Fallback for allowlisted guests who can't use a Verve Google account.
+  const [useEmail, setUseEmail] = useState(false);
+
+  if (useEmail) return <EmailSignIn onUseGoogle={() => setUseEmail(false)} />;
 
   // One-time notice if we got here via the 15-min idle auto-logout.
   const [idleOut] = useState(() => {
@@ -106,13 +110,21 @@ function GoogleSignIn() {
       <p className="mt-3 font-mono text-[11px] leading-relaxed tracking-wider text-faint">
         {c.fine} · @{c.allowedDomain}
       </p>
+      <button
+        type="button"
+        onClick={() => setUseEmail(true)}
+        className="mt-4 font-mono text-[11px] tracking-wider text-faint underline-offset-4 transition-colors hover:text-verve hover:underline"
+      >
+        Sign in with a code instead →
+      </button>
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
     </div>
   );
 }
 
-/* Real Verve-email sign-in (Supabase OTP / magic link). */
-function EmailSignIn() {
+/* Real Verve-email sign-in (Supabase OTP / magic link). `onUseGoogle`, when
+   given, renders a link back to the Google screen (email is a fallback there). */
+function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
   const c = event.signIn;
   const { sendCode, verifyCode } = useAuth();
   const [email, setEmail] = useState("");
@@ -180,6 +192,15 @@ function EmailSignIn() {
           <Button variant="gold" onClick={send} disabled={busy || trimmed.length === 0}>
             {busy ? "Sending…" : `${c.sendLabel} →`}
           </Button>
+          {onUseGoogle && (
+            <button
+              type="button"
+              onClick={onUseGoogle}
+              className="mt-1 font-mono text-[11px] tracking-wider text-faint underline-offset-4 transition-colors hover:text-verve hover:underline"
+            >
+              ← Use Google instead
+            </button>
+          )}
         </div>
       ) : (
         <div className="mt-8 flex w-full flex-col gap-3">

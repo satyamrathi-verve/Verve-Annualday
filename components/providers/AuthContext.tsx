@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { getAuthBackend, type AuthMode, type Session } from "@/lib/auth";
+import { EmailAuthBackend } from "@/lib/auth/emailBackend";
 
 interface AuthContextValue {
   session: Session | null;
@@ -30,6 +31,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [backend] = useState(() => getAuthBackend());
+  // Email-code fallback: in Google mode the active backend has no send/verify,
+  // but we still expose the OTP flow (for allowlisted external guests who can't
+  // use a Verve Google account). Reuse the active backend if it already does
+  // email; otherwise stand up a dedicated EmailAuthBackend on the same Supabase
+  // client. Both share Supabase, so verifyOtp's SIGNED_IN reaches backend.onChange.
+  const [emailBackend] = useState(() =>
+    backend.sendCode ? backend : new EmailAuthBackend(),
+  );
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -63,20 +72,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendCode = useCallback(
     async (email: string) => {
-      if (!backend.sendCode) throw new Error("Email sign-in isn't available in this mode.");
-      await backend.sendCode(email);
+      if (!emailBackend.sendCode) throw new Error("Email sign-in isn't available in this mode.");
+      await emailBackend.sendCode(email);
     },
-    [backend],
+    [emailBackend],
   );
 
   const verifyCode = useCallback(
     async (email: string, token: string) => {
-      if (!backend.verifyCode) throw new Error("Email sign-in isn't available in this mode.");
-      const next = await backend.verifyCode(email, token);
+      if (!emailBackend.verifyCode) throw new Error("Email sign-in isn't available in this mode.");
+      const next = await emailBackend.verifyCode(email, token);
       setSession(next);
       return next;
     },
-    [backend],
+    [emailBackend],
   );
 
   const signInAs = useCallback(
