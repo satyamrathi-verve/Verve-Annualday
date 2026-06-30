@@ -8,7 +8,7 @@ import { getRealtimeBackend } from "./index";
 import type { GuessEdge, TeamRoom } from "./types";
 
 export interface WheelMember extends Member {
-  /** grey (ungueessed) · yellow (guessed, pending) · green (mutual / revealed). */
+  /** grey (ungueessed) · yellow (guessed, pending) · green (mutual). */
   status: CanisterStatus;
   isSelf: boolean;
   online: boolean;
@@ -29,8 +29,6 @@ export interface TeamWheel {
   myGuessed: string[];
   /** Record a correct guess of `targetId` by me. */
   guess: (targetId: string) => Promise<void>;
-  /** Manager God-Mode: force a member green. */
-  reveal: (memberId: string) => Promise<void>;
   reset: () => Promise<void>;
 }
 
@@ -111,10 +109,6 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
     [selfMemberId],
   );
 
-  const reveal = useCallback(async (memberId: string) => {
-    await roomRef.current?.reveal(memberId);
-  }, []);
-
   const reset = useCallback(async () => {
     await roomRef.current?.reset();
   }, []);
@@ -131,7 +125,6 @@ export function useTeamWheel(teamId: string, selfMemberId: string): TeamWheel {
     myTargets,
     myGuessed,
     guess,
-    reveal,
     reset,
   };
 }

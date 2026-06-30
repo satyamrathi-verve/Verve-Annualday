@@ -1,4 +1,3 @@
-import { GODMODE_GUESSER } from "./derive";
 import type { GuessEdge, RealtimeBackend, TeamRoom, TeamRoomCallbacks } from "./types";
 
 /*
@@ -116,7 +115,6 @@ export class MockRealtimeBackend implements RealtimeBackend {
 
     return {
       guess: (guesserId, guessedId) => addEdge(guesserId, guessedId),
-      reveal: (memberId) => addEdge(GODMODE_GUESSER, memberId),
       reset: async () => {
         writeKeys([]);
         bc?.postMessage({ type: "state" });

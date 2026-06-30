@@ -7,13 +7,10 @@ import type { GuessEdge } from "./types";
 
     grey   — nobody has correctly guessed this person yet
     yellow — someone guessed them, but it isn't mutual yet ("you may be right…")
-    green  — two people guessed EACH OTHER, or a manager force-revealed them
+    green  — two people guessed EACH OTHER
 */
 
 export type CanisterStatus = "grey" | "yellow" | "green";
-
-/** Reserved guesser id used by the manager God-Mode override (force a member green). */
-export const GODMODE_GUESSER = "__godmode__";
 
 export interface DerivedWheel {
   /** memberId → status, for every member id passed in. */
@@ -43,7 +40,6 @@ export function deriveWheel(memberIds: string[], edges: GuessEdge[]): DerivedWhe
 
   for (const id of memberIds) {
     const by = guessedBy.get(id) ?? new Set<string>();
-    const godmoded = by.has(GODMODE_GUESSER);
 
     // Mutual: I guessed someone (a real teammate) who also guessed me back.
     let mutual = false;
@@ -57,7 +53,7 @@ export function deriveWheel(memberIds: string[], edges: GuessEdge[]): DerivedWhe
       }
     }
 
-    if (mutual || godmoded) {
+    if (mutual) {
       status[id] = "green";
       greenCount++;
     } else if (by.size > 0) {

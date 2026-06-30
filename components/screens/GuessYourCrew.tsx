@@ -9,7 +9,6 @@ import { Wheel } from "@/components/wheel/Wheel";
 import { ClueCard } from "@/components/wheel/ClueCard";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
 import { event, getTeam } from "@/lib/data/config";
 import { teamEmoji } from "@/lib/data/teamMeta";
@@ -46,25 +45,16 @@ export function GuessYourCrew({ onNext }: { onNext?: () => void }) {
     );
   }
 
-  return (
-    <CrewBoard
-      teamId={session.teamId}
-      selfId={session.memberId}
-      isManager={session.isManager}
-      onNext={onNext}
-    />
-  );
+  return <CrewBoard teamId={session.teamId} selfId={session.memberId} onNext={onNext} />;
 }
 
 function CrewBoard({
   teamId,
   selfId,
-  isManager,
   onNext,
 }: {
   teamId: string;
   selfId: string;
-  isManager: boolean;
   onNext?: () => void;
 }) {
   const c = event.guess;
@@ -80,8 +70,6 @@ function CrewBoard({
     complete,
     ready,
     guess,
-    reveal,
-    reset,
     backendKind,
   } = wheel;
   const color = team?.color ?? "#3d77ff";
@@ -96,7 +84,7 @@ function CrewBoard({
   const byId = useMemo(() => new Map(members.map((m) => [m.id, m])), [members]);
 
   // My share = the teammates I'm assigned to guess. A target drops off once I've
-  // guessed it OR it's already confirmed green (e.g. a manager revealed it).
+  // guessed it OR it's already confirmed green.
   const myGuessedSet = useMemo(() => new Set(wheel.myGuessed), [wheel.myGuessed]);
   const myTargetSet = useMemo(() => new Set(wheel.myTargets), [wheel.myTargets]);
   const pendingTargets = useMemo(
@@ -324,14 +312,6 @@ function CrewBoard({
                   </div>
                 </GlassCard>
               </motion.div>
-            )}
-
-            {isManager && (
-              <GodModePanel
-                members={members}
-                onReveal={(id) => void reveal(id)}
-                onReset={() => void reset()}
-              />
             )}
           </div>
         </div>
