@@ -1,6 +1,5 @@
 import { getSupabase } from "@/lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { GODMODE_GUESSER } from "./derive";
 import type { GuessEdge, RealtimeBackend, TeamRoom, TeamRoomCallbacks } from "./types";
 
 interface GuessRow {
@@ -130,7 +129,6 @@ export class SupabaseRealtimeBackend implements RealtimeBackend {
 
     return {
       guess: (guesserId, guessedId) => insertEdge(guesserId, guessedId),
-      reveal: (memberId) => insertEdge(GODMODE_GUESSER, memberId),
       reset: async () => {
         const { error } = await supabase.from("guesses").delete().eq("team_id", teamId);
         if (error) {

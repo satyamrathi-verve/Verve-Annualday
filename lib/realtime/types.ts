@@ -25,8 +25,6 @@ export interface TeamRoomCallbacks {
 export interface TeamRoom {
   /** Record that `guesserId` correctly guessed `guessedId`. */
   guess: (guesserId: string, guessedId: string) => Promise<void>;
-  /** Manager override: force a member's canister green regardless of guesses. */
-  reveal: (memberId: string) => Promise<void>;
   /** Clear the whole team's wheel (admin / demo re-run). */
   reset: () => Promise<void>;
   leave: () => void;
