@@ -8,6 +8,7 @@ import { useTeamsProgress } from "@/lib/realtime/useTeamsProgress";
 import { Wheel } from "@/components/wheel/Wheel";
 import { ClueCard } from "@/components/wheel/ClueCard";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
 import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
 import { event, getTeam } from "@/lib/data/config";
@@ -22,7 +23,7 @@ function matchesName(input: string, displayName: string): boolean {
   return a === b || a === b.split(" ")[0];
 }
 
-export function GuessYourCrew() {
+export function GuessYourCrew({ onNext }: { onNext?: () => void }) {
   const { session } = useAuth();
 
   if (!session) {
@@ -45,17 +46,26 @@ export function GuessYourCrew() {
     );
   }
 
-  return <CrewBoard teamId={session.teamId} selfId={session.memberId} isManager={session.isManager} />;
+  return (
+    <CrewBoard
+      teamId={session.teamId}
+      selfId={session.memberId}
+      isManager={session.isManager}
+      onNext={onNext}
+    />
+  );
 }
 
 function CrewBoard({
   teamId,
   selfId,
   isManager,
+  onNext,
 }: {
   teamId: string;
   selfId: string;
   isManager: boolean;
+  onNext?: () => void;
 }) {
   const c = event.guess;
   const reduce = useReducedMotion();
@@ -266,7 +276,17 @@ function CrewBoard({
             </AnimatePresence>
 
             {complete ? (
-              <FinaleCard title={c.completeTitle} subtitle={c.completeSubtitle} />
+              <div className="flex flex-col gap-4">
+                <FinaleCard title={c.completeTitle} subtitle={c.completeSubtitle} />
+                {/* The wheel only unlocks the next step once the WHOLE team is green. */}
+                {onNext && (
+                  <div className="flex justify-center">
+                    <Button variant="gold" glow onClick={onNext}>
+                      Next step →
+                    </Button>
+                  </div>
+                )}
+              </div>
             ) : myDone ? (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                 <GlassCard accent className="p-6 text-center">
