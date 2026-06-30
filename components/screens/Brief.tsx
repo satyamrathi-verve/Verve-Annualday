@@ -19,13 +19,7 @@ export function Brief({ onNext }: { onNext: () => void }) {
     <div className="flex w-full max-w-3xl flex-col items-center text-center">
       <p className="eyebrow">{c.eyebrow}</p>
 
-      <VideoFrame
-        className="mt-5"
-        src={src}
-        recLabel={c.captain.toUpperCase()}
-        posterLabel={c.videoLabel}
-        onPlayed={() => setPlayed(true)}
-      />
+      <VideoFrame className="mt-5" src={src} onPlayed={() => setPlayed(true)} />
 
       <h1 className="mt-7 font-display text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
         {c.title}

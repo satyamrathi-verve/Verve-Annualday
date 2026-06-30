@@ -5,22 +5,18 @@ import { motion } from "framer-motion";
 import { clsx } from "@/lib/clsx";
 
 /*
-  Shared "transmission" video frame: a 16:9 card with a REC badge and a play
-  poster; on play it swaps to the real <video> (native controls + an explicit
-  Fullscreen button, iOS webkit fallback, object-contain so nothing is cropped).
-  Calls onPlayed when the clip ends (or on play if there's no src yet, or on
-  error) so the parent can reveal its CTA. Used by the briefing + bridge screens.
+  Shared video frame: a 16:9 card with a play poster; on play it swaps to the
+  real <video> (native controls + an explicit Fullscreen button, iOS webkit
+  fallback, object-contain so nothing is cropped). No text overlays. Calls
+  onPlayed when the clip ends (or on play if there's no src yet, or on error)
+  so the parent can reveal its CTA. Used by the briefing + bridge screens.
 */
 export function VideoFrame({
   src,
-  recLabel,
-  posterLabel,
   onPlayed,
   className,
 }: {
   src?: string;
-  recLabel: string;
-  posterLabel: string;
   onPlayed: () => void;
   className?: string;
 }) {
@@ -52,11 +48,6 @@ export function VideoFrame({
         className,
       )}
     >
-      <div className="absolute left-4 top-3 z-10 flex items-center gap-2 font-mono text-[10px] tracking-[0.28em] text-gold-deep">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-gold" />
-        REC · {recLabel}
-      </div>
-
       {playing && hasVideo ? (
         <>
           <video
@@ -79,24 +70,16 @@ export function VideoFrame({
           </button>
         </>
       ) : (
-        <>
-          <motion.button
-            type="button"
-            onClick={onPlay}
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.96 }}
-            aria-label="Play"
-            className="group grid h-20 w-20 place-items-center rounded-full border border-verve-400 bg-verve-soft shadow-[0_0_38px_-6px_rgba(91,141,255,0.7)] lg:h-24 lg:w-24"
-          >
-            <span
-              className="ml-1.5 border-y-[13px] border-l-[21px] border-y-transparent border-l-verve-400 transition-colors group-hover:border-l-verve-glow"
-              style={{ opacity: playing ? 0.3 : 1 }}
-            />
-          </motion.button>
-          <p className="absolute bottom-3 font-mono text-[10px] tracking-wider text-faint">
-            {playing ? "▸ transmission placeholder — clip drops in later" : posterLabel}
-          </p>
-        </>
+        <motion.button
+          type="button"
+          onClick={onPlay}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.96 }}
+          aria-label="Play"
+          className="group grid h-20 w-20 place-items-center rounded-full border border-verve-400 bg-verve-soft shadow-[0_0_38px_-6px_rgba(91,141,255,0.7)] lg:h-24 lg:w-24"
+        >
+          <span className="ml-1.5 border-y-[13px] border-l-[21px] border-y-transparent border-l-verve-400 transition-colors group-hover:border-l-verve-glow" />
+        </motion.button>
       )}
     </motion.div>
   );
