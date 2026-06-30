@@ -42,3 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large media — the briefing video is >100MB (GitHub's limit). Host it externally
+# for production (Supabase Storage / Vimeo / CDN) and point brief.videoSrc at it.
+/public/*.mp4

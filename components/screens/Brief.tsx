@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { event } from "@/lib/data/config";
@@ -12,11 +12,22 @@ export function Brief({ onNext }: { onNext: () => void }) {
   const [playing, setPlaying] = useState(false);
   const [played, setPlayed] = useState(false);
   const hasVideo = Boolean(c.videoSrc);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const onPlay = () => {
     setPlaying(true);
     // No real clip wired up yet → there's nothing to "end", so unlock right away.
     if (!hasVideo) setPlayed(true);
+  };
+
+  // Explicit fullscreen (native controls also expose one; iOS uses webkit API).
+  const goFullscreen = () => {
+    const v = videoRef.current as
+      | (HTMLVideoElement & { webkitEnterFullscreen?: () => void })
+      | null;
+    if (!v) return;
+    if (v.requestFullscreen) void v.requestFullscreen();
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
   };
 
   return (
@@ -36,14 +47,26 @@ export function Brief({ onNext }: { onNext: () => void }) {
         </div>
 
         {playing && hasVideo ? (
-          <video
-            src={c.videoSrc}
-            autoPlay
-            controls
-            playsInline
-            onEnded={() => setPlayed(true)}
-            className="h-full w-full bg-black object-cover"
-          />
+          <>
+            <video
+              ref={videoRef}
+              src={c.videoSrc}
+              autoPlay
+              controls
+              playsInline
+              onEnded={() => setPlayed(true)}
+              onError={() => setPlayed(true)}
+              className="h-full w-full bg-black object-contain"
+            />
+            <button
+              type="button"
+              onClick={goFullscreen}
+              className="absolute right-3 top-3 z-10 rounded-md border border-white/25 bg-black/45 px-2.5 py-1 font-mono text-[10px] tracking-wider text-white/90 backdrop-blur transition-colors hover:bg-black/70"
+              aria-label="Fullscreen"
+            >
+              ⛶ Fullscreen
+            </button>
+          </>
         ) : (
           <>
             <motion.button
@@ -71,12 +94,6 @@ export function Brief({ onNext }: { onNext: () => void }) {
       <h1 className="mt-7 font-display text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
         {c.title}
       </h1>
-
-      {/* Gold quote-rule on Captain Wanderlust's monologue. */}
-      <blockquote className="relative mx-auto mt-5 max-w-2xl pl-5 text-left font-mono text-[15px] leading-relaxed text-body lg:text-base">
-        <span className="absolute left-0 top-0 h-full w-[3px] rounded-full bg-gradient-to-b from-gold-400 to-gold-500 shadow-[0_0_18px_-2px_rgba(232,176,75,0.6)]" />
-        {c.quote}
-      </blockquote>
 
       {/* CTA auto-reveals once the briefing has played. */}
       <div className="mt-9 grid min-h-[64px] place-items-center">

@@ -216,7 +216,8 @@
     "captain": "Captain Wanderlust",
     "title": "If you choose to accept it.",
     "videoLabel": "Captain Wanderlust · the briefing",
-    "quote": "You knocked, you guessed, you came in. Now the part that's actually off the books: the people you're looking for were never the ones beside you. We took finance, HR, ops and IT and quietly reshuffled the deck. Find them not by where they sit, but by the quirks and little legends only their crew would know. Light up every canister — and what's behind the door stops being a rumour.",
+    "quote": "",
+    "videoSrc": "/briefing.mp4",
     "cta": "Spin up the wheel"
   },
   "guess": {
