@@ -200,7 +200,7 @@ function FunnelInner() {
           />
         );
       case "activity2":
-        return <ActivityTwo />;
+        return <ActivityTwo onComplete={ignite} />;
       case "bridge3":
         return (
           <VideoBridge

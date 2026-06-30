@@ -4,10 +4,11 @@ import { useMemo, useState } from "react";
 import { useAppSettings } from "@/lib/data/settings";
 import { setActivityOpen, setGuessOpen } from "@/lib/data/adminApi";
 import { useSubmissions } from "@/lib/data/activity1";
+import { useCommits, useTeamSubmissions } from "@/lib/data/activity2";
+import { getTeams } from "@/lib/data/config";
+import { teamEmoji } from "@/lib/data/teamMeta";
 import { clsx } from "@/lib/clsx";
 import { ActivityStatusBoard, type MemberStatus } from "./ActivityStatusBoard";
-
-const EMPTY_STATUS = new Map<string, MemberStatus>();
 
 /*
   Super-admin "activities" control centre: an open/close toggle + a status panel
@@ -36,22 +37,21 @@ export function ActivitiesAdmin() {
         onText="Open — the guide + gallery are available to players."
         offText="Closed — hidden from players."
         write={(v) => setActivityOpen(1, v)}
+        collapsible
       >
         <Activity1Board />
       </ToggleCard>
 
       <ToggleCard
         eyebrow="Activity 2"
-        title="Build a Dashboard"
+        title="Build the Tool That Finally Fits"
         on={s.activity2Open}
-        onText="Open — players can reach the (placeholder) activity."
+        onText="Open — players can clone, build, and watch the live commit board."
         offText="Closed — hidden from players."
         write={(v) => setActivityOpen(2, v)}
+        collapsible
       >
-        <ActivityStatusBoard
-          doneByMember={EMPTY_STATUS}
-          pendingNote="Structure only — tasks to be defined. Every player will light up here once Activity 2 is built."
-        />
+        <Activity2Board />
       </ToggleCard>
     </div>
   );
@@ -64,6 +64,7 @@ function ToggleCard({
   onText,
   offText,
   write,
+  collapsible = false,
   children,
 }: {
   eyebrow: string;
@@ -72,10 +73,13 @@ function ToggleCard({
   onText: string;
   offText: string;
   write: (v: boolean) => Promise<void>;
+  collapsible?: boolean;
   children?: React.ReactNode;
 }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // Collapsible cards start closed so the panel stays compact.
+  const [open, setOpen] = useState(!collapsible);
 
   const flip = async () => {
     setBusy(true);
@@ -116,7 +120,23 @@ function ToggleCard({
           />
         </button>
       </div>
-      {children && <div className="mt-4 border-t border-line/60 pt-4">{children}</div>}
+      {children &&
+        (collapsible ? (
+          <div className="mt-4 border-t border-line/60 pt-4">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              className="flex w-full items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-gold-deep"
+            >
+              <span className={clsx("inline-block transition-transform", open && "rotate-90")}>▸</span>
+              {open ? "Hide status board" : "Show status board"}
+            </button>
+            {open && <div className="mt-4">{children}</div>}
+          </div>
+        ) : (
+          <div className="mt-4 border-t border-line/60 pt-4">{children}</div>
+        ))}
     </div>
   );
 }
@@ -136,4 +156,89 @@ function Activity1Board() {
   }
 
   return <ActivityStatusBoard doneByMember={doneByMember} />;
+}
+
+/* Activity 2 is team-level (not per-member): one row per team with live commit
+   count + whether the lead has submitted. */
+function Activity2Board() {
+  const { byTeam: commits, ready: cReady } = useCommits();
+  const { byTeam: subs, ready: sReady } = useTeamSubmissions();
+  const teams = getTeams();
+
+  const rows = teams
+    .map((t) => ({ id: t.id, name: t.name, stat: commits.get(t.id), sub: subs.get(t.id) }))
+    .sort((a, b) => (b.stat?.count ?? 0) - (a.stat?.count ?? 0));
+
+  const totalCommits = rows.reduce((n, r) => n + (r.stat?.count ?? 0), 0);
+  const submitted = rows.filter((r) => r.sub).length;
+
+  if (!cReady && !sReady) {
+    return <p className="font-mono text-[11px] tracking-wider text-faint">loading the board…</p>;
+  }
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-3">
+        <Stat label="teams submitted" value={`${submitted} / ${teams.length}`} />
+        <Stat label="total commits" value={String(totalCommits)} />
+        <Stat label="building" value={String(rows.filter((r) => (r.stat?.count ?? 0) > 0).length)} />
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2">
+        {rows.map((r) => (
+          <div
+            key={r.id}
+            className="flex items-center gap-2 rounded-xl border border-line/70 bg-white/[0.02] p-3"
+          >
+            <span className="text-base leading-none" aria-hidden>{teamEmoji(r.id)}</span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className="truncate font-display text-sm font-bold text-navy">{r.name}</span>
+                {r.sub && (
+                  <span className="rounded bg-node-live/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-node-live">
+                    submitted ✓
+                  </span>
+                )}
+              </span>
+              {r.sub?.repoUrl ? (
+                <a
+                  href={r.sub.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-0.5 block truncate font-mono text-[11px] text-verve hover:underline"
+                >
+                  {r.sub.note ? `${r.sub.note} · ` : ""}{r.sub.repoUrl}
+                </a>
+              ) : r.stat?.lastMessage ? (
+                <span className="mt-0.5 block truncate font-mono text-[11px] text-faint">
+                  {r.stat.lastMessage}
+                </span>
+              ) : (
+                <span className="mt-0.5 block font-mono text-[11px] text-faint">not started</span>
+              )}
+            </span>
+            <span className="flex-none text-right">
+              <span className="font-display text-lg font-extrabold leading-none text-navy">
+                {r.stat?.count ?? 0}
+              </span>
+              <span className="block font-mono text-[9px] uppercase tracking-widest text-gold-deep">
+                commits
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-line/60 bg-white/[0.02] px-3 py-2 text-center">
+      <div className="font-display text-lg font-extrabold text-navy">{value}</div>
+      <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-gold-deep">
+        {label}
+      </div>
+    </div>
+  );
 }
