@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useSubmissions, submitProfile } from "@/lib/data/activity1";
 import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
 import { teamEmoji } from "@/lib/data/teamMeta";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { clsx } from "@/lib/clsx";
 
 /*
   Activity 1 — "About Me". A very detailed, non-coder, step-by-step guide to
@@ -292,56 +291,124 @@ function Gallery({
           loading the gallery…
         </p>
       ) : (
-        <div className="mt-6 flex flex-col gap-8">
-          {groups.map((group) => {
-            const members = group.members;
-            return (
-              <div key={group.id}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg leading-none" aria-hidden>{teamEmoji(group.id)}</span>
-                  <h3 className="font-display text-base font-bold text-navy">{group.name}</h3>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                  {members.map((m, i) => {
-                    const url = urlByMember.get(m.id);
-                    return (
-                      <motion.a
-                        key={m.id}
-                        href={url || undefined}
-                        target={url ? "_blank" : undefined}
-                        rel={url ? "noopener noreferrer" : undefined}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.25) }}
-                        whileHover={url ? { y: -3 } : undefined}
-                        className={clsx(
-                          "group relative overflow-hidden rounded-xl border p-3 transition-colors",
-                          url
-                            ? "cursor-pointer border-node-live/40 bg-node-live/[0.06] hover:border-node-live"
-                            : "cursor-default border-line bg-white/[0.02]",
-                        )}
-                      >
-                        <p className="truncate font-display text-sm font-semibold text-navy">
-                          {m.displayName}
-                        </p>
-                        <p
-                          className={clsx(
-                            "mt-1 font-mono text-[10px] uppercase tracking-wider",
-                            url ? "text-node-live" : "text-faint",
-                          )}
-                        >
-                          {url ? "View profile →" : "not yet"}
-                        </p>
-                      </motion.a>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {groups.map((group) => (
+            <ProfileWheel key={group.id} group={group} urlByMember={urlByMember} />
+          ))}
         </div>
       )}
     </div>
+  );
+}
+
+/* One team as an animated wheel: members orbit a hub; a submitted member is a
+   lit, clickable node (opens their profile), pending members stay dim. */
+function ProfileWheel({
+  group,
+  urlByMember,
+}: {
+  group: { id: string; name: string; color: string; members: { id: string; displayName: string }[] };
+  urlByMember: Map<string, string>;
+}) {
+  const reduce = useReducedMotion();
+  const members = group.members;
+  const n = Math.max(members.length, 1);
+  const done = members.filter((m) => urlByMember.has(m.id)).length;
+  const RADIUS = 40; // % from centre
+
+  const initials = (name: string) =>
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+  return (
+    <GlassCard className="p-4">
+      <div className="flex items-center gap-2">
+        <span className="text-lg leading-none" aria-hidden>
+          {teamEmoji(group.id)}
+        </span>
+        <h3 className="truncate font-display text-sm font-bold text-navy">{group.name}</h3>
+        <span className="ml-auto font-mono text-[10px] text-faint">
+          {done}/{members.length}
+        </span>
+      </div>
+
+      <div className="relative mx-auto mt-3 aspect-square w-full max-w-[230px]">
+        {/* decorative slowly-rotating ring */}
+        <motion.div
+          className="absolute inset-[16%] rounded-full border border-dashed border-white/10"
+          animate={reduce ? undefined : { rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* hub */}
+        <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
+          <div className="flex flex-col items-center">
+            <span className="text-2xl" aria-hidden>
+              {teamEmoji(group.id)}
+            </span>
+            <span className="mt-0.5 font-display text-base font-extrabold leading-none text-navy">
+              {done}
+              <span className="text-[11px] text-faint">/{members.length}</span>
+            </span>
+            <span className="font-mono text-[8px] uppercase tracking-[0.22em] text-gold-deep">
+              live
+            </span>
+          </div>
+        </div>
+
+        {/* member nodes */}
+        {members.map((m, i) => {
+          const ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+          const x = 50 + RADIUS * Math.cos(ang);
+          const y = 50 + RADIUS * Math.sin(ang);
+          const url = urlByMember.get(m.id);
+          return (
+            <motion.div
+              key={m.id}
+              className="group/node absolute z-10 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${x}%`, top: `${y}%` }}
+              initial={{ scale: 0, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: Math.min(i * 0.05, 0.6),
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+              }}
+            >
+              {url ? (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${m.displayName} — view profile`}
+                  className="grid h-9 w-9 place-items-center rounded-full font-display text-[10px] font-bold text-white transition-transform hover:scale-110"
+                  style={{ backgroundColor: group.color, boxShadow: `0 0 12px -1px ${group.color}` }}
+                >
+                  {initials(m.displayName)}
+                </a>
+              ) : (
+                <div
+                  title="not yet"
+                  aria-label={`${m.displayName} — not submitted`}
+                  className="grid h-9 w-9 place-items-center rounded-full border border-line bg-white/[0.03] font-display text-[10px] font-bold text-faint"
+                >
+                  {initials(m.displayName)}
+                </div>
+              )}
+              <span className="pointer-events-none absolute left-1/2 top-[114%] z-20 -translate-x-1/2 whitespace-nowrap rounded-md border border-line bg-[#0E1525] px-2 py-0.5 font-mono text-[9px] text-ink opacity-0 shadow-lg transition-opacity duration-150 group-hover/node:opacity-100">
+                {m.displayName.split(" ")[0]}
+                {url ? " · view →" : " · not yet"}
+              </span>
+            </motion.div>
+          );
+        })}
+      </div>
+    </GlassCard>
   );
 }
