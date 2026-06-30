@@ -18,7 +18,7 @@ export const TEAM_THEME: Record<string, TeamTheme> = {
   team6: { name: "Project 6", emoji: "🪐" },
   team7: { name: "Project 7", emoji: "🍕" },
   team8: { name: "Project 8", emoji: "🐙" },
-  demo: { name: "Project Test", emoji: "🧪" },
+  demo: { name: "Project 9", emoji: "🛸" },
 };
 
 /** Emoji for a team id (falls back to a neutral marker, e.g. the Unplaced group). */

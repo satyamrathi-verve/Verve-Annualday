@@ -55,6 +55,18 @@ export const rumourSchema = z.object({
   body: z.array(z.string().min(1)).min(1),
 });
 
+/* A date-gated "wait for <date>" screen (Task 1 / Task 2). Locked until the host
+   flips the matching activity toggle, then flips to an "the wait is over" CTA. */
+export const taskGateSchema = z.object({
+  lockedEyebrow: z.string().default("Locked"),
+  /** e.g. "Wait for 3 July." — edit the date here. */
+  lockedTitle: z.string(),
+  lockedBody: z.array(z.string().min(1)).min(1),
+  openEyebrow: z.string().default("The wait is over."),
+  openTitle: z.string(),
+  cta: z.string(),
+});
+
 export const eventSchema = z.object({
   eventName: z.string(),
   edition: z.string(),
@@ -172,6 +184,35 @@ export const eventSchema = z.object({
       .min(1)
       .default(["No more rumours. No more waiting. Your crew is right behind the door — go assemble them."]),
   }),
+  /** The two date-gated "wait for <date>" screens between the activities. */
+  taskGates: z
+    .object({
+      task1: taskGateSchema,
+      task2: taskGateSchema,
+    })
+    .default({
+      task1: {
+        lockedEyebrow: "Task 1 · locked",
+        lockedTitle: "Wait for 3 July.",
+        lockedBody: [
+          "Your first task drops on the 3rd. Keep this page open — it lights up the instant the host opens it.",
+        ],
+        openEyebrow: "The wait is over.",
+        openTitle: "Your first task is live.",
+        cta: "Continue to Task 1 →",
+      },
+      task2: {
+        lockedEyebrow: "Task 2 · locked",
+        lockedTitle: "Wait for 6 July.",
+        lockedBody: [
+          "Task 2 opens on the 6th. While you wait, explore everyone's profiles below.",
+          "This page flips the moment the host opens the next task.",
+        ],
+        openEyebrow: "The wait is over.",
+        openTitle: "Time for the next task.",
+        cta: "Move to the next task →",
+      },
+    }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z
     .array(z.object({ name: z.string(), email: z.string().email() }))
@@ -186,3 +227,4 @@ export type Member = z.infer<typeof memberSchema>;
 export type Team = z.infer<typeof teamSchema>;
 export type EventConfig = z.infer<typeof eventSchema>;
 export type Rumour = z.infer<typeof rumourSchema>;
+export type TaskGate = z.infer<typeof taskGateSchema>;

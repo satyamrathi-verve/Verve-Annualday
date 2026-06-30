@@ -9,6 +9,7 @@ import { getTeams } from "@/lib/data/config";
 import { teamEmoji } from "@/lib/data/teamMeta";
 import { clsx } from "@/lib/clsx";
 import { ActivityStatusBoard, type MemberStatus } from "./ActivityStatusBoard";
+import { ReposAdmin } from "./ReposAdmin";
 
 /*
   Super-admin "activities" control centre: an open/close toggle + a status panel
@@ -178,6 +179,15 @@ function Activity2Board() {
 
   return (
     <div>
+      <div className="mb-4 rounded-xl border border-line/60 bg-white/[0.02] p-3">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-deep">
+          Team repositories
+        </p>
+        <div className="mt-3">
+          <ReposAdmin />
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-3">
         <Stat label="teams submitted" value={`${submitted} / ${teams.length}`} />
         <Stat label="total commits" value={String(totalCommits)} />

@@ -12,9 +12,11 @@ import { useVideos, setVideoUrl } from "@/lib/data/videos";
 
 const SLOTS: { key: string; label: string; where: string }[] = [
   { key: "briefing", label: "Briefing", where: "Before the wheel · “Top secret · do not forward”" },
-  { key: "bridge1", label: "Bridge 1", where: "After the wheel → Activity 1" },
-  { key: "bridge2", label: "Bridge 2", where: "After Activity 1 → Activity 2" },
-  { key: "bridge3", label: "Bridge 3", where: "Closing · after Activity 2" },
+  { key: "wheelOutro", label: "Wheel outro", where: "After the wheel · short send-off into Task 1" },
+  { key: "a1intro", label: "Task 1 · intro", where: "Before Activity 1 · explains the task" },
+  { key: "a1outro", label: "Task 1 · closing", where: "After Activity 1 · before the Task 2 wait" },
+  { key: "a2intro", label: "Task 2 · intro", where: "Before Activity 2 · explains the task" },
+  { key: "bridge3", label: "Closing", where: "Final wrap · after Activity 2" },
 ];
 
 export function VideosAdmin() {

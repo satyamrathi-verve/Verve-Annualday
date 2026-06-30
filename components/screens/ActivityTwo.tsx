@@ -3,22 +3,29 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
-import { getTeams } from "@/lib/data/config";
+import { getTeams, getTeamMembers } from "@/lib/data/config";
 import { teamEmoji } from "@/lib/data/teamMeta";
-import { useCommits, useTeamSubmissions, submitTeamTool } from "@/lib/data/activity2";
+import {
+  useCommits,
+  useRepos,
+  useTeamSubmissions,
+  submitTeamTool,
+  type CommitStat,
+} from "@/lib/data/activity2";
 import { GlassCard } from "@/components/ui/GlassCard";
-import activity2Config from "@/config/activity2.json";
 
 /*
   Activity 2 — "Build the Tool That Finally Fits". A per-TEAM build sprint: the
   team clones its repo, lets Claude Code read the README + build the AR Manager
   screens against a pre-seeded Supabase backend, and pushes as they go. This
-  screen shows the clone/kickoff steps, a LIVE commit leaderboard (every push
-  lights a team up), and a Submit that only the team LEAD sees — which records the
-  team's repo + note and hands off to the wrap video.
-*/
+  screen shows the clone/kickoff steps, a LIVE commit board — a per-member bar
+  chart for every team plus a top-4 trend line — and a Submit that only the team
+  LEAD sees, which records the team's repo + note and hands off to the wrap video.
 
-const REPOS = (activity2Config as { repos: Record<string, string> }).repos ?? {};
+  Per-member attribution needs each player to commit under their OWN git identity
+  (see the "make your commits count" step), since the board groups commits by
+  author. Names are anonymised to "U1…Un" on screen.
+*/
 
 const KICKOFF_PROMPT =
   "Read README.md and CLAUDE.md in this repo, then tell me in 5 lines what we're " +
@@ -45,6 +52,15 @@ function buildGuide(repoSlug: string): GuideStep[] {
         "You already set these up in Activity 1 — open VS Code and the Claude Code extension.",
         "Open a terminal in VS Code: top menu → Terminal → New Terminal.",
       ],
+    },
+    {
+      title: "Make your commits count (do this once) 🪪",
+      body: [
+        "So the live board can credit YOUR work, tell git who you are — use your own email.",
+        "Paste these two lines into the terminal (swap in your real name + email). Everyone on the team does this on their own laptop.",
+        "Without this, all of a team's commits look like one person and the per-member chart won't work.",
+      ],
+      snippet: 'git config --global user.name "Your Name"\ngit config --global user.email "you@verveadvisory.com"',
     },
     {
       title: "Clone your team's repo",
@@ -75,7 +91,8 @@ function buildGuide(repoSlug: string): GuideStep[] {
 
 export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
   const { session } = useAuth();
-  const repoSlug = session?.teamId ? REPOS[session.teamId] ?? "" : "";
+  const { repos } = useRepos();
+  const repoSlug = session?.teamId ? repos[session.teamId] ?? "" : "";
   const guide = useMemo(() => buildGuide(repoSlug), [repoSlug]);
 
   return (
@@ -92,8 +109,32 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
         </p>
       </div>
 
+      {/* How you're judged */}
+      <GlassCard accent className="mt-8 p-5">
+        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
+          How you&apos;re judged
+        </p>
+        <ul className="mt-3 flex flex-col gap-2">
+          <li className="flex gap-2 text-[15px] leading-relaxed text-body">
+            <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
+            <span>
+              <span className="font-semibold text-navy">Utility</span> — does the tool actually solve
+              a real problem, and solve it well?
+            </span>
+          </li>
+          <li className="flex gap-2 text-[15px] leading-relaxed text-body">
+            <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
+            <span>
+              <span className="font-semibold text-navy">Commits</span> — the number of commits, and{" "}
+              <span className="font-semibold text-navy">every team member must have commits</span>. The
+              board below tracks each member, so make sure everyone pushes.
+            </span>
+          </li>
+        </ul>
+      </GlassCard>
+
       {/* The guide */}
-      <div className="mt-8 grid gap-4">
+      <div className="mt-6 grid gap-4">
         {guide.map((step, i) => (
           <motion.div
             key={i}
@@ -286,12 +327,20 @@ function formatAgo(iso: string | null): string {
   return `${Math.round(h / 24)}d ago`;
 }
 
+interface TeamRow {
+  id: string;
+  name: string;
+  color: string;
+  stat: CommitStat | undefined;
+  submitted: boolean;
+}
+
 function Leaderboard({ ownTeamId }: { ownTeamId: string | null }) {
-  const { byTeam: commits } = useCommits();
+  const { byTeam: commits, since } = useCommits();
   const { byTeam: subs } = useTeamSubmissions();
   const teams = getTeams();
 
-  const rows = teams
+  const rows: TeamRow[] = teams
     .map((t) => ({
       id: t.id,
       name: t.name,
@@ -300,8 +349,6 @@ function Leaderboard({ ownTeamId }: { ownTeamId: string | null }) {
       submitted: subs.has(t.id),
     }))
     .sort((a, b) => (b.stat?.count ?? 0) - (a.stat?.count ?? 0));
-
-  const max = Math.max(1, ...rows.map((r) => r.stat?.count ?? 0));
 
   return (
     <div className="mt-12">
@@ -313,59 +360,286 @@ function Leaderboard({ ownTeamId }: { ownTeamId: string | null }) {
         <p className="mt-2 text-sm text-muted">Commits since kickoff. Push to climb. 🔥</p>
       </div>
 
+      {/* Top-4 trend line */}
+      <TrendChart rows={rows} since={since} />
+
+      {/* Per-team member bars */}
       <div className="mt-6 flex flex-col gap-3">
-        {rows.map((r, i) => {
-          const count = r.stat?.count ?? 0;
-          const pct = Math.round((count / max) * 100);
-          const mine = r.id === ownTeamId;
+        {rows.map((r, i) => (
+          <TeamCard key={r.id} row={r} rank={i + 1} mine={r.id === ownTeamId} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TeamCard({ row, rank, mine }: { row: TeamRow; rank: number; mine: boolean }) {
+  const count = row.stat?.count ?? 0;
+  return (
+    <GlassCard accent={mine} className="p-4">
+      <div className="flex items-center gap-3">
+        <span className="w-6 flex-none text-center font-display text-sm font-extrabold text-faint">
+          {rank}
+        </span>
+        <span className="text-lg leading-none" aria-hidden>
+          {teamEmoji(row.id)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
+            <span className="truncate font-display text-sm font-bold text-navy">{row.name}</span>
+            {mine && (
+              <span className="rounded bg-gold/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-gold-deep">
+                you
+              </span>
+            )}
+            {row.submitted && (
+              <span className="rounded bg-node-live/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-node-live">
+                submitted ✓
+              </span>
+            )}
+          </span>
+          {row.stat?.lastMessage && (
+            <span className="mt-0.5 block truncate font-mono text-[11px] text-faint">
+              {row.stat.lastMessage} · {formatAgo(row.stat.lastAt)}
+            </span>
+          )}
+        </span>
+        <span className="flex-none text-right">
+          <span className="font-display text-xl font-extrabold leading-none text-navy">{count}</span>
+          <span className="block font-mono text-[9px] uppercase tracking-widest text-gold-deep">
+            commits
+          </span>
+        </span>
+      </div>
+
+      <MemberBars teamId={row.id} stat={row.stat} color={row.color} />
+    </GlassCard>
+  );
+}
+
+/* One vertical bar per teammate (anonymised U1…Un), height ∝ that person's
+   commits. Members who haven't pushed yet show as empty bars so the team's full
+   lineup is visible. */
+function MemberBars({
+  teamId,
+  stat,
+  color,
+}: {
+  teamId: string;
+  stat: CommitStat | undefined;
+  color: string;
+}) {
+  const authors = stat?.authors ?? [];
+  const teamSize = getTeamMembers(teamId).length;
+
+  if (stat?.error) {
+    return (
+      <p className="mt-3 font-mono text-[10px] text-faint">repo not reachable ({stat.error})</p>
+    );
+  }
+  if (authors.length === 0) {
+    return <p className="mt-3 font-mono text-[10px] text-faint">no commits yet — push to light it up</p>;
+  }
+
+  const slots = Math.max(authors.length, teamSize, 1);
+  const bars = Array.from({ length: slots }, (_, i) => authors[i]?.count ?? 0);
+  const maxCount = Math.max(1, ...bars);
+
+  return (
+    <div className="mt-3 border-t border-line/50 pt-3">
+      <div className="flex items-end gap-1.5 overflow-x-auto pb-1">
+        {bars.map((c, i) => {
+          const h = Math.round((c / maxCount) * 100);
           return (
-            <GlassCard key={r.id} accent={mine} className="p-4">
-              <div className="flex items-center gap-3">
-                <span className="w-6 flex-none text-center font-display text-sm font-extrabold text-faint">
-                  {i + 1}
-                </span>
-                <span className="text-lg leading-none" aria-hidden>
-                  {teamEmoji(r.id)}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate font-display text-sm font-bold text-navy">{r.name}</span>
-                    {mine && (
-                      <span className="rounded bg-gold/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-gold-deep">
-                        you
-                      </span>
-                    )}
-                    {r.submitted && (
-                      <span className="rounded bg-node-live/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-node-live">
-                        submitted ✓
-                      </span>
-                    )}
-                  </span>
-                  {r.stat?.lastMessage && (
-                    <span className="mt-0.5 block truncate font-mono text-[11px] text-faint">
-                      {r.stat.lastMessage} · {formatAgo(r.stat.lastAt)}
-                    </span>
-                  )}
-                </span>
-                <span className="flex-none text-right">
-                  <span className="font-display text-xl font-extrabold leading-none text-navy">
-                    {count}
-                  </span>
-                  <span className="block font-mono text-[9px] uppercase tracking-widest text-gold-deep">
-                    commits
-                  </span>
-                </span>
-              </div>
-              <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
+            <div key={i} className="flex w-7 flex-none flex-col items-center gap-1">
+              <span className="font-mono text-[9px] leading-none text-faint">{c || ""}</span>
+              <div className="flex h-16 w-full items-end rounded bg-white/[0.03]">
                 <div
-                  className="h-full rounded-full transition-[width] duration-700"
-                  style={{ width: `${pct}%`, backgroundColor: r.color }}
+                  className="w-full rounded transition-[height] duration-500"
+                  style={{
+                    height: `${c ? Math.max(h, 6) : 0}%`,
+                    backgroundColor: c ? color : "transparent",
+                  }}
                 />
               </div>
-            </GlassCard>
+              <span className="font-mono text-[8px] leading-none text-faint">U{i + 1}</span>
+            </div>
           );
         })}
       </div>
+      <p className="mt-1 font-mono text-[9px] text-faint">
+        each bar = one teammate&apos;s commits (anonymised)
+      </p>
     </div>
+  );
+}
+
+const BUCKET_MS = 3 * 60 * 60 * 1000; // ~every 3 hours
+const MAX_BUCKETS = 32;
+
+/* Cumulative commits at each time boundary for a team, from sorted commit times. */
+function cumulativeSeries(times: number[], boundaries: number[]): number[] {
+  const sorted = [...times].sort((a, b) => a - b);
+  const out: number[] = [];
+  let idx = 0;
+  for (const t of boundaries) {
+    while (idx < sorted.length && sorted[idx] <= t) idx += 1;
+    out.push(idx);
+  }
+  return out;
+}
+
+/* Top-4 teams' cumulative commit trend over time (one line per team). Bars tell
+   you "who", this line tells you "the race". */
+function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
+  const top = rows.filter((r) => (r.stat?.count ?? 0) > 0).slice(0, 4);
+
+  const chart = useMemo(() => {
+    if (top.length === 0) return null;
+
+    const allTimes: number[] = [];
+    for (const r of top) {
+      for (const p of r.stat?.commits ?? []) {
+        const t = Date.parse(p.at);
+        if (!Number.isNaN(t)) allTimes.push(t);
+      }
+    }
+    if (allTimes.length === 0) return null;
+
+    const sinceMs = Date.parse(since);
+    const startMs = !Number.isNaN(sinceMs) ? sinceMs : Math.min(...allTimes);
+    // End at the latest commit (the line's right edge); the poll refreshes this
+    // every ~20s, so "now" tracks the build without an impure Date.now() in render.
+    const endMs = Math.max(Math.max(...allTimes), startMs + BUCKET_MS);
+    const span = Math.max(1, endMs - startMs);
+
+    const rawBuckets = Math.ceil(span / BUCKET_MS) + 1;
+    const n = Math.min(Math.max(rawBuckets, 2), MAX_BUCKETS);
+    const step = span / (n - 1);
+    const boundaries = Array.from({ length: n }, (_, i) => startMs + i * step);
+
+    const teamSeries = top.map((r) => {
+      const times = (r.stat?.commits ?? [])
+        .map((p) => Date.parse(p.at))
+        .filter((t) => !Number.isNaN(t));
+      return { row: r, series: cumulativeSeries(times, boundaries) };
+    });
+
+    const maxY = Math.max(1, ...teamSeries.map((t) => t.series[t.series.length - 1] ?? 0));
+    return { boundaries, teamSeries, maxY };
+  }, [top, since]);
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-deep">
+          Trend · top 4 teams
+        </p>
+        <p className="font-mono text-[9px] text-faint">cumulative commits, ~3h steps</p>
+      </div>
+
+      {!chart ? (
+        <GlassCard className="mt-2 p-6 text-center">
+          <p className="font-mono text-[12px] text-faint">
+            The trend line appears once teams start pushing.
+          </p>
+        </GlassCard>
+      ) : (
+        <GlassCard className="mt-2 p-4">
+          <Sparklines chart={chart} />
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            {chart.teamSeries.map(({ row }) => (
+              <span key={row.id} className="flex items-center gap-1.5">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: row.color }}
+                  aria-hidden
+                />
+                <span className="text-lg leading-none" aria-hidden>
+                  {teamEmoji(row.id)}
+                </span>
+                <span className="font-mono text-[11px] text-muted">
+                  {row.name} · {row.stat?.count ?? 0}
+                </span>
+              </span>
+            ))}
+          </div>
+        </GlassCard>
+      )}
+    </div>
+  );
+}
+
+const VB_W = 320;
+const VB_H = 120;
+const PAD = { l: 8, r: 8, t: 10, b: 18 };
+
+function Sparklines({
+  chart,
+}: {
+  chart: {
+    boundaries: number[];
+    teamSeries: { row: TeamRow; series: number[] }[];
+    maxY: number;
+  };
+}) {
+  const { boundaries, teamSeries, maxY } = chart;
+  const n = boundaries.length;
+  const innerW = VB_W - PAD.l - PAD.r;
+  const innerH = VB_H - PAD.t - PAD.b;
+  const x = (i: number) => PAD.l + (n <= 1 ? 0 : (i / (n - 1)) * innerW);
+  const y = (v: number) => PAD.t + (1 - v / maxY) * innerH;
+
+  return (
+    <svg
+      viewBox={`0 0 ${VB_W} ${VB_H}`}
+      className="w-full"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Cumulative commit trend for the top four teams"
+    >
+      {/* baseline */}
+      <line
+        x1={PAD.l}
+        y1={VB_H - PAD.b}
+        x2={VB_W - PAD.r}
+        y2={VB_H - PAD.b}
+        stroke="currentColor"
+        className="text-line"
+        strokeWidth={1}
+        vectorEffect="non-scaling-stroke"
+      />
+      {teamSeries.map(({ row, series }) => {
+        const pts = series.map((v, i) => `${x(i)},${y(v)}`).join(" ");
+        return (
+          <polyline
+            key={row.id}
+            points={pts}
+            fill="none"
+            stroke={row.color}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        );
+      })}
+      {/* axis labels */}
+      <text x={PAD.l} y={VB_H - 5} className="fill-faint" style={{ fontSize: 9, fontFamily: "monospace" }}>
+        D0
+      </text>
+      <text
+        x={VB_W - PAD.r}
+        y={VB_H - 5}
+        textAnchor="end"
+        className="fill-faint"
+        style={{ fontSize: 9, fontFamily: "monospace" }}
+      >
+        now
+      </text>
+      <text x={PAD.l} y={PAD.t + 2} className="fill-faint" style={{ fontSize: 9, fontFamily: "monospace" }}>
+        {maxY}
+      </text>
+    </svg>
   );
 }
