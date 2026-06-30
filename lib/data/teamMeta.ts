@@ -10,14 +10,14 @@ export interface TeamTheme {
 }
 
 export const TEAM_THEME: Record<string, TeamTheme> = {
-  team1: { name: "Project Falcon", emoji: "🦅" },
-  team2: { name: "Project Cobra", emoji: "🐍" },
-  team3: { name: "Project Phoenix", emoji: "🔥" },
-  team4: { name: "Project Shark", emoji: "🦈" },
-  team5: { name: "Project Wolf", emoji: "🐺" },
-  team6: { name: "Project Tiger", emoji: "🐯" },
-  team7: { name: "Project Panther", emoji: "🐆" },
-  team8: { name: "Project Owl", emoji: "🦉" },
+  team1: { name: "Project 1", emoji: "🚀" },
+  team2: { name: "Project 2", emoji: "🎲" },
+  team3: { name: "Project 3", emoji: "💎" },
+  team4: { name: "Project 4", emoji: "🌮" },
+  team5: { name: "Project 5", emoji: "🦄" },
+  team6: { name: "Project 6", emoji: "🪐" },
+  team7: { name: "Project 7", emoji: "🍕" },
+  team8: { name: "Project 8", emoji: "🐙" },
   demo: { name: "Project Test", emoji: "🧪" },
 };
 
