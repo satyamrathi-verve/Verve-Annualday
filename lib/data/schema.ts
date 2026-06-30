@@ -11,6 +11,9 @@ export const clueSchema = z.object({
   hobbies: z.array(z.string()).default([]),
   quirks: z.array(z.string()).default([]),
   funFacts: z.array(z.string()).default([]),
+  /** Single free-text clue pointing to this person — the primary clue admins
+   *  edit; shown to whoever must guess them. (The arrays above are legacy.) */
+  clue: z.string().default(""),
 });
 
 export const memberSchema = z.object({
@@ -19,7 +22,9 @@ export const memberSchema = z.object({
   /** Verve email — how a Google/email-authed person is matched to the roster. */
   email: z.string().email().optional(),
   displayName: z.string().min(1),
-  teamId: z.string().min(1),
+  /** Team the member belongs to. `null` = "unplaced" — exists in the roster but
+   *  not yet assigned to a crew (placed via the super-admin panel). */
+  teamId: z.string().min(1).nullable(),
   /** Managers get the God-Mode override on the Guess screen. */
   isManager: z.boolean().default(false),
   /**
@@ -48,6 +53,18 @@ export const rumourSchema = z.object({
   heading: z.string().min(1),
   sub: z.string().min(1),
   body: z.array(z.string().min(1)).min(1),
+});
+
+/* A date-gated "wait for <date>" screen (Task 1 / Task 2). Locked until the host
+   flips the matching activity toggle, then flips to an "the wait is over" CTA. */
+export const taskGateSchema = z.object({
+  lockedEyebrow: z.string().default("Locked"),
+  /** e.g. "Wait for 3 July." — edit the date here. */
+  lockedTitle: z.string(),
+  lockedBody: z.array(z.string().min(1)).min(1),
+  openEyebrow: z.string().default("The wait is over."),
+  openTitle: z.string(),
+  cta: z.string(),
 });
 
 export const eventSchema = z.object({
@@ -91,7 +108,7 @@ export const eventSchema = z.object({
     codeLabel: z.string(),
     /** Only emails on this domain may sign in (client-side gate). */
     allowedDomain: z.string(),
-    /** Extra individual emails allowed to sign in despite a different domain. */
+    /** Specific non-domain emails also allowed through (external guests). */
     allowedEmails: z.array(z.string()).default([]),
     domainError: z.string(),
     /** Shown after the code is sent. Use {email} as a placeholder. */
@@ -142,15 +159,60 @@ export const eventSchema = z.object({
       .string()
       .default("Couldn't assemble this crew's wheel. Refresh — and if it persists, ping the host."),
   }),
-  /** Pre-event "Now We Wait." holding screen (shown after sign-in). */
+  /** "Now We Wait." screen (shown after sign-in); its CTA dives into the game. */
   wait: z.object({
     eyebrow: z.string(),
     emoji: z.string(),
     title: z.string(),
     subtitle: z.string(),
     body: z.array(z.string().min(1)).min(1),
-    replayCta: z.string(),
+    cta: z.string(),
+    /** Locked-state CTA — sends waiting players back to the teasers/whispers reel. */
+    whispersCta: z.string().default("See what they're whispering today →"),
+    /** Button label shown while the host hasn't opened the crew hunt yet. */
+    lockedCta: z.string().default("🔒 The host hasn't opened the wheel yet"),
+    /** Helper line shown under the locked button. */
+    lockedNote: z
+      .string()
+      .default("Hang tight — the crew hunt opens any moment. This page lights up the instant the host flips it on."),
+    /* "Open" variant — shown on this same screen once the host flips the toggle. */
+    openEyebrow: z.string().default("The wait is over."),
+    openTitle: z.string().default("The time has arrived."),
+    openSubtitle: z.string().default("The door's open — step through and find your crew."),
+    openBody: z
+      .array(z.string().min(1))
+      .min(1)
+      .default(["No more rumours. No more waiting. Your crew is right behind the door — go assemble them."]),
   }),
+  /** The two date-gated "wait for <date>" screens between the activities. */
+  taskGates: z
+    .object({
+      task1: taskGateSchema,
+      task2: taskGateSchema,
+    })
+    .default({
+      task1: {
+        lockedEyebrow: "Task 1 · locked",
+        lockedTitle: "Wait for 3 July.",
+        lockedBody: [
+          "Your first task drops on the 3rd. Keep this page open — it lights up the instant the host opens it.",
+        ],
+        openEyebrow: "The wait is over.",
+        openTitle: "Your first task is live.",
+        cta: "Continue to Task 1 →",
+      },
+      task2: {
+        lockedEyebrow: "Task 2 · locked",
+        lockedTitle: "Wait for 6 July.",
+        lockedBody: [
+          "Task 2 opens on the 6th. While you wait, explore everyone's profiles below.",
+          "This page flips the moment the host opens the next task.",
+        ],
+        openEyebrow: "The wait is over.",
+        openTitle: "Time for the next task.",
+        cta: "Move to the next task →",
+      },
+    }),
   /** Super admins see a live all-teams dashboard instead of the funnel. */
   superAdmins: z
     .array(z.object({ name: z.string(), email: z.string().email() }))
@@ -165,3 +227,4 @@ export type Member = z.infer<typeof memberSchema>;
 export type Team = z.infer<typeof teamSchema>;
 export type EventConfig = z.infer<typeof eventSchema>;
 export type Rumour = z.infer<typeof rumourSchema>;
+export type TaskGate = z.infer<typeof taskGateSchema>;

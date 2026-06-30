@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { teams, getTeamMembers } from "@/lib/data/config";
+import { getTeams, getTeamMembers } from "@/lib/data/config";
 import { deriveWheel } from "./derive";
 import { getRealtimeBackend } from "./index";
 import type { GuessEdge, TeamRoom } from "./types";
@@ -38,7 +38,7 @@ export function useAllWheels(selfId: string): {
     const backend = getRealtimeBackend();
     const rooms: TeamRoom[] = [];
 
-    for (const team of teams) {
+    for (const team of getTeams()) {
       backend
         .joinTeam(team.id, selfId, {
           onGuesses: (edges) => {
@@ -73,7 +73,7 @@ export function useAllWheels(selfId: string): {
   }, []);
 
   const progress = useMemo<TeamProgress[]>(() => {
-    return teams.map((team) => {
+    return getTeams().map((team) => {
       const members = getTeamMembers(team.id);
       const ids = members.map((m) => m.id);
       const idSet = new Set(ids);

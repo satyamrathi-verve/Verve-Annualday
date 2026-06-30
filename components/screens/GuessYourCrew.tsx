@@ -11,6 +11,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { GodModePanel } from "@/components/admin/GodModePanel";
 import { clsx } from "@/lib/clsx";
 import { event, getTeam } from "@/lib/data/config";
+import { teamEmoji } from "@/lib/data/teamMeta";
 
 /** Lenient name match: full name or first name, case/space-insensitive. */
 function matchesName(input: string, displayName: string): boolean {
@@ -168,7 +169,7 @@ function CrewBoard({
         )}
       >
         <span className="font-bold" style={{ color }}>
-          {team?.name ?? teamId}
+          <span aria-hidden>{teamEmoji(teamId)}</span> {team?.name ?? teamId}
         </span>
         <span className="text-line">|</span>
         <span className="flex items-center gap-1.5">
@@ -318,18 +319,15 @@ function CrewBoard({
 
       <OtherCrews currentTeamId={teamId} />
 
-      {/* Decode-the-canister bottom sheet */}
-      <DecodeSheet
-        open={openNodeId !== null}
-        onClose={() => setOpenNodeId(null)}
-        reduce={reduce}
-      >
+      {/* Decode-the-canister modal */}
+      <DecodeSheet open={openNodeId !== null} onClose={() => setOpenNodeId(null)} reduce={reduce}>
         {openNodeId && byId.get(openNodeId) && (
           <ClueCard
             clues={byId.get(openNodeId)!.clues}
             onGuess={onGuess}
             wrongNote={c.wrongNote}
             title={c.clueSheetTitle}
+            onClose={() => setOpenNodeId(null)}
           />
         )}
       </DecodeSheet>
@@ -386,6 +384,9 @@ function FinaleCard({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
+/* Centered decode modal: a fully-opaque dialog above a separate dim+blur
+   backdrop (so the dialog text stays crisp). Locks body scroll, closes on ✕ /
+   backdrop / Esc, traps Tab focus, and restores focus on close. */
 function DecodeSheet({
   open,
   onClose,
@@ -397,35 +398,80 @@ function DecodeSheet({
   reduce: boolean | null;
   children: React.ReactNode;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const restoreRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    const dialogEl = dialogRef.current;
+    restoreRef.current = document.activeElement as HTMLElement | null;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = dialogEl;
+      if (!root) return;
+      const f = root.querySelectorAll<HTMLElement>(
+        'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
+      );
+      if (f.length === 0) return;
+      const first = f[0];
+      const last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prevOverflow;
+      // Return focus to the trigger (if it's still around and outside the dialog).
+      const el = restoreRef.current;
+      if (el && document.contains(el) && !dialogEl?.contains(el)) el.focus?.();
+    };
+  }, [open]);
+
   return (
     <AnimatePresence>
       {open && (
-        <>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* dim + blur on the BACKDROP ONLY, so the dialog stays crisp */}
           <motion.div
-            className="fixed inset-0 z-50 bg-void/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-[#070B14]/80 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
+          {/* opaque centered dialog */}
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[55] mx-auto w-full max-w-lg rounded-t-3xl border border-line bg-card p-5 pb-8 shadow-[0_-24px_60px_-20px_rgba(0,0,0,0.85)]"
-            initial={reduce ? { opacity: 0 } : { y: "100%" }}
-            animate={reduce ? { opacity: 1 } : { y: 0 }}
-            exit={reduce ? { opacity: 0 } : { y: "100%" }}
-            transition={{ type: "spring", stiffness: 320, damping: 34 }}
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            className="relative z-10 max-h-[85vh] w-full max-w-[480px] overflow-auto rounded-2xl border border-verve-400/20 bg-[#0E1525] p-7 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+            animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: "spring", stiffness: 300, damping: 26 }}
           >
-            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-line" />
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute right-4 top-4 font-mono text-[11px] tracking-wider text-faint transition-colors hover:text-verve"
-            >
-              close ✕
-            </button>
             {children}
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
@@ -448,10 +494,9 @@ function OtherCrews({ currentTeamId }: { currentTeamId: string }) {
           return (
             <GlassCard key={t.teamId} accent={isMine} className="p-3">
               <div className="flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 flex-none rounded-full"
-                  style={{ backgroundColor: t.color }}
-                />
+                <span className="flex-none text-sm leading-none" aria-hidden>
+                  {teamEmoji(t.teamId)}
+                </span>
                 <span className="truncate font-display text-[13px] font-bold text-navy">
                   {t.name}
                 </span>

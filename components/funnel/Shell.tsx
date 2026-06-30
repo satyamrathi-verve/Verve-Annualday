@@ -13,10 +13,12 @@ interface ShellProps {
   index: number;
   canGoBack: boolean;
   onBack: () => void;
+  /** Optional top nav (page switcher) rendered on the right of the header. */
+  nav?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function Shell({ steps, index, canGoBack, onBack, children }: ShellProps) {
+export function Shell({ steps, index, canGoBack, onBack, nav, children }: ShellProps) {
   return (
     <div className="relative flex min-h-dvh flex-col">
       <header className="flex flex-none items-center gap-4 px-5 py-5 sm:px-8 lg:gap-6 lg:px-12 lg:py-6">
@@ -28,15 +30,18 @@ export function Shell({ steps, index, canGoBack, onBack, children }: ShellProps)
           priority
           className="h-12 w-auto sm:h-14 lg:h-16"
         />
-        {canGoBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="ml-auto font-mono text-sm tracking-widest text-faint transition-colors hover:text-verve lg:text-base"
-          >
-            ← Back
-          </button>
-        )}
+        <div className="ml-auto flex items-center gap-3 lg:gap-5">
+          {nav}
+          {canGoBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="font-mono text-sm tracking-widest text-faint transition-colors hover:text-verve lg:text-base"
+            >
+              ← Back
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="flex flex-none items-center gap-3 px-5 sm:px-8 lg:px-12">

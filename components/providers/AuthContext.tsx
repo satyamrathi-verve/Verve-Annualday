@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { getAuthBackend, type AuthMode, type Session } from "@/lib/auth";
-import { EmailAuthBackend } from "@/lib/auth/emailBackend";
+import { hydrateRoster } from "@/lib/data/config";
 
 interface AuthContextValue {
   session: Session | null;
@@ -31,21 +31,16 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [backend] = useState(() => getAuthBackend());
-  // Email-code fallback: in Google mode the active backend has no send/verify,
-  // but we still expose the OTP flow (for allowlisted external guests who can't
-  // use a Verve Google account). Reuse the active backend if it already does
-  // email; otherwise stand up a dedicated EmailAuthBackend on the same Supabase
-  // client. Both share Supabase, so verifyOtp's SIGNED_IN reaches backend.onChange.
-  const [emailBackend] = useState(() =>
-    backend.sendCode ? backend : new EmailAuthBackend(),
-  );
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let active = true;
-    backend
-      .getSession()
+    // Load the live roster/teams (Supabase, falling back to the JSON seed)
+    // BEFORE resolving the session — session enrichment matches the signed-in
+    // email against the roster, so the roster must be current first.
+    hydrateRoster()
+      .then(() => backend.getSession())
       .then((s) => {
         if (active) {
           setSession(s);
@@ -72,20 +67,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendCode = useCallback(
     async (email: string) => {
-      if (!emailBackend.sendCode) throw new Error("Email sign-in isn't available in this mode.");
-      await emailBackend.sendCode(email);
+      if (!backend.sendCode) throw new Error("Email sign-in isn't available in this mode.");
+      await backend.sendCode(email);
     },
-    [emailBackend],
+    [backend],
   );
 
   const verifyCode = useCallback(
     async (email: string, token: string) => {
-      if (!emailBackend.verifyCode) throw new Error("Email sign-in isn't available in this mode.");
-      const next = await emailBackend.verifyCode(email, token);
+      if (!backend.verifyCode) throw new Error("Email sign-in isn't available in this mode.");
+      const next = await backend.verifyCode(email, token);
       setSession(next);
       return next;
     },
-    [emailBackend],
+    [backend],
   );
 
   const signInAs = useCallback(

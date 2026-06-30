@@ -76,7 +76,7 @@ export function VibeCheck({ onNext }: { onNext: () => void }) {
 
           <p className="mt-3 font-display text-lg font-semibold text-navy">{t.sub}</p>
 
-          <div className="mt-6 border-l-2 border-gold/70 pl-4 text-[15px] leading-relaxed text-muted lg:text-base">
+          <div className="mt-6 border-l-2 border-gold/70 pl-4 text-[15px] leading-relaxed text-body lg:text-base">
             {t.body.map((p, i) => (
               <p key={i} className={i > 0 ? "mt-3" : undefined}>
                 {p}

@@ -47,8 +47,7 @@
       "sayam.doshi",
       "amol.bibwe",
       "abhishek.sonar",
-      "vishakha.jat",
-      "viren.sunil.khetani-2"
+      "vishakha.jat"
     ]
   },
   {
@@ -96,7 +95,6 @@
       "aditi.singh",
       "sakshi.ghodke",
       "harsha.rajput",
-      "arya.magar-2",
       "gagandeep.singh",
       "debarima.paul"
     ]
@@ -135,7 +133,7 @@
   },
   {
     "id": "demo",
-    "name": "Demo Team",
+    "name": "Project 9",
     "color": "#0d9488",
     "memberIds": [
       "satyam.rathi",

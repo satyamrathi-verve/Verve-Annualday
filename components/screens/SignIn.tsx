@@ -40,8 +40,9 @@ function GoogleSignIn() {
   const { signInWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Fallback for allowlisted guests who can't use a Verve Google account.
-  const [useEmail, setUseEmail] = useState(false);
+  // Secondary path: whitelisted external/Gmail addresses (e.g. the host) sign in
+  // with an email code instead of Google.
+  const [showCode, setShowCode] = useState(false);
 
   // One-time notice if we got here via the 15-min idle auto-logout.
   const [idleOut] = useState(() => {
@@ -60,10 +61,6 @@ function GoogleSignIn() {
       /* sessionStorage may be unavailable */
     }
   }, [idleOut]);
-
-  // Every hook above must run on every render — only switch to the email
-  // fallback AFTER them (an earlier return would skip hooks and crash React).
-  if (useEmail) return <EmailSignIn onUseGoogle={() => setUseEmail(false)} />;
 
   const go = async () => {
     setError(null);
@@ -91,7 +88,7 @@ function GoogleSignIn() {
       <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
 
       {c.body.length > 0 && (
-        <div className="mt-5 max-w-md border-l-2 border-gold/70 pl-4 text-left text-[15px] leading-relaxed text-muted">
+        <div className="mt-5 max-w-md border-l-2 border-gold/70 pl-4 text-left text-[15px] leading-relaxed text-body">
           {c.body.map((p, i) => (
             <p key={i} className={i > 0 ? "mt-3" : undefined}>
               {p}
@@ -112,21 +109,28 @@ function GoogleSignIn() {
       <p className="mt-3 font-mono text-[11px] leading-relaxed tracking-wider text-faint">
         {c.fine} · @{c.allowedDomain}
       </p>
-      <button
-        type="button"
-        onClick={() => setUseEmail(true)}
-        className="mt-4 font-mono text-[11px] tracking-wider text-faint underline-offset-4 transition-colors hover:text-verve hover:underline"
-      >
-        Sign in with a code instead →
-      </button>
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+
+      <div className="mt-6 w-full max-w-md border-t border-line/60 pt-5">
+        {showCode ? (
+          <EmailCodeFlow />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowCode(true)}
+            className="font-mono text-[11px] tracking-wider text-faint transition-colors hover:text-verve"
+          >
+            Using a non-Verve email? Sign in with a code →
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
-/* Real Verve-email sign-in (Supabase OTP / magic link). `onUseGoogle`, when
-   given, renders a link back to the Google screen (email is a fallback there). */
-function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
+/* Email-code flow (Supabase OTP) — the inner form only. Reused by `email` mode
+   and as a secondary option under Google sign-in for whitelisted addresses. */
+function EmailCodeFlow() {
   const c = event.signIn;
   const { sendCode, verifyCode } = useAuth();
   const [email, setEmail] = useState("");
@@ -136,9 +140,9 @@ function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
   const [error, setError] = useState<string | null>(null);
 
   const trimmed = email.trim().toLowerCase();
-  const allowedEmails = (c.allowedEmails ?? []).map((e) => e.toLowerCase());
   const domainOk =
-    trimmed.endsWith(`@${c.allowedDomain.toLowerCase()}`) || allowedEmails.includes(trimmed);
+    trimmed.endsWith(`@${c.allowedDomain.toLowerCase()}`) ||
+    c.allowedEmails.some((e) => e.toLowerCase() === trimmed);
 
   const send = async () => {
     setError(null);
@@ -162,8 +166,7 @@ function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
     setBusy(true);
     try {
       await verifyCode(trimmed, code.trim());
-      // On success, onAuthStateChange flips the session and this screen
-      // re-renders into the "Welcome" state with a Continue button.
+      // On success, onAuthStateChange flips the session and this screen unmounts.
     } catch (e) {
       setError((e as Error).message || "That code didn't work — check and retry.");
     } finally {
@@ -172,15 +175,9 @@ function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
   };
 
   return (
-    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
-      <p className="eyebrow">{c.eyebrow}</p>
-      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
-        {c.title}
-      </h1>
-      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
-
+    <div className="w-full">
       {stage === "email" ? (
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-3">
           <input
             type="email"
             inputMode="email"
@@ -194,18 +191,9 @@ function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
           <Button variant="gold" onClick={send} disabled={busy || trimmed.length === 0}>
             {busy ? "Sending…" : `${c.sendLabel} →`}
           </Button>
-          {onUseGoogle && (
-            <button
-              type="button"
-              onClick={onUseGoogle}
-              className="mt-1 font-mono text-[11px] tracking-wider text-faint underline-offset-4 transition-colors hover:text-verve hover:underline"
-            >
-              ← Use Google instead
-            </button>
-          )}
         </div>
       ) : (
-        <div className="mt-8 flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-3">
           <p className="font-mono text-[12px] leading-relaxed text-muted">
             {c.checkEmail.replace("{email}", trimmed)}
           </p>
@@ -242,6 +230,23 @@ function EmailSignIn({ onUseGoogle }: { onUseGoogle?: () => void }) {
       )}
 
       {error && <p className="mt-3 font-mono text-[12px] leading-relaxed text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+/* Real Verve-email sign-in screen (NEXT_PUBLIC_AUTH_MODE=email). */
+function EmailSignIn() {
+  const c = event.signIn;
+  return (
+    <div className="flex w-full max-w-lg flex-col items-center text-center lg:max-w-xl">
+      <p className="eyebrow">{c.eyebrow}</p>
+      <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
+        {c.title}
+      </h1>
+      <p className="mt-4 max-w-md text-base leading-relaxed text-muted lg:text-lg">{c.subtitle}</p>
+      <div className="mt-8 w-full">
+        <EmailCodeFlow />
+      </div>
     </div>
   );
 }

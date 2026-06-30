@@ -10,8 +10,10 @@ interface ClueCardProps {
   onGuess: (name: string) => boolean;
   /** Copy shown after a wrong guess. */
   wrongNote: string;
-  /** Mono header label for the sheet. */
+  /** Mono header label for the dialog. */
   title?: string;
+  /** Close the dialog (the ✕ button). */
+  onClose: () => void;
 }
 
 function ClueRow({ label, items }: { label: string; items: string[] }) {
@@ -21,16 +23,23 @@ function ClueRow({ label, items }: { label: string; items: string[] }) {
       <span className="mt-0.5 w-16 flex-none font-mono text-[10px] uppercase tracking-[0.18em] text-gold-deep">
         {label}
       </span>
-      <span className="text-[14px] leading-snug text-navy">{items.join(" · ")}</span>
+      <span className="text-[15px] leading-relaxed text-navy">{items.join(" · ")}</span>
     </div>
   );
 }
 
-export function ClueCard({ clues, onGuess, wrongNote, title = "Decode the canister" }: ClueCardProps) {
+export function ClueCard({
+  clues,
+  onGuess,
+  wrongNote,
+  title = "Decode the canister",
+  onClose,
+}: ClueCardProps) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
 
-  const hasClues =
+  const single = (clues.clue ?? "").trim();
+  const hasArrays =
     clues.hobbies.length > 0 || clues.quirks.length > 0 || clues.funFacts.length > 0;
 
   const submit = () => {
@@ -38,7 +47,7 @@ export function ClueCard({ clues, onGuess, wrongNote, title = "Decode the canist
     if (!name) return;
     const ok = onGuess(name);
     if (ok) {
-      // On success the parent closes the sheet; clear for the next canister.
+      // On success the parent closes the dialog; clear for the next canister.
       setValue("");
       setWrong(false);
     } else {
@@ -49,21 +58,31 @@ export function ClueCard({ clues, onGuess, wrongNote, title = "Decode the canist
 
   return (
     <div className="w-full">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
+      <div className="mb-4 flex items-center gap-2.5">
+        <span className="h-2 w-2 flex-none rounded-full bg-gold animate-pulse" />
         <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-gold-deep">{title}</p>
         <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.22em] text-faint">
           who is this?
         </span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="-mr-1.5 grid h-10 w-10 flex-none place-items-center rounded-lg text-base text-faint transition-colors hover:bg-white/5 hover:text-ink"
+        >
+          ✕
+        </button>
       </div>
 
       <motion.div
         animate={wrong ? { x: [0, -7, 7, -5, 5, 0] } : { x: 0 }}
         transition={{ duration: 0.4 }}
-        className="surface-card rounded-2xl p-5"
+        className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
       >
         <div className="flex flex-col gap-2.5">
-          {hasClues ? (
+          {single ? (
+            <p className="text-[15px] leading-relaxed text-navy">{single}</p>
+          ) : hasArrays ? (
             <>
               <ClueRow label="Hobbies" items={clues.hobbies} />
               <ClueRow label="Quirk" items={clues.quirks} />
@@ -83,7 +102,7 @@ export function ClueCard({ clues, onGuess, wrongNote, title = "Decode the canist
           e.preventDefault();
           submit();
         }}
-        className="mt-4 flex gap-2"
+        className="mt-5 flex gap-3"
       >
         <input
           type="text"
@@ -92,14 +111,16 @@ export function ClueCard({ clues, onGuess, wrongNote, title = "Decode the canist
           placeholder="Type their name…"
           autoComplete="off"
           autoFocus
-          className={`w-full rounded-xl border bg-card px-4 py-3 text-sm text-ink outline-none transition-colors ${
-            wrong ? "border-red-400 focus:border-red-400" : "border-line focus:border-verve-400"
+          className={`flex-1 rounded-xl border bg-surface px-4 py-3 text-sm text-ink outline-none transition placeholder:text-faint focus:ring-1 ${
+            wrong
+              ? "border-red-400 focus:border-red-400 focus:ring-red-400/50"
+              : "border-verve-400/30 focus:border-verve-400/60 focus:ring-verve-400/50"
           }`}
         />
         <button
           type="submit"
           disabled={!value.trim()}
-          className="flex-none rounded-xl bg-verve px-5 py-3 text-sm font-semibold text-white transition-opacity hover:bg-verve-glow disabled:opacity-40"
+          className="flex-none whitespace-nowrap rounded-xl bg-gradient-to-b from-[#F0BE55] to-[#E0A436] px-6 py-3 font-display text-sm font-semibold text-[#0e1a33] transition-opacity hover:opacity-95 disabled:opacity-40"
         >
           Guess
         </button>

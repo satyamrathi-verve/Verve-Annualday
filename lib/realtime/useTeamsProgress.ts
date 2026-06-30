@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { teams, getTeamMembers } from "@/lib/data/config";
+import { getTeams, getTeamMembers } from "@/lib/data/config";
 import { deriveWheel } from "./derive";
 import { getRealtimeBackend } from "./index";
 import type { GuessEdge } from "./types";
@@ -31,7 +31,7 @@ export function useTeamsProgress(intervalMs = 6000): TeamStanding[] {
 
     const refresh = async () => {
       const results = await Promise.all(
-        teams.map(async (t) => [t.id, await backend.readTeam(t.id)] as const),
+        getTeams().map(async (t) => [t.id, await backend.readTeam(t.id)] as const),
       );
       if (active) setEdgesByTeam(Object.fromEntries(results));
     };
@@ -46,7 +46,7 @@ export function useTeamsProgress(intervalMs = 6000): TeamStanding[] {
 
   return useMemo(
     () =>
-      teams.map((t) => {
+      getTeams().map((t) => {
         const ids = getTeamMembers(t.id).map((m) => m.id);
         const { greenCount, yellowCount } = deriveWheel(ids, edgesByTeam[t.id] ?? []);
         return {

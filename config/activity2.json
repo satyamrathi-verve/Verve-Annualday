@@ -1,0 +1,15 @@
+{
+  "_comment": "Activity 2 — one GitHub repo per team for the live commit leaderboard. Use the 'owner/repo' slug (NOT a full URL). The server route /api/commits reads commit counts from these via the GitHub API (token in GITHUB_TOKEN). 'eventStartIso' makes the board count only commits made during the event. Empty slug = team not linked yet.",
+  "eventStartIso": "2026-07-01T00:00:00Z",
+  "repos": {
+    "team1": "",
+    "team2": "",
+    "team3": "",
+    "team4": "",
+    "team5": "",
+    "team6": "",
+    "team7": "",
+    "team8": "",
+    "demo": ""
+  }
+}

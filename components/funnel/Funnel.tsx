@@ -1,28 +1,79 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Shell, type StepDef } from "./Shell";
+import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
+import { NavBar, type NavItem } from "./NavBar";
+import { useAppSettings } from "@/lib/data/settings";
+import { useVideos } from "@/lib/data/videos";
+import { event } from "@/lib/data/config";
 import { Landing } from "@/components/screens/Landing";
 import { VibeCheck } from "@/components/screens/VibeCheck";
 import { SignIn } from "@/components/screens/SignIn";
 import { Wait } from "@/components/screens/Wait";
+import { Brief } from "@/components/screens/Brief";
+import { GuessYourCrew } from "@/components/screens/GuessYourCrew";
+import { VideoBridge } from "@/components/screens/VideoBridge";
+import { GateScreen } from "@/components/screens/GateScreen";
+import { ProfileGallery } from "@/components/screens/ProfileGallery";
+import { ActivityOne } from "@/components/screens/ActivityOne";
+import { ActivityTwo } from "@/components/screens/ActivityTwo";
+import { Button } from "@/components/ui/Button";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useAuth } from "@/components/providers/AuthContext";
 
-// Pre-event teaser funnel. The Brief + Guess-Your-Crew (event-day) screens are
-// parked — their components still live under components/screens/ and can be
-// re-added here when the door opens for real on the 1st.
+// Teaser funnel → crew-guessing game → the two task arcs. Each arc is:
+//   short video → date-gated "wait for <date>" → intro video → the activity →
+//   closing video. The wait screens flip to a "continue" CTA the moment the host
+//   opens that activity's toggle.
 const STEPS: StepDef[] = [
   { key: "landing", title: "Cold open" },
   { key: "vibe", title: "The teasers" },
   { key: "signin", title: "The door" },
   { key: "wait", title: "Now we wait" },
+  { key: "brief", title: "The briefing" },
+  { key: "guess", title: "Guess your crew" },
+  { key: "wheelOutro", title: "Transmission" },
+  { key: "wait1", title: "Task 1 incoming" },
+  { key: "a1intro", title: "Task 1 brief" },
+  { key: "activity1", title: "About Me" },
+  { key: "a1outro", title: "Task 1 wrap" },
+  { key: "wait2", title: "Task 2 incoming" },
+  { key: "a2intro", title: "Task 2 brief" },
+  { key: "activity2", title: "Build the tool" },
+  { key: "bridge3", title: "Wrap" },
 ];
 
-const RESUME_KEY = "getaway.funnel.index";
+// Bump the suffix whenever STEPS' order/length changes, so a tab left open across
+// a deploy can't resolve a pre-change saved index onto a mismatched screen — a
+// stale read simply misses and falls back to the start (or the sign-in gate).
+const RESUME_KEY = "getaway.funnel.index.v2";
 // Where to land after a sign-out / idle auto-logout — the Google sign-in step.
 const SIGNIN_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "signin"));
+// The teasers reel — where the locked "Now We Wait" screen sends players to read whispers.
+const VIBE_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "vibe"));
+const GUESS_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "guess"));
+const ACTIVITY1_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity1"));
+const ACTIVITY2_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity2"));
+// Steps that require a session — a logged-out reload must not resume onto these.
+const AUTH_GATED = new Set([
+  "wait",
+  "brief",
+  "guess",
+  "wheelOutro",
+  "wait1",
+  "a1intro",
+  "activity1",
+  "a1outro",
+  "wait2",
+  "a2intro",
+  "activity2",
+  "bridge3",
+]);
+// Which nav tab each step lights up.
+const ACTIVITY1_KEYS = new Set(["wheelOutro", "wait1", "a1intro", "activity1", "a1outro"]);
+const ACTIVITY2_KEYS = new Set(["wait2", "a2intro", "activity2", "bridge3"]);
 
 export function Funnel() {
   // Wait for the persisted/auth session check before rendering the funnel. This
@@ -45,18 +96,21 @@ export function Funnel() {
 
 function FunnelInner() {
   const { session } = useAuth();
+  const reduce = useReducedMotion();
+  const { guessOpen: open, activity1Open, activity2Open, ready: settingsReady } = useAppSettings();
+  const { videos } = useVideos();
+  // Drives the self-destruct "char" overlay on every forward hand-off.
+  const [burning, setBurning] = useState(false);
 
   // Resume where we left off — so a Google/email redirect lands the user back on
   // the step they were on (signed in), instead of all the way at the start. But
-  // never resume onto the auth-gated "Now We Wait" step without a session (e.g.
-  // the cached session failed server validation on reload), which would strand a
-  // logged-out device on an inner screen — start at sign-in instead.
+  // never resume onto an auth-gated step without a session — start at sign-in.
   const [index, setIndex] = useState(() => {
     if (typeof window === "undefined") return 0;
     const saved = window.sessionStorage.getItem(RESUME_KEY);
     const parsed = saved ? parseInt(saved, 10) : 0;
     const n = Number.isFinite(parsed) && parsed >= 0 && parsed < STEPS.length ? parsed : 0;
-    if (!session && STEPS[n].key === "wait") return SIGNIN_INDEX;
+    if (!session && AUTH_GATED.has(STEPS[n].key)) return SIGNIN_INDEX;
     return n;
   });
 
@@ -67,10 +121,19 @@ function FunnelInner() {
   const next = () => go(Math.min(STEPS.length - 1, index + 1));
   const back = () => go(Math.max(0, index - 1));
 
-  // When the session ENDS while the tab is open (15-min idle auto-logout, manual
-  // sign-out, or a token refresh that discovers the user was deleted), throw back
-  // to the Google sign-in screen. The reload/fresh-load case is handled by the
-  // index initializer above.
+  // Forward hand-off: play the self-destruct burn, which advances the funnel one
+  // step under cover. Falls back to a plain advance when motion is reduced or
+  // mask-image is unsupported.
+  const ignite = () => {
+    if (reduce || !supportsMask) {
+      next();
+      return;
+    }
+    setBurning(true);
+  };
+
+  // When the session ENDS while the tab is open (idle auto-logout, manual
+  // sign-out, deleted user), throw back to the Google sign-in screen.
   const wasSignedIn = useRef(Boolean(session));
   useEffect(() => {
     const signedIn = Boolean(session);
@@ -81,9 +144,39 @@ function FunnelInner() {
     wasSignedIn.current = signedIn;
   }, [session]);
 
-  const vibeIndex = STEPS.findIndex((s) => s.key === "vibe");
-
   const key = STEPS[index].key;
+
+  // Top nav (page switcher). Only the pages the host has UNLOCKED and the player
+  // can actually open are shown — locked pages are hidden, not dimmed.
+  const navItems: NavItem[] = [];
+  if (session) {
+    navItems.push({ key: "vibe", label: "Whispers", onClick: () => go(VIBE_INDEX), active: key === "vibe" });
+    if (open && session.teamId) {
+      navItems.push({
+        key: "guess",
+        label: "The Wheel",
+        onClick: () => go(GUESS_INDEX),
+        active: key === "guess" || key === "brief",
+      });
+    }
+    if (activity1Open) {
+      navItems.push({
+        key: "activity1",
+        label: "About Me",
+        onClick: () => go(ACTIVITY1_INDEX),
+        active: ACTIVITY1_KEYS.has(key),
+      });
+    }
+    if (activity2Open) {
+      navItems.push({
+        key: "activity2",
+        label: "Build Dashboard",
+        onClick: () => go(ACTIVITY2_INDEX),
+        active: ACTIVITY2_KEYS.has(key),
+      });
+    }
+  }
+
   const screen = (() => {
     switch (key) {
       case "landing":
@@ -93,26 +186,138 @@ function FunnelInner() {
       case "signin":
         return <SignIn onNext={next} />;
       case "wait":
-        return <Wait onReplay={() => go(vibeIndex)} />;
+        return <Wait onNext={ignite} onWhispers={() => go(VIBE_INDEX)} />;
+      case "brief":
+        return <Brief onNext={ignite} />;
+      case "guess":
+        return <GuessYourCrew />;
+      case "wheelOutro":
+        return (
+          <VideoBridge
+            eyebrow="Transmission · incoming"
+            title="Crew assembled."
+            caption="The hunt's over — here's what comes next."
+            ctaLabel="Next step →"
+            onNext={ignite}
+            src={videos.wheelOutro}
+          />
+        );
+      case "wait1":
+        return (
+          <GateScreen
+            copy={event.taskGates.task1}
+            open={activity1Open}
+            ready={settingsReady}
+            onNext={ignite}
+          />
+        );
+      case "a1intro":
+        return (
+          <VideoBridge
+            eyebrow="Task 1 · briefing"
+            title="Your first task."
+            ctaLabel="Start Task 1 →"
+            onNext={ignite}
+            src={videos.a1intro}
+          />
+        );
+      case "activity1":
+        return <ActivityOne />;
+      case "a1outro":
+        return (
+          <VideoBridge
+            eyebrow="Task 1 · wrap"
+            title="Task 1 — that's a wrap."
+            caption="Nice work. One more thing before the next task…"
+            ctaLabel="Next step →"
+            onNext={ignite}
+            src={videos.a1outro}
+          />
+        );
+      case "wait2":
+        return (
+          <GateScreen
+            copy={event.taskGates.task2}
+            open={activity2Open}
+            ready={settingsReady}
+            onNext={ignite}
+          >
+            <ProfileGallery subtitle="Browse and open everyone's pages while you wait." />
+          </GateScreen>
+        );
+      case "a2intro":
+        return (
+          <VideoBridge
+            eyebrow="Task 2 · briefing"
+            title="Your next task."
+            ctaLabel="Start Task 2 →"
+            onNext={ignite}
+            src={videos.a2intro}
+          />
+        );
+      case "activity2":
+        return <ActivityTwo onComplete={ignite} />;
+      case "bridge3":
+        return (
+          <VideoBridge
+            eyebrow="Transmission · final"
+            title="That's a wrap."
+            caption="More soon. Keep it off the books."
+            src={videos.bridge3}
+          />
+        );
       default:
         return null;
     }
   })();
 
+  // Sequential "Continue" on the screens that don't carry their own forward CTA.
+  const forward =
+    key === "guess"
+      ? "Next step →"
+      : key === "activity1"
+        ? "Next step →"
+        : key === "activity2"
+          ? "Wrap up →"
+          : null;
+
   return (
-    <Shell steps={STEPS} index={index} canGoBack={index > 0} onBack={back}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={key}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="flex w-full justify-center"
-        >
-          {screen}
-        </motion.div>
-      </AnimatePresence>
-    </Shell>
+    <>
+      <Shell
+      steps={STEPS}
+      index={index}
+      canGoBack={index > 0}
+      onBack={back}
+      nav={<NavBar items={navItems} />}
+    >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={key}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="flex w-full justify-center"
+          >
+            {screen}
+          </motion.div>
+        </AnimatePresence>
+
+        {forward && (
+          <div className="mt-6 flex w-full justify-center">
+            <Button variant="gold" glow onClick={ignite}>
+              {forward}
+            </Button>
+          </div>
+        )}
+      </Shell>
+
+      {/* Self-destruct char overlay — covers each forward swap, then chars away to
+          reveal the next screen. Lives outside AnimatePresence so the exiting
+          screen's fade can't fade the fire. */}
+      {burning && (
+        <BurnTransition onCovered={next} onComplete={() => setBurning(false)} />
+      )}
+    </>
   );
 }
