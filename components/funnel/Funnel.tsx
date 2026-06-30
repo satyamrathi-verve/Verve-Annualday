@@ -190,7 +190,9 @@ function FunnelInner() {
       case "brief":
         return <Brief onNext={ignite} />;
       case "guess":
-        return <GuessYourCrew />;
+        // The "Next step →" CTA lives INSIDE the wheel and only appears once the
+        // team's whole wheel is green (see GuessYourCrew). No Funnel forward here.
+        return <GuessYourCrew onNext={ignite} />;
       case "wheelOutro":
         return (
           <VideoBridge
@@ -272,14 +274,14 @@ function FunnelInner() {
   })();
 
   // Sequential "Continue" on the screens that don't carry their own forward CTA.
+  // (The wheel's "Next step →" lives inside GuessYourCrew, gated on a full-green
+  // team — so it is intentionally absent here.)
   const forward =
-    key === "guess"
+    key === "activity1"
       ? "Next step →"
-      : key === "activity1"
-        ? "Next step →"
-        : key === "activity2"
-          ? "Wrap up →"
-          : null;
+      : key === "activity2"
+        ? "Wrap up →"
+        : null;
 
   return (
     <>
