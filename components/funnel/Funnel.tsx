@@ -194,8 +194,8 @@ function FunnelInner() {
       case "brief":
         return <Brief onNext={ignite} />;
       case "guess":
-        // The "Next step →" CTA lives INSIDE the wheel and only appears once the
-        // team's whole wheel is green (see GuessYourCrew). No Funnel forward here.
+        // The "Let's move ahead →" CTA lives INSIDE the wheel and only appears once
+        // the team's whole wheel is green (see GuessYourCrew). No Funnel forward here.
         return <GuessYourCrew onNext={ignite} />;
       case "wheelOutro":
         return (
@@ -203,7 +203,7 @@ function FunnelInner() {
             eyebrow="Transmission · incoming"
             title="Crew assembled."
             caption="The hunt's over. Here's what comes next."
-            ctaLabel="Next step →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.wheelOutro}
           />
@@ -222,7 +222,7 @@ function FunnelInner() {
           <VideoBridge
             eyebrow="Task 1 · briefing"
             title="Your first task."
-            ctaLabel="Start Task 1 →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a1intro}
           />
@@ -235,7 +235,7 @@ function FunnelInner() {
             eyebrow="Task 1 · wrap"
             title="Task 1: that's a wrap."
             caption="Nice work. One more thing before the next task…"
-            ctaLabel="Next step →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a1outro}
           />
@@ -256,7 +256,7 @@ function FunnelInner() {
           <VideoBridge
             eyebrow="Task 2 · briefing"
             title="Your next task."
-            ctaLabel="Start Task 2 →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a2intro}
           />
@@ -278,8 +278,8 @@ function FunnelInner() {
   })();
 
   // Sequential "Continue" on the screens that don't carry their own forward CTA.
-  // (The wheel's "Next step →" lives inside GuessYourCrew, gated on a full-green
-  // team, so it is intentionally absent here.)
+  // (The wheel's "Let's move ahead →" lives inside GuessYourCrew, gated on a
+  // full-green team, so it is intentionally absent here.)
   // On Activity 1 the CTA only appears once THIS player has submitted their link,
   // so nobody moves on before they've built and shared a page.
   const a1Submitted =
@@ -290,7 +290,7 @@ function FunnelInner() {
         ? "Let's move ahead →"
         : null
       : key === "activity2"
-        ? "Wrap up →"
+        ? "Let's move ahead →"
         : null;
 
   return (

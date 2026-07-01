@@ -267,22 +267,21 @@
       "lockedEyebrow": "Task 1 · locked",
       "lockedTitle": "Wait for 3 July.",
       "lockedBody": [
-        "Your first task drops on the 3rd. Keep this page open; it lights up the instant the host opens it."
+        "Now we wait for 3 July to finally know our Off The Books project."
       ],
-      "openEyebrow": "The wait is over.",
-      "openTitle": "Your first task is live.",
-      "cta": "Continue to Task 1 →"
+      "openEyebrow": "The wait is finally over.",
+      "openTitle": "The suspense is about to unveil.",
+      "cta": "Let's move ahead →"
     },
     "task2": {
       "lockedEyebrow": "Task 2 · locked",
       "lockedTitle": "Wait for 6 July.",
       "lockedBody": [
-        "Task 2 opens on the 6th. While you wait, explore everyone's profiles below.",
-        "This page flips the moment the host opens the next task."
+        "While you wait, explore everyone's profiles below."
       ],
       "openEyebrow": "The wait is over.",
-      "openTitle": "Time for the next task.",
-      "cta": "Move to the next task →"
+      "openTitle": "The time has arrived.",
+      "cta": "Let's move ahead →"
     }
   },
   "superAdmins": [
