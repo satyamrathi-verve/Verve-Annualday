@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSettings } from "@/lib/data/settings";
+import { getSettingsId } from "@/lib/data/settingsId";
 import { setActivityOpen, setGuessOpen } from "@/lib/data/adminApi";
 import { useSubmissions } from "@/lib/data/activity1";
 import { useCommits, useTeamSubmissions } from "@/lib/data/activity2";
@@ -20,6 +21,7 @@ export function ActivitiesAdmin() {
   const s = useAppSettings();
   return (
     <div className="mx-auto mt-6 flex w-full max-w-4xl flex-col gap-4">
+      <EnvBadge />
       <ToggleCard
         eyebrow="Crew hunt"
         title="The Wheel"
@@ -54,6 +56,31 @@ export function ActivitiesAdmin() {
       >
         <Activity2Board />
       </ToggleCard>
+    </div>
+  );
+}
+
+/* Which app_settings row these toggles write — and on what host. Read after
+   mount (window isn't available during prerender). Loud red on LIVE so nobody
+   flips the real event thinking they're on the test site. */
+function EnvBadge() {
+  const [info, setInfo] = useState<{ id: 1 | 2; host: string } | null>(null);
+  useEffect(() => {
+    setInfo({ id: getSettingsId(), host: window.location.hostname });
+  }, []);
+  if (!info) return null;
+  const isTest = info.id === 2;
+  return (
+    <div
+      className={clsx(
+        "rounded-xl border px-4 py-2 font-mono text-[11px]",
+        isTest
+          ? "border-node-live/40 bg-node-live/10 text-node-live"
+          : "border-red-500/40 bg-red-500/10 text-red-300",
+      )}
+    >
+      Toggling <b>{isTest ? "TEST" : "LIVE"}</b> — writes app_settings id={info.id}
+      {!isTest && " · these changes hit the REAL event"} · host {info.host}
     </div>
   );
 }
