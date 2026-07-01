@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useSubmissions } from "@/lib/data/activity1";
 import { useAppSettings } from "@/lib/data/settings";
-import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
+import { getTeams, getTeamMembers } from "@/lib/data/config";
 import { teamEmoji, TEST_TEAM_ID } from "@/lib/data/teamMeta";
 import { GlassCard } from "@/components/ui/GlassCard";
 
@@ -24,14 +24,14 @@ export function ProfileGallery({ subtitle }: { subtitle?: string }) {
   const count = submissions.length;
 
   // The test crew (Project 9) is hidden until the super admin flips it on.
+  // Unplaced members (no team) are left off the dashboard entirely.
   const teams = getTeams().filter((t) => showTestTeam || t.id !== TEST_TEAM_ID);
-  const unplaced = getRosterSorted().filter((m) => !m.teamId);
-  const groups = [
-    ...teams.map((t) => ({ id: t.id, name: t.name, color: t.color, members: getTeamMembers(t.id) })),
-    ...(unplaced.length
-      ? [{ id: "__unplaced__", name: "Unplaced", color: "#9aa4b2", members: unplaced }]
-      : []),
-  ];
+  const groups = teams.map((t) => ({
+    id: t.id,
+    name: t.name,
+    color: t.color,
+    members: getTeamMembers(t.id),
+  }));
 
   return (
     <div>
