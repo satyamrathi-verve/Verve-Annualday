@@ -90,7 +90,7 @@ export function ClueCard({
             </>
           ) : (
             <p className="font-mono text-[12px] leading-relaxed text-faint">
-              Clues coming soon — they&apos;ll show here once added.
+              Clues coming soon. They&apos;ll show here once added.
             </p>
           )}
         </div>

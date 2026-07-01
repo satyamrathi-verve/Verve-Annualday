@@ -6,6 +6,7 @@ import { Shell, type StepDef } from "./Shell";
 import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
 import { NavBar, type NavItem } from "./NavBar";
 import { useAppSettings } from "@/lib/data/settings";
+import { useSubmissions } from "@/lib/data/activity1";
 import { useVideos } from "@/lib/data/videos";
 import { event } from "@/lib/data/config";
 import { Landing } from "@/components/screens/Landing";
@@ -99,6 +100,9 @@ function FunnelInner() {
   const reduce = useReducedMotion();
   const { guessOpen: open, activity1Open, activity2Open, ready: settingsReady } = useAppSettings();
   const { videos } = useVideos();
+  // Whether THIS player has submitted their Activity 1 link — the "let's move
+  // ahead" CTA only appears once they have, so nobody skips past unbuilt.
+  const { submissions } = useSubmissions();
   // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
@@ -190,16 +194,16 @@ function FunnelInner() {
       case "brief":
         return <Brief onNext={ignite} />;
       case "guess":
-        // The "Next step →" CTA lives INSIDE the wheel and only appears once the
-        // team's whole wheel is green (see GuessYourCrew). No Funnel forward here.
+        // The "Let's move ahead →" CTA lives INSIDE the wheel and only appears once
+        // the team's whole wheel is green (see GuessYourCrew). No Funnel forward here.
         return <GuessYourCrew onNext={ignite} />;
       case "wheelOutro":
         return (
           <VideoBridge
             eyebrow="Transmission · incoming"
             title="Crew assembled."
-            caption="The hunt's over — here's what comes next."
-            ctaLabel="Next step →"
+            caption="The hunt's over. Here's what comes next."
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.wheelOutro}
           />
@@ -218,7 +222,7 @@ function FunnelInner() {
           <VideoBridge
             eyebrow="Task 1 · briefing"
             title="Your first task."
-            ctaLabel="Start Task 1 →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a1intro}
           />
@@ -229,9 +233,9 @@ function FunnelInner() {
         return (
           <VideoBridge
             eyebrow="Task 1 · wrap"
-            title="Task 1 — that's a wrap."
+            title="Task 1: that's a wrap."
             caption="Nice work. One more thing before the next task…"
-            ctaLabel="Next step →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a1outro}
           />
@@ -252,7 +256,7 @@ function FunnelInner() {
           <VideoBridge
             eyebrow="Task 2 · briefing"
             title="Your next task."
-            ctaLabel="Start Task 2 →"
+            ctaLabel="Let's move ahead →"
             onNext={ignite}
             src={videos.a2intro}
           />
@@ -274,13 +278,19 @@ function FunnelInner() {
   })();
 
   // Sequential "Continue" on the screens that don't carry their own forward CTA.
-  // (The wheel's "Next step →" lives inside GuessYourCrew, gated on a full-green
-  // team — so it is intentionally absent here.)
+  // (The wheel's "Let's move ahead →" lives inside GuessYourCrew, gated on a
+  // full-green team, so it is intentionally absent here.)
+  // On Activity 1 the CTA only appears once THIS player has submitted their link,
+  // so nobody moves on before they've built and shared a page.
+  const a1Submitted =
+    Boolean(session?.memberId) && submissions.some((s) => s.memberId === session?.memberId);
   const forward =
     key === "activity1"
-      ? "Next step →"
+      ? a1Submitted
+        ? "Let's move ahead →"
+        : null
       : key === "activity2"
-        ? "Wrap up →"
+        ? "Let's move ahead →"
         : null;
 
   return (

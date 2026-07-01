@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSettings } from "@/lib/data/settings";
-import { setActivityOpen, setGuessOpen } from "@/lib/data/adminApi";
+import { getSettingsId } from "@/lib/data/settingsId";
+import { setActivityOpen, setGuessOpen, setShowTestTeam } from "@/lib/data/adminApi";
 import { useSubmissions } from "@/lib/data/activity1";
 import { useCommits, useTeamSubmissions } from "@/lib/data/activity2";
 import { getTeams } from "@/lib/data/config";
@@ -20,12 +21,13 @@ export function ActivitiesAdmin() {
   const s = useAppSettings();
   return (
     <div className="mx-auto mt-6 flex w-full max-w-4xl flex-col gap-4">
+      <EnvBadge />
       <ToggleCard
         eyebrow="Crew hunt"
         title="The Wheel"
         on={s.guessOpen}
-        onText="Open — players can enter the wheel from the wait screen."
-        offText="Closed — players are held on “Now We Wait”."
+        onText="Open: players can enter the wheel from the wait screen."
+        offText="Closed: players are held on “Now We Wait”."
         write={(v) => setGuessOpen(v)}
       >
         <p className="font-mono text-[11px] text-faint">Live progress is on the ● live board tab.</p>
@@ -35,8 +37,8 @@ export function ActivitiesAdmin() {
         eyebrow="Activity 1"
         title="About Me · profile builder"
         on={s.activity1Open}
-        onText="Open — the guide + gallery are available to players."
-        offText="Closed — hidden from players."
+        onText="Open: the guide + gallery are available to players."
+        offText="Closed: hidden from players."
         write={(v) => setActivityOpen(1, v)}
         collapsible
       >
@@ -47,13 +49,47 @@ export function ActivitiesAdmin() {
         eyebrow="Activity 2"
         title="Build the Tool That Finally Fits"
         on={s.activity2Open}
-        onText="Open — players can clone, build, and watch the live commit board."
-        offText="Closed — hidden from players."
+        onText="Open: players can clone, build, and watch the live commit board."
+        offText="Closed: hidden from players."
         write={(v) => setActivityOpen(2, v)}
         collapsible
       >
         <Activity2Board />
       </ToggleCard>
+
+      <ToggleCard
+        eyebrow="Test crew"
+        title="Project 9 · the test team"
+        on={s.showTestTeam}
+        onText="Visible: Project 9 shows on the player gallery and live board."
+        offText="Hidden: players never see Project 9 on the gallery or live board."
+        write={(v) => setShowTestTeam(v)}
+      />
+    </div>
+  );
+}
+
+/* Which app_settings row these toggles write — and on what host. Read after
+   mount (window isn't available during prerender). Loud red on LIVE so nobody
+   flips the real event thinking they're on the test site. */
+function EnvBadge() {
+  const [info, setInfo] = useState<{ id: 1 | 2; host: string } | null>(null);
+  useEffect(() => {
+    setInfo({ id: getSettingsId(), host: window.location.hostname });
+  }, []);
+  if (!info) return null;
+  const isTest = info.id === 2;
+  return (
+    <div
+      className={clsx(
+        "rounded-xl border px-4 py-2 font-mono text-[11px]",
+        isTest
+          ? "border-node-live/40 bg-node-live/10 text-node-live"
+          : "border-red-500/40 bg-red-500/10 text-red-300",
+      )}
+    >
+      Toggling <b>{isTest ? "TEST" : "LIVE"}</b> writes app_settings id={info.id}
+      {!isTest && " · these changes hit the REAL event"} · host {info.host}
     </div>
   );
 }

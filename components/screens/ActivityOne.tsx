@@ -28,7 +28,7 @@ const GUIDE: GuideStep[] = [
       "Open code.visualstudio.com in your browser.",
       "Click the big blue Download button for your computer (Windows or Mac).",
       "Open the downloaded file and follow the installer (just keep clicking Next / Continue).",
-      "Open VS Code once it's installed — you'll see a welcome screen.",
+      "Open VS Code once it's installed, and you'll see a welcome screen.",
     ],
   },
   {
@@ -51,8 +51,8 @@ const GUIDE: GuideStep[] = [
   {
     title: "Give Claude the real you 🪪",
     body: [
-      "The page is only as good as what Claude knows about you — so feed it your real details.",
-      "Open your LinkedIn profile and your résumé. Copy the highlights — your role, experience, skills, achievements — and keep them handy for the next step.",
+      "The page is only as good as what Claude knows about you, so feed it your real details.",
+      "Open your LinkedIn profile and your résumé. Copy the highlights (your role, experience, skills, achievements) and keep them handy for the next step.",
       "Tip: you can paste your LinkedIn URL and a few lines from your résumé straight into the prompt; Claude will pull the best bits into your page.",
     ],
   },
@@ -60,19 +60,19 @@ const GUIDE: GuideStep[] = [
     title: "Ask Claude Code to build your profile",
     body: [
       "Open Claude Code (click the Claude icon in the left sidebar, or press Cmd/Ctrl+Esc).",
-      "Paste the prompt below into Claude Code and fill in your details in the [brackets] — including your LinkedIn + résumé highlights from the last step. Hit Enter and let it create an index.html file.",
-      "To preview it: in the file list, double-click index.html — it opens in your browser. Don't love it? Just tell Claude ‘make it more colourful’, ‘bigger photo’, ‘add a projects section’, etc., until it looks great.",
+      "Paste the prompt below into Claude Code and fill in your details in the [brackets], including your LinkedIn + résumé highlights from the last step. Hit Enter and let it create an index.html file.",
+      "To preview it: in the file list, double-click index.html and it opens in your browser. Don't love it? Just tell Claude ‘make it more colourful’, ‘bigger photo’, ‘add a projects section’, etc., until it looks great.",
     ],
     snippet:
-      "Create a single-file index.html ‘About Me’ page for me — modern, colourful, mobile-friendly, no build tools, everything inline. I'm [Your Name], I work in [Your Team] at Verve Advisory. Use this real info about me and pull the best parts in — LinkedIn: [paste your LinkedIn URL], and from my résumé: [paste a few lines — role, experience, key skills, achievements]. Include: a big header with my name + role, a circular photo placeholder, a 2-3 line bio, my hobbies ([list]), 3 fun facts ([list]), my favourite quote, and buttons linking to [LinkedIn / Instagram]. Use a nice font and a soft gradient background.",
+      "Here's the project: I'm building a personal ‘About Me’ web page. It should be one self-contained index.html file (no build tools, everything inline) that I'll put online with Vercel later, so anyone can open it from a link. Please build that page for me: modern, colourful, mobile-friendly. I'm [Your Name], I work in [Your Team] at Verve Advisory. Use this real info about me and pull the best parts in. LinkedIn: [paste your LinkedIn URL]. From my résumé: [paste a few lines: role, experience, key skills, achievements]. Include: a big header with my name and role, a circular photo placeholder, a 2 to 3 line bio, my hobbies ([list]), 3 fun facts ([list]), my favourite quote, and buttons linking to [LinkedIn / Instagram]. Use a nice font and a soft gradient background.",
   },
   {
     title: "Put it online with Vercel (free)",
     body: [
       "First make a free account: open vercel.com → Sign Up → ‘Continue with GitHub’ (or email).",
-      "Now the easy part — ask Claude Code to deploy it for you. Paste the prompt below.",
-      "A terminal will open. The first time, it asks you to log into Vercel — press Enter, authorise in the browser, then return. Accept the default answers (just press Enter) for any questions.",
-      "When it finishes, it prints a link ending in .vercel.app — that's your live page! Open it to check.",
+      "Now the easy part: ask Claude Code to deploy it for you. Paste the prompt below.",
+      "A terminal will open. The first time, it asks you to log into Vercel. Press Enter, authorise in the browser, then return. Accept the default answers (just press Enter) for any questions.",
+      "When it finishes, it prints a link ending in .vercel.app. That's your live page! Open it to check.",
     ],
     snippet: "Deploy this folder to Vercel and give me the final public https://….vercel.app link.",
   },
@@ -81,7 +81,16 @@ const GUIDE: GuideStep[] = [
     body: [
       "Copy your https://….vercel.app link.",
       "Paste it in the box below and hit Submit.",
-      "That's it — your profile joins the gallery, and you can browse everyone else's. 🎉",
+      "That's it. Your profile joins the gallery, and you can browse everyone else's. 🎉",
+    ],
+  },
+  {
+    title: "Keep making it better (until the deadline)",
+    body: [
+      "You're not locked in. Any time before the deadline, jump back into the same Claude Code chat and keep improving your page.",
+      "Try things like: “add a projects section”, “use a nicer font”, “make the colours pop”, “add a little animation”.",
+      "When you like it, ask Claude to deploy again. Your live link updates instantly, so there's nothing else to resubmit.",
+      "Make it the best page you can. This is your corner of the gallery. ✨",
     ],
   },
 ];
@@ -103,7 +112,7 @@ export function ActivityOne() {
           Build your <span className="text-gold-deep">About-Me</span> page.
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-muted">
-          You&apos;ll make your own little website and put it online — with an AI assistant doing the
+          You&apos;ll make your own little website and put it online, with an AI assistant doing the
           hard parts. Follow the steps, then drop your link below.
         </p>
       </div>
@@ -220,7 +229,7 @@ function SubmitBox({ memberId, current }: { memberId: string; current: string })
   return (
     <GlassCard accent className="p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
-        {current ? "Your profile is in — update it anytime" : "Submit your live link"}
+        {current ? "Your profile is in. Update it anytime." : "Submit your live link"}
       </p>
       <form
         onSubmit={(e) => {

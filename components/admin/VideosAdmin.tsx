@@ -35,7 +35,7 @@ export function VideosAdmin() {
       <div className="surface-card rounded-2xl p-4">
         <p className="font-mono text-[11px] leading-relaxed text-muted">
           Host each clip in Supabase Storage (public <span className="text-navy">videos</span> bucket)
-          or any CDN, then paste its public URL here. Changes go live instantly — no redeploy.
+          or any CDN, then paste its public URL here. Changes go live instantly, no redeploy.
         </p>
       </div>
 

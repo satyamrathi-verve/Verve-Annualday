@@ -9,6 +9,10 @@ export interface TeamTheme {
   emoji: string;
 }
 
+/** The throwaway test crew (Project 9). Hidden from player dashboards unless the
+ *  super admin flips the "show test team" toggle. */
+export const TEST_TEAM_ID = "demo";
+
 export const TEAM_THEME: Record<string, TeamTheme> = {
   team1: { name: "Project 1", emoji: "🚀" },
   team2: { name: "Project 2", emoji: "🎲" },

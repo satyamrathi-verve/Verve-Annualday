@@ -1,6 +1,6 @@
 "use client";
 
-import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
+import { getTeams, getTeamMembers } from "@/lib/data/config";
 import { teamEmoji } from "@/lib/data/teamMeta";
 import { clsx } from "@/lib/clsx";
 
@@ -21,10 +21,10 @@ interface Group {
 
 /*
   Reusable per-activity status dashboard for the super admin: every team (incl.
-  the demo team — active for all activities) as a card, plus an "Unplaced" card
-  for roster members not on a team (they can still do the activity), each player
-  marked done/pending, with per-team completion bars and overall totals. Activity
-  1 passes submission links; Activity 2 passes an empty map + a note for now.
+  the demo team, active for all activities) as a card, each player marked
+  done/pending, with per-team completion bars and overall totals. Roster members
+  not on a team (unplaced) are left off the board. Activity 1 passes submission
+  links; Activity 2 passes an empty map + a note for now.
 */
 export function ActivityStatusBoard({
   doneByMember,
@@ -33,20 +33,14 @@ export function ActivityStatusBoard({
   doneByMember: Map<string, MemberStatus>;
   pendingNote?: string;
 }) {
-  const teams = getTeams(); // demo team included — active for all activities
-  const unplaced = getRosterSorted().filter((m) => !m.teamId);
+  const teams = getTeams(); // demo team included, active for all activities
 
-  const groups: Group[] = [
-    ...teams.map((t) => ({
-      id: t.id,
-      name: t.name,
-      color: t.color,
-      members: getTeamMembers(t.id),
-    })),
-    ...(unplaced.length
-      ? [{ id: "__unplaced__", name: "Unplaced", color: "#9aa4b2", members: unplaced }]
-      : []),
-  ];
+  const groups: Group[] = teams.map((t) => ({
+    id: t.id,
+    name: t.name,
+    color: t.color,
+    members: getTeamMembers(t.id),
+  }));
 
   const allMembers = groups.flatMap((g) => g.members);
   const total = allMembers.length;
