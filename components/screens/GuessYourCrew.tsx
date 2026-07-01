@@ -87,12 +87,15 @@ function CrewBoard({
   // guessed it OR it's already confirmed green.
   const myGuessedSet = useMemo(() => new Set(wheel.myGuessed), [wheel.myGuessed]);
   const myTargetSet = useMemo(() => new Set(wheel.myTargets), [wheel.myTargets]);
+  // A target stays actionable until I've guessed it MYSELF. It does NOT drop off
+  // just because it went green via someone else — I still need to guess a
+  // teammate who guessed me to turn my OWN canister green.
   const pendingTargets = useMemo(
     () =>
       wheel.myTargets
         .map((id) => byId.get(id))
         .filter((m): m is WheelMember => Boolean(m))
-        .filter((m) => !myGuessedSet.has(m.id) && m.status !== "green"),
+        .filter((m) => !myGuessedSet.has(m.id)),
     [wheel.myTargets, byId, myGuessedSet],
   );
 

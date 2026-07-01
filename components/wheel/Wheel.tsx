@@ -21,8 +21,9 @@ interface WheelProps {
   Vegas marquee wheel. Crew members are pie wedges ringed by chasing marquee
   bulbs, with a glowing hub medallion and a pointer up top. Status drives the
   wedge colour: grey → idle, yellow → "yours" (amber, awaiting their guess
-  back), green → "mutual". Clicking an actionable idle wedge opens the decode
-  sheet. Every animation is gated behind prefers-reduced-motion. Scales 4–~12.
+  back), green → "mutual". Clicking any of the viewer's assigned target wedges
+  (any colour) opens the decode sheet. Every animation is gated behind
+  prefers-reduced-motion. Scales 4–~12.
 */
 
 const VB = 420;
@@ -125,41 +126,50 @@ export function Wheel({
 
           const isMutual = m.status === "green";
           const isYours = m.status === "yellow";
-          const isIdle = m.status === "grey";
-          const actionable = isIdle && Boolean(actionableIds?.has(m.id)) && Boolean(onNodeClick);
+          // Actionable = one of the viewer's assigned targets they haven't guessed
+          // yet — clickable regardless of the target's global colour.
+          const actionable = Boolean(actionableIds?.has(m.id)) && Boolean(onNodeClick);
           const hovered = actionable && hoverId === m.id;
 
-          const fill = isMutual
-            ? MUTUAL
-            : isYours
-              ? YOURS
-              : actionable
-                ? hovered
-                  ? ACTIONABLE_HOVER
-                  : ACTIONABLE
+          // A viewer's own targets ALWAYS render as their "to-guess" state — a
+          // bright blue wedge with a HIDDEN name — even if that person is already
+          // green via someone else, so the viewer can still decode + guess them
+          // (and complete their own mutual). Everyone NOT assigned to guess that
+          // person sees the confirmed green + revealed name as normal.
+          const fill = actionable
+            ? hovered
+              ? ACTIONABLE_HOVER
+              : ACTIONABLE
+            : isMutual
+              ? MUTUAL
+              : isYours
+                ? YOURS
                 : slot % 2 === 0
                   ? IDLE_A
                   : IDLE_B;
 
-          const onColored = isYours || isMutual;
+          const onColored = !actionable && (isYours || isMutual);
           const labelColor = onColored ? "#0A0E1A" : "#C4CDE6";
-          // Reveal the name only once mutual; pending/idle stay "?" to avoid spoilers.
-          const text = m.isSelf ? "YOU" : isMutual ? firstName(m.displayName) : "?";
+          // Names reveal only on confirmed (green) canisters — and only to viewers
+          // who DON'T still have to guess that person; your own targets stay "?".
+          const text = m.isSelf ? "YOU" : !actionable && isMutual ? firstName(m.displayName) : "?";
 
-          const glowClass = reduce
-            ? undefined
-            : isMutual
-              ? "animate-glow-green"
-              : isYours
-                ? "animate-glow-amber"
-                : undefined;
-          const staticGlow = reduce
-            ? isMutual
-              ? "drop-shadow(0 0 7px rgba(91,230,160,.7))"
-              : isYours
-                ? "drop-shadow(0 0 7px rgba(224,164,54,.7))"
-                : undefined
-            : undefined;
+          const glowClass =
+            reduce || actionable
+              ? undefined
+              : isMutual
+                ? "animate-glow-green"
+                : isYours
+                  ? "animate-glow-amber"
+                  : undefined;
+          const staticGlow =
+            !actionable && reduce
+              ? isMutual
+                ? "drop-shadow(0 0 7px rgba(91,230,160,.7))"
+                : isYours
+                  ? "drop-shadow(0 0 7px rgba(224,164,54,.7))"
+                  : undefined
+              : undefined;
 
           return (
             <g key={m.id}>
