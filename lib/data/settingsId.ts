@@ -1,15 +1,27 @@
 /*
-  Which app_settings row this deployment reads/writes.
+  Which app_settings row this deployment reads/writes: id=1 = LIVE (production),
+  id=2 = the isolated TEST deployment. Flipping toggles on one row never touches
+  the other, so testing open/close on the test site can't move the live site.
 
-  There are two rows in Supabase: id=1 is the LIVE (production) environment,
-  id=2 is the TEST deployment. Which one a build talks to is frozen at BUILD
-  time via NEXT_PUBLIC_APP_ENV — the reference below must stay a direct
-  `process.env.NEXT_PUBLIC_APP_ENV` lookup so Next inlines it into the browser
-  bundle (a computed/aliased lookup would NOT be inlined).
+  The row is chosen at RUNTIME from the browser host, so no build-time flag or
+  Cloud Build trigger change is needed (the live and test services build the
+  same image). An explicit NEXT_PUBLIC_APP_ENV still wins if it's ever set at
+  build time (direct process.env ref so Next can inline it).
 
-  Default is 1: any build that does NOT explicitly set NEXT_PUBLIC_APP_ENV=test
-  targets the live row. This keeps the backup→main merge safe — main never
-  carries the test flag, so live always stays on id=1. Only the test service's
-  build passes NEXT_PUBLIC_APP_ENV=test.
+  Live-safe by construction: the default is 1, and only a host explicitly listed
+  in TEST_HOSTS returns 2. The live host is never listed, so production always
+  stays on id=1 — including under any future custom domain. Merge-safe too: the
+  same code runs on both branches; behaviour is keyed off the host, not the code.
 */
-export const SETTINGS_ID = process.env.NEXT_PUBLIC_APP_ENV === "test" ? 2 : 1;
+
+// Cloud Run hosts (add any custom domains here) that ARE the test deployment.
+const TEST_HOSTS = new Set<string>([
+  "test-1041806466019.europe-west1.run.app",
+]);
+
+export function getSettingsId(): 1 | 2 {
+  if (process.env.NEXT_PUBLIC_APP_ENV === "test") return 2;
+  if (process.env.NEXT_PUBLIC_APP_ENV === "production") return 1;
+  if (typeof window !== "undefined" && TEST_HOSTS.has(window.location.hostname)) return 2;
+  return 1;
+}

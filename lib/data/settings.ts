@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
-import { SETTINGS_ID } from "@/lib/data/settingsId";
+import { getSettingsId } from "@/lib/data/settingsId";
 
 /*
   Live app settings, backed by public.app_settings. The row is chosen by
-  SETTINGS_ID (id=1 live, id=2 test) so the test deployment's toggles are
+  getSettingsId() (id=1 live, id=2 test) so the test deployment's toggles are
   isolated from live. Holds the crew-guessing toggle plus each activity's
   open/close flag. The super admin flips them from the control panel; players
   see changes instantly.
@@ -46,6 +46,7 @@ export function useAppSettings(): AppSettings {
       return;
     }
     let active = true;
+    const settingsId = getSettingsId();
 
     const apply = (row: SettingsRow | null | undefined) => {
       if (!row) return;
@@ -59,7 +60,7 @@ export function useAppSettings(): AppSettings {
       const { data, error } = await supabase
         .from("app_settings")
         .select("*")
-        .eq("id", SETTINGS_ID)
+        .eq("id", settingsId)
         .maybeSingle();
       if (!active) return;
       if (!error) apply(data as SettingsRow);
@@ -69,10 +70,10 @@ export function useAppSettings(): AppSettings {
     void read();
 
     const channel = supabase
-      .channel(`app_settings:${SETTINGS_ID}:${++channelSeq}`)
+      .channel(`app_settings:${settingsId}:${++channelSeq}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "app_settings", filter: `id=eq.${SETTINGS_ID}` },
+        { event: "*", schema: "public", table: "app_settings", filter: `id=eq.${settingsId}` },
         (payload) => {
           if (!active) return;
           const next = payload.new as SettingsRow | null;
