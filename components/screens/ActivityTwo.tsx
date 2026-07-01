@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { getTeams, getTeamMembers } from "@/lib/data/config";
@@ -109,8 +109,38 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
         </p>
       </div>
 
+      {/* What you're building — the finished tool to aim for */}
+      <GlassCard className="mt-8 p-5">
+        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
+          What you&apos;re building
+        </p>
+        <p className="mt-3 text-[15px] leading-relaxed text-body">
+          An <span className="font-semibold text-navy">AR Manager</span> — the tool that finally fits
+          how Verve chases what it&apos;s owed. By the end you should have a working app, running on
+          your laptop, that an AR analyst could actually sit down and use:
+        </p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          <BriefItem title="Customer Master">
+            every customer, their contact + credit terms, searchable.
+          </BriefItem>
+          <BriefItem title="Invoices">
+            all invoices with status (paid / due / overdue), sortable and filterable.
+          </BriefItem>
+          <BriefItem title="Overdue at a glance">
+            late rows flagged red, with days-late and amount outstanding.
+          </BriefItem>
+          <BriefItem title="Actions">
+            record a payment, add a note, print or export a statement.
+          </BriefItem>
+        </ul>
+        <p className="mt-3 font-mono text-[11px] leading-relaxed text-faint">
+          The Supabase backend and all the data already exist — you only build the screens on top. Aim
+          for something demo-ready: real data, a clean layout, and the overdue view telling the story.
+        </p>
+      </GlassCard>
+
       {/* How you're judged */}
-      <GlassCard accent className="mt-8 p-5">
+      <GlassCard accent className="mt-6 p-5">
         <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
           How you&apos;re judged
         </p>
@@ -189,6 +219,18 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
       {/* Live leaderboard */}
       <Leaderboard ownTeamId={session?.teamId ?? null} />
     </div>
+  );
+}
+
+/* One line of the "what you're building" brief: a bold feature name + what it does. */
+function BriefItem({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <li className="flex gap-2 text-[14px] leading-relaxed text-body">
+      <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
+      <span>
+        <span className="font-semibold text-navy">{title}</span> — {children}
+      </span>
+    </li>
   );
 }
 
@@ -363,8 +405,8 @@ function Leaderboard({ ownTeamId }: { ownTeamId: string | null }) {
       {/* Top-4 trend line */}
       <TrendChart rows={rows} since={since} />
 
-      {/* Per-team member bars */}
-      <div className="mt-6 flex flex-col gap-3">
+      {/* Per-team member bars — two teams per row */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {rows.map((r, i) => (
           <TeamCard key={r.id} row={r} rank={i + 1} mine={r.id === ownTeamId} />
         ))}
