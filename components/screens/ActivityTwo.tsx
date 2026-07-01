@@ -102,15 +102,30 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
         <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl lg:text-5xl">
           Build <span className="text-gold-deep">the tool</span> the rumour promised.
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-muted">
-          The whisper was true — Verve&apos;s building its own tool, and your team builds it now: an
-          AR Manager, screen by screen, with Claude doing the heavy lifting. The backend is already
-          done. Clone, build, and push — every push climbs the live board.
-        </p>
       </div>
 
-      {/* What you're building — the finished tool to aim for */}
+      {/* The mission — the story + how the sprint works */}
       <GlassCard className="mt-8 p-5">
+        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
+          The mission
+        </p>
+        <p className="mt-3 text-[15px] leading-relaxed text-body">
+          The whisper was true — Verve&apos;s building its own tool, and your team builds it now. Over
+          the next stretch you&apos;ll turn an empty repo into a working{" "}
+          <span className="font-semibold text-navy">AR Manager</span>, screen by screen, with Claude
+          Code doing the heavy lifting while you steer. The backend and all the data are already in
+          place, so you spend your time entirely on the screens people will actually use.
+        </p>
+        <p className="mt-2 text-[15px] leading-relaxed text-body">
+          Clone your team&apos;s repo, build a screen, then commit and push — every push climbs the
+          live board below, and{" "}
+          <span className="font-semibold text-navy">every teammate&apos;s commits count</span>. The
+          more your team ships (and the better it works), the higher you climb.
+        </p>
+      </GlassCard>
+
+      {/* What you're building — the finished tool to aim for */}
+      <GlassCard className="mt-6 p-5">
         <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
           What you&apos;re building
         </p>
