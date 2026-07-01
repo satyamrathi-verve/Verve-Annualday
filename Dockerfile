@@ -9,6 +9,12 @@ RUN npm ci
 
 FROM node:22-slim AS builder
 WORKDIR /app
+# Selects the app_settings row (env-scoped toggles): unset/"production" -> id=1
+# (live), "test" -> id=2. The test Cloud Run trigger passes
+# --build-arg NEXT_PUBLIC_APP_ENV=test; live builds leave it at the default.
+# Must be set here (build stage) because NEXT_PUBLIC_* is inlined by next build.
+ARG NEXT_PUBLIC_APP_ENV=production
+ENV NEXT_PUBLIC_APP_ENV=$NEXT_PUBLIC_APP_ENV
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

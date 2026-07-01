@@ -2,6 +2,7 @@
 
 import { getSupabase } from "@/lib/supabase/client";
 import { clueSchema, type Clue } from "./schema";
+import { SETTINGS_ID } from "./settingsId";
 
 /*
   Super-admin writes to the roster + open/close toggle. Every call goes through
@@ -93,7 +94,7 @@ export async function getGuessOpen(): Promise<boolean> {
   const { data, error } = await supabase
     .from("app_settings")
     .select("guess_page_open")
-    .eq("id", 1)
+    .eq("id", SETTINGS_ID)
     .maybeSingle();
   if (error) throw new Error(error.message);
   return Boolean(data?.guess_page_open);
@@ -103,7 +104,7 @@ export async function setGuessOpen(open: boolean): Promise<void> {
   const supabase = client();
   const { error } = await supabase
     .from("app_settings")
-    .upsert({ id: 1, guess_page_open: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    .upsert({ id: SETTINGS_ID, guess_page_open: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
   if (error) throw new Error(error.message);
 }
 
@@ -113,7 +114,7 @@ export async function setActivityOpen(activity: 1 | 2, open: boolean): Promise<v
   const col = activity === 1 ? "activity1_open" : "activity2_open";
   const { error } = await supabase
     .from("app_settings")
-    .upsert({ id: 1, [col]: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    .upsert({ id: SETTINGS_ID, [col]: open, updated_at: new Date().toISOString() }, { onConflict: "id" });
   if (error) throw new Error(error.message);
 }
 
