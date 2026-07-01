@@ -110,7 +110,7 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           The mission
         </p>
         <p className="mt-3 text-[15px] leading-relaxed text-body">
-          Back in Activity 1 you built a whole page about yourself — so you&apos;ve already felt how
+          Just before this, you built a whole page about yourself — so you&apos;ve already felt how
           easy it is to build something real these days. Now let&apos;s point that at something bigger.
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-body">
@@ -119,6 +119,11 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           <span className="font-semibold text-navy">AR Manager</span>, screen by screen, with Claude
           Code doing the heavy lifting while you steer. The backend and all the data are already in
           place, so you spend your time entirely on the screens people will actually use.
+        </p>
+        <p className="mt-2 text-[15px] leading-relaxed text-body">
+          We&apos;ve defined everything for you — you just have to ask Claude and he&apos;ll tell you
+          exactly what&apos;s needed and how to approach it. It&apos;s that easy. So if you&apos;re ever
+          in doubt, ask him as many questions as you want — he&apos;ll explain it to you.
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-body">
           Clone your team&apos;s repo, build a screen, then commit and push — every push climbs the
