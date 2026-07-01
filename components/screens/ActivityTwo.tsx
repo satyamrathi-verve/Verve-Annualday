@@ -110,6 +110,10 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           The mission
         </p>
         <p className="mt-3 text-[15px] leading-relaxed text-body">
+          Back in Activity 1 you built a whole page about yourself — so you&apos;ve already felt how
+          easy it is to build something real these days. Now let&apos;s point that at something bigger.
+        </p>
+        <p className="mt-2 text-[15px] leading-relaxed text-body">
           The whisper was true — Verve&apos;s building its own tool, and your team builds it now. Over
           the next stretch you&apos;ll turn an empty repo into a working{" "}
           <span className="font-semibold text-navy">AR Manager</span>, screen by screen, with Claude
