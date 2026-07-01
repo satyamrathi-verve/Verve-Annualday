@@ -38,7 +38,7 @@ export function GuessYourCrew({ onNext }: { onNext?: () => void }) {
           You&apos;re in, {session.displayName.split(" ")[0]}.
         </h1>
         <p className="mt-4 text-base leading-relaxed text-muted lg:text-lg">
-          Verified as <span className="font-mono text-navy">{session.email}</span> — but you&apos;re
+          Verified as <span className="font-mono text-navy">{session.email}</span>, but you&apos;re
           not on a crew roster yet. Once the real roster lands, your team and clues light up here.
         </p>
       </div>
@@ -273,7 +273,7 @@ function CrewBoard({
                 {onNext && (
                   <div className="flex justify-center">
                     <Button variant="gold" glow onClick={onNext}>
-                      Next step →
+                      Let&apos;s move ahead →
                     </Button>
                   </div>
                 )}

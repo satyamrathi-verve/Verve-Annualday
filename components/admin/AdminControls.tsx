@@ -126,7 +126,7 @@ export function AdminControls() {
           key={UNPLACED}
           title="Unplaced"
           emoji="🧩"
-          note="Not on a crew yet — pick a team to place them."
+          note="Not on a crew yet. Pick a team to place them."
           members={unplaced}
           teams={teams}
           teamName={teamName}

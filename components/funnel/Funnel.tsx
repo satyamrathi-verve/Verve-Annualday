@@ -6,6 +6,7 @@ import { Shell, type StepDef } from "./Shell";
 import { BurnTransition, supportsMask } from "@/components/transitions/BurnTransition";
 import { NavBar, type NavItem } from "./NavBar";
 import { useAppSettings } from "@/lib/data/settings";
+import { useSubmissions } from "@/lib/data/activity1";
 import { useVideos } from "@/lib/data/videos";
 import { event } from "@/lib/data/config";
 import { Landing } from "@/components/screens/Landing";
@@ -99,6 +100,9 @@ function FunnelInner() {
   const reduce = useReducedMotion();
   const { guessOpen: open, activity1Open, activity2Open, ready: settingsReady } = useAppSettings();
   const { videos } = useVideos();
+  // Whether THIS player has submitted their Activity 1 link — the "let's move
+  // ahead" CTA only appears once they have, so nobody skips past unbuilt.
+  const { submissions } = useSubmissions();
   // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
@@ -198,7 +202,7 @@ function FunnelInner() {
           <VideoBridge
             eyebrow="Transmission · incoming"
             title="Crew assembled."
-            caption="The hunt's over — here's what comes next."
+            caption="The hunt's over. Here's what comes next."
             ctaLabel="Next step →"
             onNext={ignite}
             src={videos.wheelOutro}
@@ -229,7 +233,7 @@ function FunnelInner() {
         return (
           <VideoBridge
             eyebrow="Task 1 · wrap"
-            title="Task 1 — that's a wrap."
+            title="Task 1: that's a wrap."
             caption="Nice work. One more thing before the next task…"
             ctaLabel="Next step →"
             onNext={ignite}
@@ -275,10 +279,16 @@ function FunnelInner() {
 
   // Sequential "Continue" on the screens that don't carry their own forward CTA.
   // (The wheel's "Next step →" lives inside GuessYourCrew, gated on a full-green
-  // team — so it is intentionally absent here.)
+  // team, so it is intentionally absent here.)
+  // On Activity 1 the CTA only appears once THIS player has submitted their link,
+  // so nobody moves on before they've built and shared a page.
+  const a1Submitted =
+    Boolean(session?.memberId) && submissions.some((s) => s.memberId === session?.memberId);
   const forward =
     key === "activity1"
-      ? "Next step →"
+      ? a1Submitted
+        ? "Let's move ahead →"
+        : null
       : key === "activity2"
         ? "Wrap up →"
         : null;

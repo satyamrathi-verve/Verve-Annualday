@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppSettings } from "@/lib/data/settings";
 import { getSettingsId } from "@/lib/data/settingsId";
-import { setActivityOpen, setGuessOpen } from "@/lib/data/adminApi";
+import { setActivityOpen, setGuessOpen, setShowTestTeam } from "@/lib/data/adminApi";
 import { useSubmissions } from "@/lib/data/activity1";
 import { useCommits, useTeamSubmissions } from "@/lib/data/activity2";
 import { getTeams } from "@/lib/data/config";
@@ -26,8 +26,8 @@ export function ActivitiesAdmin() {
         eyebrow="Crew hunt"
         title="The Wheel"
         on={s.guessOpen}
-        onText="Open — players can enter the wheel from the wait screen."
-        offText="Closed — players are held on “Now We Wait”."
+        onText="Open: players can enter the wheel from the wait screen."
+        offText="Closed: players are held on “Now We Wait”."
         write={(v) => setGuessOpen(v)}
       >
         <p className="font-mono text-[11px] text-faint">Live progress is on the ● live board tab.</p>
@@ -37,8 +37,8 @@ export function ActivitiesAdmin() {
         eyebrow="Activity 1"
         title="About Me · profile builder"
         on={s.activity1Open}
-        onText="Open — the guide + gallery are available to players."
-        offText="Closed — hidden from players."
+        onText="Open: the guide + gallery are available to players."
+        offText="Closed: hidden from players."
         write={(v) => setActivityOpen(1, v)}
         collapsible
       >
@@ -49,13 +49,22 @@ export function ActivitiesAdmin() {
         eyebrow="Activity 2"
         title="Build the Tool That Finally Fits"
         on={s.activity2Open}
-        onText="Open — players can clone, build, and watch the live commit board."
-        offText="Closed — hidden from players."
+        onText="Open: players can clone, build, and watch the live commit board."
+        offText="Closed: hidden from players."
         write={(v) => setActivityOpen(2, v)}
         collapsible
       >
         <Activity2Board />
       </ToggleCard>
+
+      <ToggleCard
+        eyebrow="Test crew"
+        title="Project 9 · the test team"
+        on={s.showTestTeam}
+        onText="Visible: Project 9 shows on the player gallery and live board."
+        offText="Hidden: players never see Project 9 on the gallery or live board."
+        write={(v) => setShowTestTeam(v)}
+      />
     </div>
   );
 }
@@ -79,7 +88,7 @@ function EnvBadge() {
           : "border-red-500/40 bg-red-500/10 text-red-300",
       )}
     >
-      Toggling <b>{isTest ? "TEST" : "LIVE"}</b> — writes app_settings id={info.id}
+      Toggling <b>{isTest ? "TEST" : "LIVE"}</b> writes app_settings id={info.id}
       {!isTest && " · these changes hit the REAL event"} · host {info.host}
     </div>
   );

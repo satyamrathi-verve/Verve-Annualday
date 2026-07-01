@@ -59,7 +59,7 @@ export function GateScreen({
           </div>
         )}
 
-        {reveal ? (
+        {reveal && (
           <button
             type="button"
             onClick={onNext}
@@ -67,10 +67,6 @@ export function GateScreen({
           >
             {copy.cta}
           </button>
-        ) : (
-          <div className="mt-9 w-full rounded-xl border border-line bg-transparent px-5 py-3.5 text-center text-sm font-medium text-faint lg:text-base">
-            🔒 Opens the moment the host flips it on.
-          </div>
         )}
       </motion.div>
 

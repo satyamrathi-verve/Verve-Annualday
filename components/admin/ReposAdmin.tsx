@@ -23,7 +23,7 @@ export function ReposAdmin() {
     <div>
       <p className="font-mono text-[11px] leading-relaxed text-muted">
         Paste each team&apos;s repo as <span className="text-navy">owner/repo</span> (or the full
-        GitHub URL). Saves live — the clone step + commit board update instantly.
+        GitHub URL). Saves live. The clone step + commit board update instantly.
       </p>
       <div className="mt-3 flex flex-col gap-2">
         {teams.map((t) => (

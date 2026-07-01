@@ -118,6 +118,15 @@ export async function setActivityOpen(activity: 1 | 2, open: boolean): Promise<v
   if (error) throw new Error(error.message);
 }
 
+/** Show/hide the test crew (Project 9) in the player-facing dashboards. */
+export async function setShowTestTeam(show: boolean): Promise<void> {
+  const supabase = client();
+  const { error } = await supabase
+    .from("app_settings")
+    .upsert({ id: getSettingsId(), show_test_team: show, updated_at: new Date().toISOString() }, { onConflict: "id" });
+  if (error) throw new Error(error.message);
+}
+
 export interface Attendee {
   id: string;
   email: string;

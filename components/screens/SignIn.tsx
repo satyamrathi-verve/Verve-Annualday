@@ -155,7 +155,7 @@ function EmailCodeFlow() {
       await sendCode(trimmed);
       setStage("code");
     } catch (e) {
-      setError((e as Error).message || "Couldn't send the code — try again.");
+      setError((e as Error).message || "Couldn't send the code, try again.");
     } finally {
       setBusy(false);
     }
@@ -168,7 +168,7 @@ function EmailCodeFlow() {
       await verifyCode(trimmed, code.trim());
       // On success, onAuthStateChange flips the session and this screen unmounts.
     } catch (e) {
-      setError((e as Error).message || "That code didn't work — check and retry.");
+      setError((e as Error).message || "That code didn't work, check and retry.");
     } finally {
       setBusy(false);
     }

@@ -3,8 +3,9 @@
 import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useSubmissions } from "@/lib/data/activity1";
+import { useAppSettings } from "@/lib/data/settings";
 import { getTeams, getTeamMembers, getRosterSorted } from "@/lib/data/config";
-import { teamEmoji } from "@/lib/data/teamMeta";
+import { teamEmoji, TEST_TEAM_ID } from "@/lib/data/teamMeta";
 import { GlassCard } from "@/components/ui/GlassCard";
 
 /*
@@ -15,13 +16,15 @@ import { GlassCard } from "@/components/ui/GlassCard";
 */
 export function ProfileGallery({ subtitle }: { subtitle?: string }) {
   const { submissions, ready } = useSubmissions();
+  const { showTestTeam } = useAppSettings();
   const urlByMember = useMemo(
     () => new Map(submissions.map((s) => [s.memberId, s.vercelUrl])),
     [submissions],
   );
   const count = submissions.length;
 
-  const teams = getTeams(); // demo team included — active for all activities
+  // The test crew (Project 9) is hidden until the super admin flips it on.
+  const teams = getTeams().filter((t) => showTestTeam || t.id !== TEST_TEAM_ID);
   const unplaced = getRosterSorted().filter((m) => !m.teamId);
   const groups = [
     ...teams.map((t) => ({ id: t.id, name: t.name, color: t.color, members: getTeamMembers(t.id) })),
@@ -142,7 +145,7 @@ function ProfileWheel({
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${m.displayName} — view profile`}
+                  aria-label={`${m.displayName}, view profile`}
                   className="grid h-9 w-9 place-items-center rounded-full font-display text-[10px] font-bold text-white transition-transform hover:scale-110"
                   style={{ backgroundColor: group.color, boxShadow: `0 0 12px -1px ${group.color}` }}
                 >
@@ -151,7 +154,7 @@ function ProfileWheel({
               ) : (
                 <div
                   title="not yet"
-                  aria-label={`${m.displayName} — not submitted`}
+                  aria-label={`${m.displayName}, not submitted`}
                   className="grid h-9 w-9 place-items-center rounded-full border border-line bg-white/[0.03] font-display text-[10px] font-bold text-faint"
                 >
                   {initials(m.displayName)}

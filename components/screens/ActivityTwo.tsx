@@ -3,8 +3,9 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
+import { useAppSettings } from "@/lib/data/settings";
 import { getTeams, getTeamMembers } from "@/lib/data/config";
-import { teamEmoji } from "@/lib/data/teamMeta";
+import { teamEmoji, TEST_TEAM_ID } from "@/lib/data/teamMeta";
 import {
   useCommits,
   useRepos,
@@ -30,7 +31,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 const KICKOFF_PROMPT =
   "Read README.md and CLAUDE.md in this repo, then tell me in 5 lines what we're " +
   "building and the order you'll build the screens in. The Supabase backend and " +
-  "ALL the data already exist — never create or alter tables, only read/write " +
+  "ALL the data already exist, so never create or alter tables, only read/write " +
   "through the existing client. First, run the app and show me the working " +
   "Customer Master screen so I can see the pattern. Then build the next screen on " +
   "the list. After each screen works, STOP and tell us exactly what to commit and push.";
@@ -49,14 +50,14 @@ function buildGuide(repoSlug: string): GuideStep[] {
     {
       title: "Open VS Code + Claude Code",
       body: [
-        "You already set these up in Activity 1 — open VS Code and the Claude Code extension.",
+        "You already set these up in Activity 1. Open VS Code and the Claude Code extension.",
         "Open a terminal in VS Code: top menu → Terminal → New Terminal.",
       ],
     },
     {
       title: "Make your commits count (do this once) 🪪",
       body: [
-        "So the live board can credit YOUR work, tell git who you are — use your own email.",
+        "So the live board can credit YOUR work, tell git who you are, using your own email.",
         "Paste these two lines into the terminal (swap in your real name + email). Everyone on the team does this on their own laptop.",
         "Without this, all of a team's commits look like one person and the per-member chart won't work.",
       ],
@@ -82,7 +83,7 @@ function buildGuide(repoSlug: string): GuideStep[] {
       title: "Commit & push after every screen 🔥",
       body: [
         "Every time a screen works, run these three lines. Each push lights your team up on the live board below.",
-        "Claude will remind you after each screen — keep the terminal handy.",
+        "Claude will remind you after each screen, so keep the terminal handy.",
       ],
       snippet: 'git add -A\ngit commit -m "Built <screen name>"\ngit push',
     },
@@ -110,23 +111,23 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           The mission
         </p>
         <p className="mt-3 text-[15px] leading-relaxed text-body">
-          Just before this, you built a whole page about yourself — so you&apos;ve already felt how
+          Just before this, you built a whole page about yourself, so you&apos;ve already felt how
           easy it is to build something real these days. Now let&apos;s point that at something bigger.
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-body">
-          The whisper was true — Verve&apos;s building its own tool, and your team builds it now. Over
+          The whisper was true: Verve&apos;s building its own tool, and your team builds it now. Over
           the next stretch you&apos;ll turn an empty repo into a working{" "}
           <span className="font-semibold text-navy">AR Manager</span>, screen by screen, with Claude
           Code doing the heavy lifting while you steer. The backend and all the data are already in
           place, so you spend your time entirely on the screens people will actually use.
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-body">
-          We&apos;ve defined everything for you — you just have to ask Claude and he&apos;ll tell you
+          We&apos;ve defined everything for you. You just have to ask Claude and he&apos;ll tell you
           exactly what&apos;s needed and how to approach it. It&apos;s that easy. So if you&apos;re ever
-          in doubt, ask him as many questions as you want — he&apos;ll explain it to you.
+          in doubt, ask him as many questions as you want, and he&apos;ll explain it to you.
         </p>
         <p className="mt-2 text-[15px] leading-relaxed text-body">
-          Clone your team&apos;s repo, build a screen, then commit and push — every push climbs the
+          Clone your team&apos;s repo, build a screen, then commit and push. Every push climbs the
           live board below, and{" "}
           <span className="font-semibold text-navy">every teammate&apos;s commits count</span>. The
           more your team ships (and the better it works), the higher you climb.
@@ -139,7 +140,7 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           What you&apos;re building
         </p>
         <p className="mt-3 text-[15px] leading-relaxed text-body">
-          An <span className="font-semibold text-navy">AR Manager</span> — the tool that finally fits
+          An <span className="font-semibold text-navy">AR Manager</span>, the tool that finally fits
           how Verve chases what it&apos;s owed. By the end you should have a working app, running on
           your laptop, that an AR analyst could actually sit down and use:
         </p>
@@ -158,7 +159,7 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           </BriefItem>
         </ul>
         <p className="mt-3 font-mono text-[11px] leading-relaxed text-faint">
-          The Supabase backend and all the data already exist — you only build the screens on top. Aim
+          The Supabase backend and all the data already exist, so you only build the screens on top. Aim
           for something demo-ready: real data, a clean layout, and the overdue view telling the story.
         </p>
       </GlassCard>
@@ -172,14 +173,14 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           <li className="flex gap-2 text-[15px] leading-relaxed text-body">
             <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
             <span>
-              <span className="font-semibold text-navy">Utility</span> — does the tool actually solve
+              <span className="font-semibold text-navy">Utility</span>: does the tool actually solve
               a real problem, and solve it well?
             </span>
           </li>
           <li className="flex gap-2 text-[15px] leading-relaxed text-body">
             <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
             <span>
-              <span className="font-semibold text-navy">Commits</span> — the number of commits, and{" "}
+              <span className="font-semibold text-navy">Commits</span>: the number of commits, and{" "}
               <span className="font-semibold text-navy">every team member must have commits</span>. The
               board below tracks each member, so make sure everyone pushes.
             </span>
@@ -233,7 +234,7 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
           <GlassCard className="p-5 text-center">
             <p className="text-sm text-muted">
               When your team&apos;s done, your <span className="font-semibold text-navy">team lead</span>{" "}
-              hits Submit. Then a judge comes by to see your tool live. Until then — keep building and
+              hits Submit. Then a judge comes by to see your tool live. Until then, keep building and
               pushing. 🔧
             </p>
           </GlassCard>
@@ -252,7 +253,7 @@ function BriefItem({ title, children }: { title: string; children: ReactNode }) 
     <li className="flex gap-2 text-[14px] leading-relaxed text-body">
       <span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
       <span>
-        <span className="font-semibold text-navy">{title}</span> — {children}
+        <span className="font-semibold text-navy">{title}</span>: {children}
       </span>
     </li>
   );
@@ -331,7 +332,7 @@ function LeadSubmit({
   return (
     <GlassCard accent className="p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold-deep">
-        {existing ? "Submitted — update or wrap up anytime" : "Team lead · submit when you're done"}
+        {existing ? "Submitted. Update or wrap up anytime." : "Team lead · submit when you're done"}
       </p>
       <p className="mt-2 text-sm text-muted">
         This records your team&apos;s repo for the judges and takes you to the wrap. Your team keeps the
@@ -404,7 +405,9 @@ interface TeamRow {
 function Leaderboard({ ownTeamId }: { ownTeamId: string | null }) {
   const { byTeam: commits, since } = useCommits();
   const { byTeam: subs } = useTeamSubmissions();
-  const teams = getTeams();
+  const { showTestTeam } = useAppSettings();
+  // The test crew (Project 9) is hidden until the super admin flips it on.
+  const teams = getTeams().filter((t) => showTestTeam || t.id !== TEST_TEAM_ID);
 
   const rows: TeamRow[] = teams
     .map((t) => ({
@@ -504,7 +507,7 @@ function MemberBars({
     );
   }
   if (authors.length === 0) {
-    return <p className="mt-3 font-mono text-[10px] text-faint">no commits yet — push to light it up</p>;
+    return <p className="mt-3 font-mono text-[10px] text-faint">no commits yet, push to light it up</p>;
   }
 
   const slots = Math.max(authors.length, teamSize, 1);
@@ -540,7 +543,7 @@ function MemberBars({
   );
 }
 
-const BUCKET_MS = 3 * 60 * 60 * 1000; // ~every 3 hours
+const BUCKET_MS = 4 * 60 * 60 * 1000; // a dot ~every 4-5 hours
 const MAX_BUCKETS = 32;
 
 /* Cumulative commits at each time boundary for a team, from sorted commit times. */
@@ -601,7 +604,7 @@ function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-deep">
           Trend · top 4 teams
         </p>
-        <p className="font-mono text-[9px] text-faint">cumulative commits, ~3h steps</p>
+        <p className="font-mono text-[9px] text-faint">cumulative commits, a dot every ~4h</p>
       </div>
 
       {!chart ? (
@@ -678,16 +681,28 @@ function Sparklines({
       {teamSeries.map(({ row, series }) => {
         const pts = series.map((v, i) => `${x(i)},${y(v)}`).join(" ");
         return (
-          <polyline
-            key={row.id}
-            points={pts}
-            fill="none"
-            stroke={row.color}
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
+          <g key={row.id}>
+            <polyline
+              points={pts}
+              fill="none"
+              stroke={row.color}
+              strokeWidth={2}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            {/* A dot at every ~4h step, so you can read the trend point by point. */}
+            {series.map((v, i) => (
+              <circle
+                key={i}
+                cx={x(i)}
+                cy={y(v)}
+                r={2.5}
+                fill={row.color}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+          </g>
         );
       })}
       {/* axis labels */}
