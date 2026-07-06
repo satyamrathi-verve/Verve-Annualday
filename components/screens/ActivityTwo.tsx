@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthContext";
 import { useAppSettings } from "@/lib/data/settings";
@@ -512,35 +512,7 @@ function MemberBars({
 
   const slots = Math.max(authors.length, teamSize, 1);
   const bars = Array.from({ length: slots }, (_, i) => authors[i]?.count ?? 0);
-  const maxCount = Math.max(1, ...bars);
-
-  return (
-    <div className="mt-3 border-t border-line/50 pt-3">
-      <div className="flex items-end gap-1.5 overflow-x-auto pb-1">
-        {bars.map((c, i) => {
-          const h = Math.round((c / maxCount) * 100);
-          return (
-            <div key={i} className="flex w-7 flex-none flex-col items-center gap-1">
-              <span className="font-mono text-[9px] leading-none text-faint">{c || ""}</span>
-              <div className="flex h-16 w-full items-end rounded bg-white/[0.03]">
-                <div
-                  className="w-full rounded transition-[height] duration-500"
-                  style={{
-                    height: `${c ? Math.max(h, 6) : 0}%`,
-                    backgroundColor: c ? color : "transparent",
-                  }}
-                />
-              </div>
-              <span className="font-mono text-[8px] leading-none text-faint">U{i + 1}</span>
-            </div>
-          );
-        })}
-      </div>
-      <p className="mt-1 font-mono text-[9px] text-faint">
-        each bar = one teammate&apos;s commits (anonymised)
-      </p>
-    </div>
-  );
+  return <MemberBarChart bars={bars} color={color} />;
 }
 
 const BUCKET_MS = 4 * 60 * 60 * 1000; // a dot ~every 4-5 hours
@@ -604,7 +576,7 @@ function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-deep">
           Trend · top 4 teams
         </p>
-        <p className="font-mono text-[9px] text-faint">cumulative commits, a dot every ~4h</p>
+        <p className="font-mono text-[9px] text-faint">cumulative commits over time</p>
       </div>
 
       {!chart ? (
@@ -615,7 +587,7 @@ function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
         </GlassCard>
       ) : (
         <GlassCard className="mt-2 p-4">
-          <Sparklines chart={chart} />
+          <TrendLineChart chart={chart} />
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
             {chart.teamSeries.map(({ row }) => (
               <span key={row.id} className="flex items-center gap-1.5">
@@ -639,88 +611,330 @@ function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
   );
 }
 
-const VB_W = 320;
-const VB_H = 120;
-const PAD = { l: 8, r: 8, t: 10, b: 18 };
+/* ── measured-pixel SVG charts ─────────────────────────────────────────────
+   Rendered at the container's real pixel width (via ResizeObserver) so axes,
+   ticks and labels stay crisp and correctly sized at any width — no viewBox
+   stretching. Shared by the trend line and the per-team member bars. */
 
-function Sparklines({
+const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
+const CARD = "#101a2e"; // --color-card — rings overlapping dots against the surface
+
+function useMeasuredWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setW(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w] as const;
+}
+
+/* ~`target` gridline values from 0 up to ≥max, snapped to 1/2/5·10ⁿ steps. */
+function axisTicks(max: number, target = 4): number[] {
+  const m = Math.max(1, Math.ceil(max));
+  const rawStep = m / Math.max(1, target);
+  const steps = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
+  const step = steps.find((s) => s >= rawStep) ?? Math.ceil(rawStep / 1000) * 1000;
+  const top = Math.ceil(m / step) * step;
+  const out: number[] = [];
+  for (let v = 0; v <= top + 1e-9; v += step) out.push(v);
+  return out;
+}
+
+/* Short time-axis label: a clock within a ~2-day span, otherwise a date. */
+function fmtClock(ms: number, spanMs: number): string {
+  const d = new Date(ms);
+  return spanMs <= 2 * 24 * 3600 * 1000
+    ? d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    : d.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
+/* Top-4 cumulative-commit trend as a real line chart: y = commits (gridlines +
+   ticks), x = time (date/clock ticks), with a hover crosshair + tooltip. */
+function TrendLineChart({
   chart,
 }: {
-  chart: {
-    boundaries: number[];
-    teamSeries: { row: TeamRow; series: number[] }[];
-    maxY: number;
-  };
+  chart: { boundaries: number[]; teamSeries: { row: TeamRow; series: number[] }[]; maxY: number };
 }) {
   const { boundaries, teamSeries, maxY } = chart;
+  const [ref, w] = useMeasuredWidth();
+  const [hover, setHover] = useState<number | null>(null);
+
+  const H = 300;
+  const pad = { l: 48, r: 18, t: 16, b: 38 };
   const n = boundaries.length;
-  const innerW = VB_W - PAD.l - PAD.r;
-  const innerH = VB_H - PAD.t - PAD.b;
-  const x = (i: number) => PAD.l + (n <= 1 ? 0 : (i / (n - 1)) * innerW);
-  const y = (v: number) => PAD.t + (1 - v / maxY) * innerH;
+  const innerW = Math.max(1, w - pad.l - pad.r);
+  const innerH = H - pad.t - pad.b;
+
+  const ticks = axisTicks(maxY, 4);
+  const topY = ticks[ticks.length - 1] || 1;
+  const x = (i: number) => pad.l + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
+  const y = (v: number) => pad.t + (1 - v / topY) * innerH;
+
+  const spanMs = (boundaries[n - 1] ?? 0) - (boundaries[0] ?? 0);
+  const labelCount = Math.min(5, n);
+  const xLabelIdx = Array.from({ length: labelCount }, (_, k) =>
+    Math.round((k / Math.max(1, labelCount - 1)) * (n - 1)),
+  );
 
   return (
-    <svg
-      viewBox={`0 0 ${VB_W} ${VB_H}`}
-      className="w-full"
-      preserveAspectRatio="none"
-      role="img"
-      aria-label="Cumulative commit trend for the top four teams"
-    >
-      {/* baseline */}
-      <line
-        x1={PAD.l}
-        y1={VB_H - PAD.b}
-        x2={VB_W - PAD.r}
-        y2={VB_H - PAD.b}
-        stroke="currentColor"
-        className="text-line"
-        strokeWidth={1}
-        vectorEffect="non-scaling-stroke"
-      />
-      {teamSeries.map(({ row, series }) => {
-        const pts = series.map((v, i) => `${x(i)},${y(v)}`).join(" ");
-        return (
-          <g key={row.id}>
-            <polyline
-              points={pts}
-              fill="none"
-              stroke={row.color}
-              strokeWidth={2}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-            {/* A dot at every ~4h step, so you can read the trend point by point. */}
-            {series.map((v, i) => (
-              <circle
-                key={i}
-                cx={x(i)}
-                cy={y(v)}
-                r={2.5}
-                fill={row.color}
-                vectorEffect="non-scaling-stroke"
+    <div ref={ref} className="relative w-full" style={{ height: H }}>
+      {w > 0 && (
+        <svg
+          width={w}
+          height={H}
+          role="img"
+          aria-label="Cumulative commit trend for the top four teams"
+          onMouseMove={(e) => {
+            if (n <= 1) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const rel = (e.clientX - rect.left - pad.l) / innerW;
+            setHover(Math.max(0, Math.min(n - 1, Math.round(rel * (n - 1)))));
+          }}
+          onMouseLeave={() => setHover(null)}
+        >
+          {/* horizontal gridlines + y axis */}
+          <g className="text-line">
+            {ticks.map((t) => (
+              <line
+                key={t}
+                x1={pad.l}
+                x2={w - pad.r}
+                y1={y(t)}
+                y2={y(t)}
+                stroke="currentColor"
+                strokeWidth={1}
+                opacity={t === 0 ? 1 : 0.5}
               />
             ))}
+            <line x1={pad.l} x2={pad.l} y1={pad.t} y2={y(0)} stroke="currentColor" strokeWidth={1} />
           </g>
-        );
-      })}
-      {/* axis labels */}
-      <text x={PAD.l} y={VB_H - 5} className="fill-faint" style={{ fontSize: 9, fontFamily: "monospace" }}>
-        D0
-      </text>
-      <text
-        x={VB_W - PAD.r}
-        y={VB_H - 5}
-        textAnchor="end"
-        className="fill-faint"
-        style={{ fontSize: 9, fontFamily: "monospace" }}
-      >
-        now
-      </text>
-      <text x={PAD.l} y={PAD.t + 2} className="fill-faint" style={{ fontSize: 9, fontFamily: "monospace" }}>
-        {maxY}
-      </text>
-    </svg>
+          {/* y tick labels + axis title */}
+          {ticks.map((t) => (
+            <text
+              key={t}
+              x={pad.l - 8}
+              y={y(t) + 3}
+              textAnchor="end"
+              className="fill-faint"
+              style={{ fontSize: 11, fontFamily: MONO }}
+            >
+              {t}
+            </text>
+          ))}
+          <text
+            transform={`translate(15 ${pad.t + innerH / 2}) rotate(-90)`}
+            textAnchor="middle"
+            className="fill-faint"
+            style={{ fontSize: 9, letterSpacing: 1.5, fontFamily: MONO }}
+          >
+            COMMITS
+          </text>
+
+          {/* x ticks + time labels */}
+          {xLabelIdx.map((i) => (
+            <g key={i}>
+              <line
+                x1={x(i)}
+                x2={x(i)}
+                y1={y(0)}
+                y2={y(0) + 5}
+                className="text-line"
+                stroke="currentColor"
+                strokeWidth={1}
+              />
+              <text
+                x={x(i)}
+                y={y(0) + 19}
+                textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"}
+                className="fill-faint"
+                style={{ fontSize: 10, fontFamily: MONO }}
+              >
+                {fmtClock(boundaries[i], spanMs)}
+              </text>
+            </g>
+          ))}
+
+          {/* hover crosshair */}
+          {hover != null && (
+            <line
+              x1={x(hover)}
+              x2={x(hover)}
+              y1={pad.t}
+              y2={y(0)}
+              className="text-verve-400"
+              stroke="currentColor"
+              strokeWidth={1}
+              strokeDasharray="3 3"
+              opacity={0.6}
+            />
+          )}
+
+          {/* one line per team */}
+          {teamSeries.map(({ row, series }) => (
+            <g key={row.id}>
+              <polyline
+                points={series.map((v, i) => `${x(i)},${y(v)}`).join(" ")}
+                fill="none"
+                stroke={row.color}
+                strokeWidth={2.25}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+              <circle
+                cx={x(series.length - 1)}
+                cy={y(series[series.length - 1] ?? 0)}
+                r={4}
+                fill={row.color}
+                stroke={CARD}
+                strokeWidth={1.5}
+              />
+              {hover != null && (
+                <circle
+                  cx={x(hover)}
+                  cy={y(series[hover] ?? 0)}
+                  r={4}
+                  fill={row.color}
+                  stroke={CARD}
+                  strokeWidth={1.5}
+                />
+              )}
+            </g>
+          ))}
+        </svg>
+      )}
+
+      {/* hover tooltip */}
+      {hover != null && w > 0 && (
+        <div
+          className="pointer-events-none absolute z-10 rounded-lg border border-line bg-surface/95 px-3 py-2 shadow-xl"
+          style={{ left: Math.min(x(hover) + 12, w - 160), top: pad.t }}
+        >
+          <p className="font-mono text-[10px] text-faint">{fmtClock(boundaries[hover], spanMs)}</p>
+          <ul className="mt-1 flex flex-col gap-0.5">
+            {[...teamSeries]
+              .sort((a, b) => (b.series[hover] ?? 0) - (a.series[hover] ?? 0))
+              .map(({ row, series }) => (
+                <li key={row.id} className="flex items-center gap-1.5 whitespace-nowrap">
+                  <span
+                    className="h-2 w-2 flex-none rounded-full"
+                    style={{ backgroundColor: row.color }}
+                  />
+                  <span className="font-mono text-[11px] text-body">{row.name}</span>
+                  <span className="ml-auto pl-3 font-mono text-[11px] font-bold text-navy">
+                    {series[hover] ?? 0}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Per-teammate commits as a compact bar chart with its own y-axis (gridlines +
+   ticks) and U1…Un x labels. Empty slots show a faint baseline stub. */
+function MemberBarChart({ bars, color }: { bars: number[]; color: string }) {
+  const [ref, w] = useMeasuredWidth();
+  const H = 150;
+  const pad = { l: 24, r: 6, t: 16, b: 20 };
+  const innerW = Math.max(1, w - pad.l - pad.r);
+  const innerH = H - pad.t - pad.b;
+  const ticks = axisTicks(Math.max(1, ...bars), 3);
+  const topY = ticks[ticks.length - 1] || 1;
+  const y = (v: number) => pad.t + (1 - v / topY) * innerH;
+  const band = innerW / Math.max(1, bars.length);
+  const bw = Math.min(28, Math.max(7, band * 0.62));
+
+  return (
+    <div className="mt-3 border-t border-line/50 pt-3">
+      <div ref={ref} className="w-full" style={{ height: H }}>
+        {w > 0 && (
+          <svg width={w} height={H} role="img" aria-label="Commits per teammate">
+            {/* gridlines + y labels */}
+            <g className="text-line">
+              {ticks.map((t) => (
+                <line
+                  key={t}
+                  x1={pad.l}
+                  x2={w - pad.r}
+                  y1={y(t)}
+                  y2={y(t)}
+                  stroke="currentColor"
+                  strokeWidth={1}
+                  opacity={t === 0 ? 1 : 0.4}
+                />
+              ))}
+            </g>
+            {ticks.map((t) => (
+              <text
+                key={t}
+                x={pad.l - 6}
+                y={y(t) + 3}
+                textAnchor="end"
+                className="fill-faint"
+                style={{ fontSize: 9, fontFamily: MONO }}
+              >
+                {t}
+              </text>
+            ))}
+            {/* bars + labels */}
+            {bars.map((c, i) => {
+              const cx = pad.l + band * i + band / 2;
+              const by = y(c);
+              return (
+                <g key={i}>
+                  {c > 0 ? (
+                    <rect x={cx - bw / 2} y={by} width={bw} height={y(0) - by} rx={3} fill={color}>
+                      <title>{`U${i + 1}: ${c} commit${c === 1 ? "" : "s"}`}</title>
+                    </rect>
+                  ) : (
+                    <rect
+                      x={cx - bw / 2}
+                      y={y(0) - 2}
+                      width={bw}
+                      height={2}
+                      rx={1}
+                      className="fill-line"
+                    >
+                      <title>{`U${i + 1}: 0 commits`}</title>
+                    </rect>
+                  )}
+                  {c > 0 && (
+                    <text
+                      x={cx}
+                      y={by - 4}
+                      textAnchor="middle"
+                      className="fill-navy"
+                      style={{ fontSize: 10, fontWeight: 700, fontFamily: MONO }}
+                    >
+                      {c}
+                    </text>
+                  )}
+                  <text
+                    x={cx}
+                    y={H - 6}
+                    textAnchor="middle"
+                    className="fill-faint"
+                    style={{ fontSize: 9, fontFamily: MONO }}
+                  >
+                    U{i + 1}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        )}
+      </div>
+      <p className="mt-1 font-mono text-[9px] text-faint">
+        each bar = one teammate&apos;s commits (anonymised)
+      </p>
+    </div>
   );
 }
