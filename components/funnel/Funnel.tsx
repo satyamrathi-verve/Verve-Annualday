@@ -7,6 +7,7 @@ import { BurnTransition, supportsMask } from "@/components/transitions/BurnTrans
 import { NavBar, type NavItem } from "./NavBar";
 import { useAppSettings } from "@/lib/data/settings";
 import { useSubmissions } from "@/lib/data/activity1";
+import { useTeamSubmissions } from "@/lib/data/activity2";
 import { useVideos } from "@/lib/data/videos";
 import { event } from "@/lib/data/config";
 import { Landing } from "@/components/screens/Landing";
@@ -103,6 +104,10 @@ function FunnelInner() {
   // Whether THIS player has submitted their Activity 1 link — the "let's move
   // ahead" CTA only appears once they have, so nobody skips past unbuilt.
   const { submissions } = useSubmissions();
+  // Whether THIS player's team LEAD has submitted the built tool — the Activity 2
+  // "let's move ahead" CTA only appears once they have, so nobody leaves the build
+  // page before the team has wrapped up.
+  const { byTeam: teamSubs } = useTeamSubmissions();
   // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
@@ -284,13 +289,17 @@ function FunnelInner() {
   // so nobody moves on before they've built and shared a page.
   const a1Submitted =
     Boolean(session?.memberId) && submissions.some((s) => s.memberId === session?.memberId);
+  const teamId = session?.teamId;
+  const a2Submitted = !!teamId && teamSubs.has(teamId);
   const forward =
     key === "activity1"
       ? a1Submitted
         ? "Let's move ahead →"
         : null
       : key === "activity2"
-        ? "Let's move ahead →"
+        ? a2Submitted
+          ? "Let's move ahead →"
+          : null
         : null;
 
   return (
