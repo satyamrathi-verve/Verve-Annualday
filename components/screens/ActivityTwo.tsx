@@ -28,64 +28,65 @@ import { GlassCard } from "@/components/ui/GlassCard";
   author. Names are anonymised to "U1…Un" on screen.
 */
 
-const KICKOFF_PROMPT =
-  "Read README.md and CLAUDE.md in this repo, then tell me in 5 lines what we're " +
-  "building and the order you'll build the screens in. The Supabase backend and " +
-  "ALL the data already exist, so never create or alter tables, only read/write " +
-  "through the existing client. First, run the app and show me the working " +
-  "Customer Master screen so I can see the pattern. Then build the next screen on " +
-  "the list. After each screen works, STOP and tell us exactly what to commit and push.";
-
 interface GuideStep {
   title: string;
   body: string[];
   snippet?: string;
 }
 
-function buildGuide(repoSlug: string): GuideStep[] {
-  const cloneCmd = repoSlug
-    ? `git clone https://github.com/${repoSlug}.git\ncd ${repoSlug.split("/")[1] ?? "ar-manager"}`
-    : "# Your host will share your team's repo link here.";
+function buildGuide(
+  repoSlug: string,
+  name?: string | null,
+  email?: string | null,
+): GuideStep[] {
+  // Bake the player's own name + Verve email into the prompts so Claude sets the
+  // right git identity and every commit is credited to the right person.
+  const who = name && email ? `"${name}" with the email ${email}` : "my name and my Verve email";
+  const repoRef = repoSlug
+    ? `our team repo (https://github.com/${repoSlug}.git)`
+    : "our team repo (your team leader will paste you the link)";
   return [
     {
-      title: "Open VS Code + Claude Code",
+      title: "Create your GitHub login 🔑",
       body: [
-        "You already set these up in Activity 1. Open VS Code and the Claude Code extension.",
-        "Open a terminal in VS Code: top menu → Terminal → New Terminal.",
+        "Go to github.com and sign in — or make a free account in a minute — using your Verve email (the one you signed in with here).",
+        "Your commits are credited to this account on the live board, so use your own.",
+        "Send your GitHub username to your team leader so they can add you to the repo.",
       ],
     },
     {
-      title: "Make your commits count (do this once) 🪪",
+      title: "Get Claude to clone your team's repo",
       body: [
-        "So the live board can credit YOUR work, tell git who you are, using your own email.",
-        "Paste these two lines into the terminal (swap in your real name + email). Everyone on the team does this on their own laptop.",
-        "Without this, all of a team's commits look like one person and the per-member chart won't work.",
+        "Your team leader owns the repo. Ask them to share it with you — add you as a collaborator using your GitHub account from step 1.",
+        "Open VS Code and the Claude Code extension, then paste this. Claude clones the project and sets you up — no terminal needed.",
       ],
-      snippet: 'git config --global user.name "Your Name"\ngit config --global user.email "you@verveadvisory.com"',
+      snippet:
+        `Clone ${repoRef} and open it in VS Code for me. Then set my git identity to ` +
+        `${who} so every commit I make is credited to me. Install whatever's needed, run ` +
+        `the app, and confirm it's working.`,
     },
     {
-      title: "Clone your team's repo",
+      title: "Ask Claude for the brief",
       body: [
-        "Paste this into the terminal to download your team's project, then open that folder in VS Code (File → Open Folder).",
-        "If it asks you to sign in to GitHub, follow the prompts.",
+        "Before building anything, get Claude to explain the tool. Paste this — it reads the project docs and walks you through what you're building and every screen to build.",
       ],
-      snippet: cloneCmd,
+      snippet:
+        "Read README.md and CLAUDE.md in this repo and give me a detailed but simple " +
+        "brief: what tool we're building, the full list of screens, and the order you'd " +
+        "build them in. The Supabase backend and all the data already exist, so never " +
+        "create or alter tables — only read/write through the existing client. Then show " +
+        "me the example Customer Master screen so I can see the pattern to copy.",
     },
     {
-      title: "Kick Claude off",
+      title: "Split the work — everyone builds & commits 🔥",
       body: [
-        "Open Claude Code in that folder and paste the prompt below. It reads the brief and starts building with you, one screen at a time.",
-        "Then just talk to it: “build the invoice list”, “make overdue rows red”, “add a print button”.",
+        "As a team, divide the screens so every member owns at least one. Then just talk to Claude, one screen at a time: “build the invoice list”, “make overdue rows red”, “add a print button”.",
+        "Every member must have commits — you each build at least one screen. When a screen works, paste the prompt below and Claude commits + pushes it under your name, lighting you up on the live board.",
       ],
-      snippet: KICKOFF_PROMPT,
-    },
-    {
-      title: "Commit & push after every screen 🔥",
-      body: [
-        "Every time a screen works, run these three lines. Each push lights your team up on the live board below.",
-        "Claude will remind you after each screen, so keep the terminal handy.",
-      ],
-      snippet: 'git add -A\ngit commit -m "Built <screen name>"\ngit push',
+      snippet:
+        "The screen I built works. Commit my changes with a clear message and push them " +
+        "to our repo. Make sure the commit is under my own name and Verve email so I get " +
+        "credit on the board.",
     },
   ];
 }
@@ -94,7 +95,10 @@ export function ActivityTwo({ onComplete }: { onComplete?: () => void }) {
   const { session } = useAuth();
   const { repos } = useRepos();
   const repoSlug = session?.teamId ? repos[session.teamId] ?? "" : "";
-  const guide = useMemo(() => buildGuide(repoSlug), [repoSlug]);
+  const guide = useMemo(
+    () => buildGuide(repoSlug, session?.displayName, session?.email),
+    [repoSlug, session?.displayName, session?.email],
+  );
 
   return (
     <div className="w-full max-w-5xl">
