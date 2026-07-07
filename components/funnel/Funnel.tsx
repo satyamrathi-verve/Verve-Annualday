@@ -58,21 +58,8 @@ const VIBE_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "vibe"));
 const GUESS_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "guess"));
 const ACTIVITY1_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity1"));
 const ACTIVITY2_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "activity2"));
-// Steps that require a session — a logged-out reload must not resume onto these.
-const AUTH_GATED = new Set([
-  "wait",
-  "brief",
-  "guess",
-  "wheelOutro",
-  "wait1",
-  "a1intro",
-  "activity1",
-  "a1outro",
-  "wait2",
-  "a2intro",
-  "activity2",
-  "bridge3",
-]);
+// The Activity 2 pre-video ("Task 2 · intro") — where a fresh sign-in lands.
+const A2INTRO_INDEX = Math.max(0, STEPS.findIndex((s) => s.key === "a2intro"));
 // Which nav tab each step lights up.
 const ACTIVITY1_KEYS = new Set(["wheelOutro", "wait1", "a1intro", "activity1", "a1outro"]);
 const ACTIVITY2_KEYS = new Set(["wait2", "a2intro", "activity2", "bridge3"]);
@@ -111,15 +98,22 @@ function FunnelInner() {
   // Drives the self-destruct "char" overlay on every forward hand-off.
   const [burning, setBurning] = useState(false);
 
-  // Resume where we left off — so a Google/email redirect lands the user back on
-  // the step they were on (signed in), instead of all the way at the start. But
-  // never resume onto an auth-gated step without a session — start at sign-in.
+  // Direct flow: a fresh visitor lands on the Google sign-in; signing in drops them
+  // straight at the Activity 2 pre-video (a2intro). The cold open, teasers, crew
+  // wheel and Activity 1 are skipped in the linear path. A Google/email redirect
+  // returns here already signed in, so we resume within the Activity 2 arc.
   const [index, setIndex] = useState(() => {
-    if (typeof window === "undefined") return 0;
+    if (typeof window === "undefined") return SIGNIN_INDEX;
+    // Not signed in → the sign-in door, every time.
+    if (!session) return SIGNIN_INDEX;
+    // Signed in → resume only within the Activity 2 arc (a2intro → activity2 →
+    // bridge3); anything earlier or unsaved jumps forward to the pre-video.
     const saved = window.sessionStorage.getItem(RESUME_KEY);
-    const parsed = saved ? parseInt(saved, 10) : 0;
-    const n = Number.isFinite(parsed) && parsed >= 0 && parsed < STEPS.length ? parsed : 0;
-    if (!session && AUTH_GATED.has(STEPS[n].key)) return SIGNIN_INDEX;
+    const parsed = saved ? parseInt(saved, 10) : NaN;
+    const n =
+      Number.isFinite(parsed) && parsed >= A2INTRO_INDEX && parsed < STEPS.length
+        ? parsed
+        : A2INTRO_INDEX;
     return n;
   });
 
@@ -193,7 +187,10 @@ function FunnelInner() {
       case "vibe":
         return <VibeCheck onNext={next} />;
       case "signin":
-        return <SignIn onNext={next} />;
+        // After sign-in, jump straight to the Activity 2 pre-video (skipping the
+        // wheel and Activity 1). This covers in-place email/code sign-in; the Google
+        // redirect lands via the initial-index logic above.
+        return <SignIn onNext={() => go(A2INTRO_INDEX)} />;
       case "wait":
         return <Wait onNext={ignite} onWhispers={() => go(VIBE_INDEX)} />;
       case "brief":
