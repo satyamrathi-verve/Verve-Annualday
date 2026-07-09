@@ -712,9 +712,16 @@ function TrendLineChart({
           role="img"
           aria-label="Cumulative commit trend for the top four teams"
           onMouseMove={(e) => {
-            if (n <= 1) return;
+            if (n <= 1 || innerW <= 0) return;
             const rect = e.currentTarget.getBoundingClientRect();
-            const rel = (e.clientX - rect.left - pad.l) / innerW;
+            if (rect.width <= 0) return;
+            // Map the pointer to SVG user space via the *rendered* width, so the
+            // math survives any scaling on ancestors. The app sets `html { zoom:
+            // 0.9 }`, which puts clientX / getBoundingClientRect in a different
+            // frame than the SVG's `width={w}` user units — dividing by
+            // rect.width (same frame as clientX) cancels that factor out.
+            const px = ((e.clientX - rect.left) / rect.width) * w;
+            const rel = (px - pad.l) / innerW;
             setHover(Math.max(0, Math.min(1, rel)));
           }}
           onMouseLeave={() => setHover(null)}
