@@ -622,6 +622,7 @@ function TrendChart({ rows, since }: { rows: TeamRow[]; since: string }) {
 
 const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
 const CARD = "#101a2e"; // --color-card — rings overlapping dots against the surface
+const TOOLTIP_W = 160; // approx trend-tooltip width, for right-edge flip logic
 
 function useMeasuredWidth() {
   const ref = useRef<HTMLDivElement>(null);
@@ -667,6 +668,9 @@ function TrendLineChart({
 }) {
   const { boundaries, teamSeries, maxY } = chart;
   const [ref, w] = useMeasuredWidth();
+  // Continuous cursor position across the plot area (0 = left edge, 1 = right),
+  // kept fractional — not snapped to a bucket — so the crosshair, dots and
+  // tooltip track the pointer exactly instead of jumping bucket-to-bucket.
   const [hover, setHover] = useState<number | null>(null);
 
   const H = 300;
@@ -686,6 +690,19 @@ function TrendLineChart({
     Math.round((k / Math.max(1, labelCount - 1)) * (n - 1)),
   );
 
+  // Interpolate along the drawn line at the exact cursor position. Because the
+  // polyline is straight between vertices and x()/y() are affine, the point
+  // (hoverX, y(valueAt)) sits precisely on the segment the pointer is over.
+  const hoverX = hover == null ? null : pad.l + hover * innerW;
+  const idxF = (hover ?? 0) * (n - 1);
+  const i0 = Math.floor(idxF);
+  const i1 = Math.min(n - 1, i0 + 1);
+  const frac = idxF - i0;
+  const valueAt = (series: number[]) =>
+    (series[i0] ?? 0) + ((series[i1] ?? 0) - (series[i0] ?? 0)) * frac;
+  const timeAt =
+    (boundaries[i0] ?? 0) + ((boundaries[i1] ?? boundaries[i0] ?? 0) - (boundaries[i0] ?? 0)) * frac;
+
   return (
     <div ref={ref} className="relative w-full" style={{ height: H }}>
       {w > 0 && (
@@ -698,7 +715,7 @@ function TrendLineChart({
             if (n <= 1) return;
             const rect = e.currentTarget.getBoundingClientRect();
             const rel = (e.clientX - rect.left - pad.l) / innerW;
-            setHover(Math.max(0, Math.min(n - 1, Math.round(rel * (n - 1)))));
+            setHover(Math.max(0, Math.min(1, rel)));
           }}
           onMouseLeave={() => setHover(null)}
         >
@@ -765,10 +782,10 @@ function TrendLineChart({
           ))}
 
           {/* hover crosshair */}
-          {hover != null && (
+          {hoverX != null && (
             <line
-              x1={x(hover)}
-              x2={x(hover)}
+              x1={hoverX}
+              x2={hoverX}
               y1={pad.t}
               y2={y(0)}
               className="text-verve-400"
@@ -798,10 +815,10 @@ function TrendLineChart({
                 stroke={CARD}
                 strokeWidth={1.5}
               />
-              {hover != null && (
+              {hoverX != null && (
                 <circle
-                  cx={x(hover)}
-                  cy={y(series[hover] ?? 0)}
+                  cx={hoverX}
+                  cy={y(valueAt(series))}
                   r={4}
                   fill={row.color}
                   stroke={CARD}
@@ -814,15 +831,24 @@ function TrendLineChart({
       )}
 
       {/* hover tooltip */}
-      {hover != null && w > 0 && (
+      {hoverX != null && w > 0 && (
         <div
           className="pointer-events-none absolute z-10 rounded-lg border border-line bg-surface/95 px-3 py-2 shadow-xl"
-          style={{ left: Math.min(x(hover) + 12, w - 160), top: pad.t }}
+          style={{
+            // Hug the crosshair: sit to its right, but flip to the left when
+            // there's no room — so the tooltip keeps tracking the cursor near
+            // the right edge instead of freezing at a clamped position.
+            left:
+              hoverX + 12 + TOOLTIP_W <= w
+                ? hoverX + 12
+                : Math.max(4, hoverX - 12 - TOOLTIP_W),
+            top: pad.t,
+          }}
         >
-          <p className="font-mono text-[10px] text-faint">{fmtClock(boundaries[hover], spanMs)}</p>
+          <p className="font-mono text-[10px] text-faint">{fmtClock(timeAt, spanMs)}</p>
           <ul className="mt-1 flex flex-col gap-0.5">
             {[...teamSeries]
-              .sort((a, b) => (b.series[hover] ?? 0) - (a.series[hover] ?? 0))
+              .sort((a, b) => valueAt(b.series) - valueAt(a.series))
               .map(({ row, series }) => (
                 <li key={row.id} className="flex items-center gap-1.5 whitespace-nowrap">
                   <span
@@ -831,7 +857,7 @@ function TrendLineChart({
                   />
                   <span className="font-mono text-[11px] text-body">{row.name}</span>
                   <span className="ml-auto pl-3 font-mono text-[11px] font-bold text-navy">
-                    {series[hover] ?? 0}
+                    {Math.round(valueAt(series))}
                   </span>
                 </li>
               ))}
